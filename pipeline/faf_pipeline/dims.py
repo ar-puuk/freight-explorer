@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from faf_pipeline.config import Context, ConfigError
+from faf_pipeline.config import ConfigError, Context
 from faf_pipeline.duck import connect, sql_literal, write_parquet
 from faf_pipeline.fetch import extracted
 

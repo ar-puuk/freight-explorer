@@ -7,7 +7,7 @@ from typing import Any
 
 import yaml
 
-from faf_pipeline.config import Context, ConfigError
+from faf_pipeline.config import ConfigError, Context
 from faf_pipeline.duck import connect, sql_literal, write_parquet
 
 YEAR_MEASURES = ("tons_kt", "value_const_musd", "value_current_musd", "tmiles_m", "ab_tons_k", "ba_tons_k", "tot_tons_k",

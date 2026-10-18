@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
 from typing import Any
 
-from faf_pipeline.config import Context, ConfigError
-from faf_pipeline.dims import SHEETS, _sheet, metadata_path, zones as zone_lookup
+from faf_pipeline.config import ConfigError, Context
+from faf_pipeline.dims import _sheet, metadata_path
+from faf_pipeline.dims import zones as zone_lookup
 from faf_pipeline.duck import connect, sql_literal, write_json, write_parquet
 from faf_pipeline.fetch import extracted
 

@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-import math
 import re
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-from faf_pipeline.config import Context, ConfigError
+from faf_pipeline.config import ConfigError, Context
 from faf_pipeline.dims import state_zone_ids
 from faf_pipeline.duck import connect, sql_literal, write_parquet
 from faf_pipeline.fetch import extract_member, extracted, plan

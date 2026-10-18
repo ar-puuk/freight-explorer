@@ -38,7 +38,7 @@ def check_pmtiles(path: Path) -> dict[str, Any]:
     raw = b[meta_off:meta_off + meta_len]
     meta = json.loads(gzip.decompress(raw) if internal_comp == 2 else raw)
     min_lon, min_lat, max_lon, max_lat = (v / 1e7 for v in struct.unpack_from("<iiii", b, 102))
-    return {"layers": [l["id"] for l in meta.get("vector_layers", [])], "bounds": (min_lon, min_lat, max_lon, max_lat),
+    return {"layers": [layer["id"] for layer in meta.get("vector_layers", [])], "bounds": (min_lon, min_lat, max_lon, max_lat),
             "minzoom": b[100], "maxzoom": b[101]}
 
 
@@ -48,7 +48,9 @@ def run(ctx: Context, previous_versions: dict[str, Any] | None = None, log=print
     out = ctx.paths.out
     con = connect()
     products = [p for p in ("faf5", "faf6") if (out / p / "flows").exists()]
-    dim = lambda name: sql_literal((out / "meta" / f"{name}.parquet").as_posix())
+
+    def dim(name: str) -> str:
+        return sql_literal((out / "meta" / f"{name}.parquet").as_posix())
 
     # ---- per product flows
     for p in products:
@@ -226,7 +228,7 @@ def scan_state_literals(ctx: Context) -> list[str]:
     from faf_pipeline.dims import state_zone_ids
     s = ctx.state
     zone_ids = sorted({z for p in ("faf5", "faf6") for z in state_zone_ids(ctx, p)})
-    pats = [(re.compile(rf"\b{re.escape(s.name)}\b", re.I), f"state name {s.name!r}"),
+    pats = [(re.compile(rf"\b{re.escape(s.name)}\b", re.IGNORECASE), f"state name {s.name!r}"),
             (re.compile(rf"""['"]{re.escape(s.abbrev)}['"]"""), f"abbreviation {s.abbrev!r}"),
             (re.compile(rf"""['"]{re.escape(s.fips)}['"]"""), f"fips {s.fips!r}")]
     pats += [(re.compile(rf"""['"]{z}['"]"""), f"zone id {z!r}") for z in zone_ids]

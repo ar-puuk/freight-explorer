@@ -35,7 +35,7 @@ class State:
     overrides: dict[str, Any]
 
     @classmethod
-    def from_dict(cls, slug: str, d: dict[str, Any]) -> "State":
+    def from_dict(cls, slug: str, d: dict[str, Any]) -> State:
         missing = [k for k in ("name", "abbrev", "fips", "bbox", "center", "zoom", "site_title", "network_buffer_km") if k not in d]
         if missing:
             raise ConfigError(f"state config {slug}.yml is missing: {', '.join(missing)}")

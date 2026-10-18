@@ -12,7 +12,7 @@ from urllib.parse import unquote, urlparse
 
 import httpx
 
-from faf_pipeline.config import Context, ConfigError
+from faf_pipeline.config import ConfigError, Context
 
 _DIR_FOR_PRODUCT = {"census_county_centers": "census"}    # everything else lives in data-raw/<product>/
 
