@@ -1,0 +1,23 @@
+# raw downloads (only the manifest is tracked)
+data-raw/*
+!data-raw/manifest.json
+!data-raw/.gitkeep
+*.zip
+*.csv
+*.xlsx
+*.gdb
+!docs/**/*.zip
+!docs/**/*.csv
+!docs/**/*.xlsx
+!docs/**/*.gdb
+
+# python
+pipeline/.venv
+__pycache__/
+.ruff_cache/
+.pytest_cache/
+
+# web
+web/node_modules
+
+.DS_Store
