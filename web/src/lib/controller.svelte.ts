@@ -1,7 +1,11 @@
+import { exportFileName, tableToCsv } from './csv';
 import { formatMeasure } from './format';
-import { Db, loadHeadline, loadLocations, loadMeta, loadZones, productKey, yearsFor, type Meta, type ZoneGeoJSON } from './data';
+import { Db, loadHeadline, loadLocations, loadMeta, loadZones, productKey, scenariosFor, yearsFor, type Meta, type ZoneGeoJSON } from './data';
 import { MapView, type FlowmapPick } from './mapview';
-import { balanceSql, breakdownSql, flowsSql, flowTotalsSql, kpiSql, measureColumn, modeSharesSql, pairBreakdownSql, type FlowFilter } from './sql';
+import {
+  balanceSql, breakdownSql, compareSql, flowsSql, flowTotalsSql, heatmapSql, kpiSql, measureColumn, modeSharesSql, modeTrendSql,
+  pairBreakdownSql, partnersSql, TABLE_DIM_SQL, tableSql, trendSql, type FlowFilter,
+} from './sql';
 import { applyTheme, defaultBasemap, onSystemThemeChange, resolveTheme, type ResolvedTheme } from './theme';
 import type { AppState, FlowRow, ZoneInfo } from './types';
 import { decode, encode, type Allowed } from './urlstate';
@@ -23,7 +27,42 @@ export type Detail =
   | { kind: 'flow'; originId: string; destId: string; count: number; byCommodity: Breakdown[]; byMode: Breakdown[]; byTrade: Breakdown[] }
   | { kind: 'link'; id: number; attrs: Record<string, unknown>; volumes: Record<string, unknown>[]; dictionary: Record<string, { label: string; description: string; unit: string | null; caveat: string | null }> };
 
+export interface TrendPoint {
+  scenario: string;
+  year: number;
+  data_version: string;
+  v: number;
+}
+export interface OtherSeries {
+  version: string;
+  benchmarkYear: number;
+  points: TrendPoint[];
+}
+export interface Trends {
+  points: TrendPoint[]; // this version, all scenarios
+  modes: { year: number; code: string; label: string; v: number }[];
+  other: OtherSeries | null;
+}
+export interface CompareSeries {
+  item: string;
+  label: string;
+  points: { year: number; v: number; data_version: string }[];
+}
+export interface Summary {
+  partners: Breakdown[];
+  commodities: Breakdown[];
+  modes: Breakdown[];
+  heat: { commodity: string; mode: string; v: number }[];
+}
+export interface TableResult {
+  rows: Record<string, unknown>[];
+  dims: string[];
+  total: number;
+}
+
 const NET_YEARS_FALLBACK = [2017, 2022, 2050];
+export const TABLE_PAGE = 200;
+const EXPORT_MAX = 250_000;
 
 export class Controller {
   meta = $state<Meta | null>(null);
@@ -47,6 +86,15 @@ export class Controller {
   linkCount = $state<number | null>(null);
   headlineShown = $state(false);
 
+  // charts drawer
+  summary = $state<Summary | null>(null);
+  trends = $state<Trends | null>(null);
+  compareSeries = $state<CompareSeries[]>([]);
+  table = $state<TableResult | null>(null);
+  panelBusy = $state(false);
+  private panelReq = 0;
+  private tables = new Set<string>();
+
   locations = new Map<string, ZoneInfo>();
   private zones: ZoneGeoJSON | null = null;
   private view: MapView | null = null;
@@ -68,10 +116,12 @@ export class Controller {
       commodities: [], modes: [], topN: 50, minFlow: 0, selected: null,
       layers: { flows: true, network: false, zones: true }, net: { year: netYears[0], truck: 'all', market: 'total', connectors: false },
       basemap: null, theme: 'system', cam: null,
+      panel: 'closed', compare: { kind: 'zone', ids: [] }, overlayOther: false, tableDims: ['orig', 'dest', 'sctg2'],
     };
     this.allowed = {
       versions,
-      years: (v) => yearsFor(m, v),
+      scenarios: (v) => scenariosFor(m, v),
+      years: (v, sc) => yearsFor(m, v, sc),
       defaultYear: (v) => m.versions.products[productKey(m, v)].default_year,
       netYears,
     };
@@ -92,10 +142,14 @@ export class Controller {
     return this.meta!.versions.products[this.product].benchmark_year;
   }
   get yearList(): number[] {
-    return yearsFor(this.meta!, this.s.version);
+    return yearsFor(this.meta!, this.s.version, this.s.scenario);
+  }
+  get scenarioList(): string[] {
+    return scenariosFor(this.meta!, this.s.version);
   }
   get dataVersionOfYear(): string {
-    return this.meta!.versions.products[this.product].years[String(this.s.year)];
+    const p = this.meta!.versions.products[this.product];
+    return (this.s.scenario === 'mid' ? p.years : (p.scenarios?.[this.s.scenario]?.years ?? {}))[String(this.s.year)];
   }
   get dim() {
     return this.meta!.dims.versions[this.s.version];
@@ -163,7 +217,7 @@ export class Controller {
   private isDefaultView(): boolean {
     const d = this.defaults;
     const s = this.s;
-    return s.version === d.version && s.year === d.year && s.view === 'total' && s.direction === 'both' && s.measure === 'tons' && !s.commodities.length && !s.modes.length && !s.selected && s.topN === 50 && s.minFlow === 0;
+    return s.version === d.version && s.scenario === 'mid' && s.year === d.year && s.view === 'total' && s.direction === 'both' && s.measure === 'tons' && !s.commodities.length && !s.modes.length && !s.selected && s.topN === 50 && s.minFlow === 0;
   }
 
   private async loadVersionGeometry(): Promise<void> {
@@ -218,6 +272,7 @@ export class Controller {
       this.headlineShown = false;
       this.view?.setFlows([...this.locations.values()], flows);
       if (this.detail?.kind === 'zone') void this.showZone(this.detail.id);
+      void this.loadPanel();
       this.error = null;
     } catch (e) {
       if (id === this.reqId) {
@@ -269,13 +324,28 @@ export class Controller {
   async setVersion(version: string): Promise<void> {
     const m = this.meta!;
     this.s.version = version;
+    this.s.scenario = 'mid';
     this.s.year = this.allowed.defaultYear(version);
+    this.s.compare.ids = [];
     this.s.selected = null;
     this.detail = null;
     this.notice = null;
     this.stateZones = m.state.zones[version];
     this.headlineShown = false;
     await this.loadVersionGeometry();
+    void this.refresh();
+  }
+
+  /** High and Low exist for forecast years only; switching to one from an annual year moves to its first forecast year. */
+  setScenario(sc: string): void {
+    const years = yearsFor(this.meta!, this.s.version, sc);
+    this.s.scenario = sc;
+    if (!years.includes(this.s.year)) {
+      this.s.year = years.find((y) => y >= this.s.year) ?? years[0];
+      this.notice = `${sc[0].toUpperCase() + sc.slice(1)} scenario is published for forecast years only; showing ${this.s.year}.`;
+    } else {
+      this.notice = null;
+    }
     void this.refresh();
   }
 
@@ -318,7 +388,7 @@ export class Controller {
   }
 
   url(): string {
-    return encode(this.s, this.defaults, this.allowed.defaultYear);
+    return encode(this.s, this.defaults, this.allowed.defaultYear, (v, sc) => yearsFor(this.meta!, v, sc)[0] ?? 0);
   }
 
   // ---- selection / detail
@@ -417,6 +487,176 @@ export class Controller {
       this.s.selected = null;
       void this.refresh();
     }
+  }
+
+  // ---- charts drawer ---------------------------------------------------------------------------------------------
+  setPanel(p: AppState['panel']): void {
+    this.s.panel = p;
+    if (p !== 'closed') void this.loadPanel();
+  }
+
+  /** (Re)load whatever the open tab needs. Called when the tab or any filter changes. */
+  async loadPanel(): Promise<void> {
+    const p = this.s.panel;
+    if (p === 'closed' || this.dbState === 'idle') return;
+    const id = ++this.panelReq;
+    this.panelBusy = true;
+    try {
+      if (p === 'summary') await this.loadSummary(id);
+      else if (p === 'trends') await this.loadTrends(id);
+      else if (p === 'compare') await this.loadCompare(id);
+      else await this.loadTable(id);
+    } catch (e) {
+      if (id === this.panelReq) this.error = `Could not load chart data: ${e instanceof Error ? e.message : String(e)}`;
+    } finally {
+      if (id === this.panelReq) this.panelBusy = false;
+    }
+  }
+
+  /** All years and scenarios of one FAF version in one in-memory table, downloaded once. */
+  private async allYears(version: string): Promise<string> {
+    const m = this.meta!;
+    const key = productKey(m, version);
+    const table = `t_${key}`;
+    if (!this.tables.has(table)) {
+      const p = m.versions.products[key];
+      const paths = Object.keys(p.years).map((y) => `${key}/flows/${p.scenario}/${y}.parquet`);
+      for (const [sc, v] of Object.entries(p.scenarios ?? {})) for (const y of Object.keys(v.years)) paths.push(`${key}/flows/${sc}/${y}.parquet`);
+      await this.db.loadTable(table, paths);
+      this.tables.add(table);
+    }
+    return table;
+  }
+
+  private label(kind: 'sctg2' | 'dms_mode' | 'trade_type', code: string): string {
+    const d = kind === 'sctg2' ? this.dim.commodity : kind === 'dms_mode' ? this.dim.mode : this.dim.trade_type;
+    return d[code] ?? code;
+  }
+
+  private async loadSummary(id: number): Promise<void> {
+    const src = await this.db.file(`${this.product}/flows/${this.s.scenario}/${this.s.year}.parquet`);
+    const f = this.filter;
+    const [partners, commodities, heat] = await Promise.all([
+      this.db.query<{ code: string; magnitude: number }>(partnersSql(src, f, this.stateZones, 10)),
+      this.db.query<{ code: string; magnitude: number }>(breakdownSql(src, f, this.stateZones, 'sctg2', null, 10)),
+      this.db.query<{ commodity: string; mode: number; v: number }>(heatmapSql(src, f, this.stateZones)),
+    ]);
+    if (id !== this.panelReq) return;
+    this.summary = {
+      partners: partners.map((r) => ({ code: String(r.code), label: this.name(String(r.code)), magnitude: r.magnitude })),
+      commodities: commodities.map((r) => ({ code: String(r.code), label: this.label('sctg2', String(r.code)), magnitude: r.magnitude })),
+      modes: this.modeShares,
+      heat: heat.map((r) => ({ commodity: String(r.commodity), mode: String(r.mode), v: r.v })),
+    };
+  }
+
+  private async loadTrends(id: number): Promise<void> {
+    const f = this.filter;
+    const tbl = await this.allYears(this.s.version);
+    const [points, modes] = await Promise.all([
+      this.db.query<TrendPoint>(trendSql(tbl, f, this.stateZones)),
+      this.db.query<{ year: number; code: number; v: number }>(modeTrendSql(tbl, f, this.stateZones)),
+    ]);
+    let other: OtherSeries | null = null;
+    if (this.s.overlayOther) {
+      const ov = this.allowed.versions.find((v) => v !== this.s.version);
+      if (ov) {
+        const otbl = await this.allYears(ov);
+        const rows = await this.db.query<TrendPoint>(trendSql(otbl, f, this.meta!.state.zones[ov]));
+        other = { version: ov, benchmarkYear: this.meta!.versions.products[productKey(this.meta!, ov)].benchmark_year, points: rows.filter((r) => r.scenario === 'mid') };
+      }
+    }
+    if (id !== this.panelReq) return;
+    this.trends = { points, modes: modes.map((r) => ({ year: r.year, code: String(r.code), label: this.label('dms_mode', String(r.code)), v: r.v })), other };
+  }
+
+  private async loadCompare(id: number): Promise<void> {
+    const { kind, ids } = this.s.compare;
+    if (!ids.length) {
+      this.compareSeries = [];
+      return;
+    }
+    const tbl = await this.allYears(this.s.version);
+    const rows = await this.db.query<{ item: string; year: number; data_version: string; v: number }>(compareSql(tbl, this.filter, this.stateZones, kind, ids));
+    if (id !== this.panelReq) return;
+    this.compareSeries = ids.map((item) => ({
+      item,
+      label: kind === 'zone' ? this.name(item) : this.label('sctg2', item),
+      points: rows.filter((r) => String(r.item) === item).map((r) => ({ year: r.year, v: r.v, data_version: r.data_version })),
+    }));
+  }
+
+  setCompare(patch: Partial<AppState['compare']>): void {
+    if (patch.kind && patch.kind !== this.s.compare.kind) this.s.compare.ids = [];
+    Object.assign(this.s.compare, patch);
+    void this.loadPanel();
+  }
+
+  addCompare(item: string): void {
+    const ids = this.s.compare.ids;
+    if (!item || ids.includes(item) || ids.length >= 6) return;
+    this.setCompare({ ids: [...ids, item] });
+  }
+
+  removeCompare(item: string): void {
+    this.setCompare({ ids: this.s.compare.ids.filter((i) => i !== item) });
+  }
+
+  setOverlayOther(on: boolean): void {
+    this.s.overlayOther = on;
+    void this.loadPanel();
+  }
+
+  private decorateRows(rows: Record<string, unknown>[], dims: string[]): Record<string, unknown>[] {
+    const aliases = dims.map((d) => TABLE_DIM_SQL[d](this.s.view).alias);
+    return rows.map((r) => {
+      const o = { ...r };
+      for (const a of aliases) {
+        const raw = r[a];
+        if (raw == null) continue;
+        const code = String(raw);
+        o[`${a}_label`] = a === 'origin' || a === 'destination' ? this.name(code) : a === 'sctg2' ? this.label('sctg2', code) : a === 'domestic_mode' ? this.label('dms_mode', code) : this.label('trade_type', code);
+      }
+      return o;
+    });
+  }
+
+  private async loadTable(id: number): Promise<void> {
+    const src = await this.db.file(`${this.product}/flows/${this.s.scenario}/${this.s.year}.parquet`);
+    const dims = this.s.tableDims;
+    const [rows, count] = await Promise.all([
+      this.db.query(tableSql(src, this.filter, this.stateZones, dims, TABLE_PAGE)),
+      this.db.query<{ n: number }>(`SELECT count(*)::INTEGER AS n FROM (${tableSql(src, this.filter, this.stateZones, dims, null)})`),
+    ]);
+    if (id !== this.panelReq) return;
+    this.table = { rows: this.decorateRows(rows, dims), dims, total: count[0].n };
+  }
+
+  setTableDims(dims: string[]): void {
+    this.s.tableDims = dims;
+    void this.loadPanel();
+  }
+
+  /** CSV of the whole filtered table (not just the visible page), with version, scenario, year, status and dollar basis on every row. */
+  async exportCsv(): Promise<void> {
+    const src = await this.db.file(`${this.product}/flows/${this.s.scenario}/${this.s.year}.parquet`);
+    const dims = this.s.tableDims;
+    const rows = this.decorateRows(await this.db.query(tableSql(src, this.filter, this.stateZones, dims, EXPORT_MAX)), dims);
+    const aliases = dims.map((d) => TABLE_DIM_SQL[d](this.s.view).alias);
+    const dimHeaders = aliases.flatMap((a) => [a, `${a}_label`]);
+    const keys = dimHeaders;
+    const meta = {
+      faf_version: this.s.version, scenario: this.s.scenario, year: this.s.year, data_version: this.dataVersionOfYear,
+      view: this.s.view, direction: this.s.direction,
+      dollar_basis: this.s.dollars === 'const' ? `constant ${this.benchmarkYear} dollars` : 'current dollars',
+    };
+    const csv = tableToCsv(meta, dimHeaders, rows as Record<string, string | number | null>[], keys);
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = exportFileName(meta);
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   // ---- formatting helpers bound to the current state

@@ -41,7 +41,7 @@ export function directionClause(direction: Direction, stateZones: string[]): str
   return `(dms_orig IN (${s}) AND dms_dest IN (${s}))`;
 }
 
-export function whereClause(f: FlowFilter, stateZones: string[], opts: { ignoreDirection?: boolean } = {}): string {
+export function whereClause(f: FlowFilter, stateZones: string[], opts: { ignoreDirection?: boolean; ignoreModes?: boolean; ignoreCommodities?: boolean } = {}): string {
   const parts: string[] = [];
   if (f.view === 'domestic') parts.push('trade_type = 1');
   if (f.view === 'import') parts.push('trade_type = 2');
@@ -50,8 +50,8 @@ export function whereClause(f: FlowFilter, stateZones: string[], opts: { ignoreD
     const dir = directionClause(f.direction, stateZones);
     if (dir) parts.push(dir);
   }
-  if (f.commodities.length) parts.push(`sctg2 IN (${inList(f.commodities, SCTG_RX)})`);
-  if (f.modes.length) {
+  if (f.commodities.length && !opts.ignoreCommodities) parts.push(`sctg2 IN (${inList(f.commodities, SCTG_RX)})`);
+  if (f.modes.length && !opts.ignoreModes) {
     if (f.modes.some((m) => !Number.isInteger(m))) throw new Error('invalid mode code');
     parts.push(`dms_mode IN (${f.modes.join(', ')})`);
   }
@@ -128,5 +128,83 @@ export function pairBreakdownSql(src: string, f: FlowFilter, stateZones: string[
   return (
     `SELECT ${column} AS code, sum(${m}) AS magnitude FROM ${src} WHERE ${whereClause(f, stateZones)} AND ${o} = '${origin}' AND ${d} = '${dest}' ` +
     `GROUP BY 1 HAVING sum(${m}) > 0 ORDER BY magnitude DESC LIMIT ${Math.floor(limit)}`
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Phase 3: charts, compare, table. `tbl` is a table (or read_parquet) holding the rows; trend queries need the all-years
+// table with a `scenario` column.
+
+/** Trend of the current filters by scenario and year. Years where the measure is not published drop out. */
+export function trendSql(tbl: string, f: FlowFilter, stateZones: string[], opts: { ignoreModes?: boolean } = {}): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT scenario, year::INTEGER AS year, any_value(data_version) AS data_version, sum(${m}) AS v FROM ${tbl} ` +
+    `WHERE ${whereClause(f, stateZones, opts)} GROUP BY 1, 2 HAVING sum(${m}) IS NOT NULL ORDER BY 1, 2`
+  );
+}
+
+/** Mode share over years (the mode filter is ignored so the stack shows every mode). */
+export function modeTrendSql(tbl: string, f: FlowFilter, stateZones: string[]): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT year::INTEGER AS year, dms_mode AS code, sum(${m}) AS v FROM ${tbl} WHERE scenario = 'mid' AND ${whereClause(f, stateZones, { ignoreModes: true })} ` +
+    `GROUP BY 1, 2 HAVING sum(${m}) > 0 ORDER BY 1, 2`
+  );
+}
+
+/** The non-state end of each flow, by view. Within-state flows have no partner (NULL) and are excluded by the caller. */
+export function partnerExpr(view: View, stateZones: string[]): string {
+  const s = inList(stateZones, ZONE_RX);
+  if (view === 'import') return `CASE WHEN dms_dest IN (${s}) THEN fr_orig WHEN dms_orig IN (${s}) THEN dms_dest END`;
+  if (view === 'export') return `CASE WHEN dms_orig IN (${s}) THEN fr_dest WHEN dms_dest IN (${s}) THEN dms_orig END`;
+  return `CASE WHEN dms_dest IN (${s}) AND dms_orig NOT IN (${s}) THEN dms_orig WHEN dms_orig IN (${s}) AND dms_dest NOT IN (${s}) THEN dms_dest END`;
+}
+
+export function partnersSql(src: string, f: FlowFilter, stateZones: string[], limit = 10): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT partner AS code, sum(magnitude) AS magnitude FROM (SELECT ${partnerExpr(f.view, stateZones)} AS partner, ${m} AS magnitude FROM ${src} ` +
+    `WHERE ${whereClause(f, stateZones)}) WHERE partner IS NOT NULL GROUP BY 1 HAVING sum(magnitude) > 0 ORDER BY magnitude DESC, code LIMIT ${Math.floor(limit)}`
+  );
+}
+
+/** Commodity x mode matrix for the current filters. */
+export function heatmapSql(src: string, f: FlowFilter, stateZones: string[]): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return `SELECT sctg2 AS commodity, dms_mode AS mode, sum(${m}) AS v FROM ${src} WHERE ${whereClause(f, stateZones)} GROUP BY 1, 2 HAVING sum(${m}) > 0`;
+}
+
+/** One line per compared item (zone: flows involving it; commodity: that SCTG code), mid-range scenario, all years. */
+export function compareSql(tbl: string, f: FlowFilter, stateZones: string[], kind: 'zone' | 'commodity', ids: string[]): string {
+  const m = measureColumn(f.measure, f.dollars);
+  const re = kind === 'zone' ? ZONE_RX : SCTG_RX;
+  const list = inList(ids, re);
+  const { o, d } = endpoints(f.view);
+  const on = kind === 'zone' ? `(${o} = ids.item OR ${d} = ids.item)` : 'sctg2 = ids.item';
+  const filter = whereClause(f, stateZones, kind === 'commodity' ? { ignoreCommodities: true } : {});
+  return (
+    `SELECT ids.item AS item, year::INTEGER AS year, any_value(data_version) AS data_version, sum(${m}) AS v FROM ${tbl} ` +
+    `JOIN (SELECT unnest([${list}]) AS item) ids ON ${on} WHERE scenario = 'mid' AND ${filter} GROUP BY 1, 2 HAVING sum(${m}) IS NOT NULL ORDER BY 1, 2`
+  );
+}
+
+export const TABLE_DIM_SQL: Record<string, (view: View) => { col: string; alias: string }> = {
+  orig: (v) => ({ col: endpoints(v).o, alias: 'origin' }),
+  dest: (v) => ({ col: endpoints(v).d, alias: 'destination' }),
+  sctg2: () => ({ col: 'sctg2', alias: 'sctg2' }),
+  dms_mode: () => ({ col: 'dms_mode', alias: 'domestic_mode' }),
+  trade_type: () => ({ col: 'trade_type', alias: 'trade_type' }),
+};
+
+/** Group-by table of the current filters: chosen dimensions plus all four measures (NULL = not published). */
+export function tableSql(src: string, f: FlowFilter, stateZones: string[], dims: string[], limit: number | null): string {
+  const picked = dims.filter((d) => d in TABLE_DIM_SQL).map((d) => TABLE_DIM_SQL[d](f.view));
+  const sel = picked.map((p) => `${p.col} AS ${p.alias}`);
+  const by = picked.length ? `GROUP BY ${picked.map((_, i) => i + 1).join(', ')}` : '';
+  const order = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT ${[...sel, 'sum(tons_kt) AS tons_kt', 'sum(value_const_musd) AS value_const_musd', 'sum(value_current_musd) AS value_current_musd', 'sum(tmiles_m) AS tmiles_m'].join(', ')} ` +
+    `FROM ${src} WHERE ${whereClause(f, stateZones)} ${by} ORDER BY sum(${order}) DESC NULLS LAST, ${picked.length ? picked.map((_, i) => i + 1).join(', ') : '1'}${limit ? ` LIMIT ${Math.floor(limit)}` : ''}`
   );
 }

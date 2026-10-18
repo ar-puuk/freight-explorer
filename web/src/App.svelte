@@ -2,6 +2,7 @@
   import 'maplibre-gl/dist/maplibre-gl.css';
   import { onMount } from 'svelte';
   import Controls from './components/Controls.svelte';
+  import Charts from './components/Charts.svelte';
   import Detail from './components/Detail.svelte';
   import Kpis from './components/Kpis.svelte';
   import { Controller } from './lib/controller.svelte';
@@ -46,6 +47,9 @@
     {#if ready}
       <button class="btn sheet-toggle" type="button" aria-expanded={sheetOpen} onclick={() => (sheetOpen = !sheetOpen)}>{sheetOpen ? 'Hide' : 'Show'} filters</button>
       <span class="spacer"></span>
+      <button class="btn" type="button" aria-expanded={ctrl.s.panel !== 'closed'} onclick={() => ctrl.setPanel(ctrl.s.panel === 'closed' ? 'summary' : 'closed')}>
+        {ctrl.s.panel === 'closed' ? 'Charts and tables' : 'Hide charts'}
+      </button>
       <label>Basemap
         <select value={ctrl.s.basemap ?? ''} onchange={(e) => ctrl.setBasemap(e.currentTarget.value || null)} aria-label="Basemap">
           <option value="">Auto ({ctrl.theme === 'dark' ? 'Dark' : 'Positron'})</option>
@@ -66,11 +70,12 @@
     {#if ready}<Controls {ctrl} />{:else if fatal}<p class="error" role="alert">{fatal}</p>{:else}<p class="muted">Loading…</p>{/if}
   </aside>
 
-  <main class="stage">
+  <main class="stage" class:drawer-open={ready && ctrl.s.panel !== 'closed'}>
     <div class="map" bind:this={mapEl} role="application" aria-label="Freight flow map"></div>
     {#if ready}
       <Kpis {ctrl} />
       <Detail {ctrl} />
+      <Charts {ctrl} />
 
       {#if ctrl.hover}
         <div class="card tooltip" style={`left:${ctrl.hover.x + 14}px;top:${ctrl.hover.y + 14}px`}>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Controller } from '../lib/controller.svelte';
   import { formatPercent, formatTonMiles, formatTons, formatValue, formatValuePerTon } from '../lib/format';
+  import { modeColor } from '../lib/palette';
 
   let { ctrl }: { ctrl: Controller } = $props();
 
@@ -9,8 +10,7 @@
   const bal = $derived(ctrl.balance);
   const balTotal = $derived(bal ? bal.inbound + bal.outbound + bal.within : 0);
 
-  // mode palette: distinguishable without color alone because every segment is also listed with its share in the title/list
-  const MODE_COLORS = ['#1f6f8b', '#c2410c', '#5b8c2a', '#8a5cc2', '#b8860b', '#0e7490', '#9a3412', '#64748b'];
+  // the mode palette is shared with the charts; segments are also named in the title and the text line, so color is never the only channel
   const modeTotal = $derived(ctrl.modeShares.reduce((a, m) => a + m.magnitude, 0));
 </script>
 
@@ -34,7 +34,7 @@
       <div class="k">Mode share (domestic leg)</div>
       {#if modeTotal > 0}
         <div class="bar" role="img" aria-label={ctrl.modeShares.map((m) => `${m.label} ${formatPercent(m.magnitude / modeTotal)}`).join(', ')}>
-          {#each ctrl.modeShares as m, i}<i title={`${m.label} ${formatPercent(m.magnitude / modeTotal)}`} style={`width:${(m.magnitude / modeTotal) * 100}%;background:${MODE_COLORS[(Number(m.code) - 1) % 8]}`}></i>{/each}
+          {#each ctrl.modeShares as m, i}<i title={`${m.label} ${formatPercent(m.magnitude / modeTotal)}`} style={`width:${(m.magnitude / modeTotal) * 100}%;background:${modeColor(m.code)}`}></i>{/each}
         </div>
         <div class="k">{ctrl.modeShares.slice(0, 3).map((m) => `${m.label.replace(/ \(.*\)/, '')} ${formatPercent(m.magnitude / modeTotal)}`).join(' · ')}</div>
       {:else}<div class="v">n/a</div>{/if}

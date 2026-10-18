@@ -33,8 +33,16 @@ export function productKey(meta: Meta, version: string): string {
   return hit[0];
 }
 
-export function yearsFor(meta: Meta, version: string): number[] {
-  return Object.keys(meta.versions.products[productKey(meta, version)].years).map(Number).sort((a, b) => a - b);
+export function yearsFor(meta: Meta, version: string, scenario = 'mid'): number[] {
+  const p = meta.versions.products[productKey(meta, version)];
+  const years = scenario === 'mid' ? p.years : (p.scenarios?.[scenario]?.years ?? {});
+  return Object.keys(years).map(Number).sort((a, b) => a - b);
+}
+
+/** 'mid' first, then whatever scenarios the version publishes (High and Low for FAF5.7.1). */
+export function scenariosFor(meta: Meta, version: string): string[] {
+  const p = meta.versions.products[productKey(meta, version)];
+  return ['mid', ...Object.keys(p.scenarios ?? {}).sort()];
 }
 
 export interface ZoneGeoJSON {
@@ -100,15 +108,27 @@ export class Db {
     this.conn = await this.db.connect();
   }
 
-  /** Register a Parquet file by its path under data/ and return the SQL source expression for it. */
-  async file(path: string): Promise<string> {
+  /** Register a Parquet file by its path under data/ and return its registered name. */
+  async register(path: string): Promise<string> {
     await this.ready();
     const name = path.replace(/[^A-Za-z0-9]+/g, '_') + '.parquet';
     if (!this.files.has(name)) {
       await this.db!.registerFileURL(name, DATA_BASE + path, duckdb.DuckDBDataProtocol.HTTP, false);
       this.files.add(name);
     }
-    return `read_parquet('${name}')`;
+    return name;
+  }
+
+  /** SQL source expression for one Parquet file under data/. */
+  async file(path: string): Promise<string> {
+    return `read_parquet('${await this.register(path)}')`;
+  }
+
+  /** Load many Parquet files into one in-memory table (downloaded once; later queries are local). */
+  async loadTable(table: string, paths: string[]): Promise<void> {
+    const names = await Promise.all(paths.map((p) => this.register(p)));
+    // DuckDB-WASM fetches each file with a plain GET (twice per file with caching off; the browser cache absorbs the second on Pages)
+    await this.query(`CREATE TABLE IF NOT EXISTS ${table} AS SELECT * FROM read_parquet([${names.map((n) => `'${n}'`).join(', ')}])`);
   }
 
   async query<T = Record<string, unknown>>(sql: string): Promise<T[]> {

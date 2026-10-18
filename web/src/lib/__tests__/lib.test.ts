@@ -88,13 +88,22 @@ describe('url state', () => {
     version: '5.7.1', scenario: 'mid', year: 2023, view: 'total', direction: 'both', measure: 'tons', dollars: 'const',
     commodities: [], modes: [], topN: 50, minFlow: 0, selected: null,
     layers: { flows: true, network: false, zones: true }, net: { year: 2017, truck: 'all', market: 'total', connectors: false },
-    basemap: null, theme: 'system', cam: null,
+    basemap: null, theme: 'system', cam: null, panel: 'closed', compare: { kind: 'zone', ids: [] }, overlayOther: false,
+    tableDims: ['orig', 'dest', 'sctg2'],
   };
-  const years: Record<string, number[]> = { '5.7.1': [2017, 2018, 2023, 2024, 2030], '6.0': [2022] };
-  const allowed: Allowed = { versions: ['5.7.1', '6.0'], years: (v) => years[v], defaultYear: (v) => (v === '6.0' ? 2022 : 2023), netYears: [2017, 2022, 2050] };
+  const years: Record<string, number[]> = { '5.7.1': [2017, 2018, 2023, 2024, 2030, 2035], '6.0': [2022] };
+  const scen: Record<string, number[]> = { high: [2030, 2035], low: [2030, 2035] };
+  const allowed: Allowed = {
+    versions: ['5.7.1', '6.0'],
+    scenarios: (v) => (v === '6.0' ? ['mid'] : ['mid', 'high', 'low']),
+    years: (v, sc) => (sc === 'mid' ? years[v] : scen[sc]),
+    defaultYear: (v) => (v === '6.0' ? 2022 : 2023),
+    netYears: [2017, 2022, 2050],
+  };
+  const firstScenarioYear = () => 2030;
 
   it('default state has a clean URL', () => {
-    expect(encode(defaults, defaults, allowed.defaultYear)).toBe('');
+    expect(encode(defaults, defaults, allowed.defaultYear, firstScenarioYear)).toBe('');
     expect(decode('', defaults, allowed)).toEqual(defaults);
   });
 
@@ -105,7 +114,7 @@ describe('url state', () => {
       layers: { flows: true, network: true, zones: false }, net: { year: 2050, truck: 'cu', market: 'import', connectors: true },
       basemap: 'dark', theme: 'dark', cam: [-111.9, 40.7, 7.25],
     };
-    const url = encode(s, defaults, allowed.defaultYear);
+    const url = encode(s, defaults, allowed.defaultYear, firstScenarioYear);
     const back = decode(url, defaults, allowed);
     expect(back).toEqual({ ...s, commodities: ['02', '15'], modes: [1, 2] });
   });

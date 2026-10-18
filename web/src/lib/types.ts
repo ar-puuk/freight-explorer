@@ -5,6 +5,8 @@ export type Dollars = 'const' | 'current';
 export type TruckType = 'all' | 'su' | 'cu';
 export type Market = 'total' | 'domestic' | 'import' | 'export';
 export type ThemePref = 'system' | 'light' | 'dark';
+export type Panel = 'closed' | 'summary' | 'trends' | 'compare' | 'table';
+export type CompareKind = 'zone' | 'commodity';
 
 export interface AppState {
   version: string; // faf_version, e.g. "5.7.1"
@@ -24,6 +26,10 @@ export interface AppState {
   basemap: string | null; // null = follow theme default
   theme: ThemePref;
   cam: [number, number, number] | null; // lon, lat, zoom
+  panel: Panel; // charts drawer tab, or closed
+  compare: { kind: CompareKind; ids: string[] };
+  overlayOther: boolean; // trend chart: also draw the other FAF version (separate series, never connected)
+  tableDims: string[]; // table view group-by columns
 }
 
 export interface StateMeta {
@@ -46,6 +52,7 @@ export interface ProductMeta {
   scenario: string;
   years: Record<string, 'base' | 'final' | 'preliminary' | 'forecast'>;
   default_year: number;
+  scenarios?: Record<string, { years: Record<string, 'forecast'> }>; // high / low, forecast years only
 }
 
 export interface VersionsMeta {

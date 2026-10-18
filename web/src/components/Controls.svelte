@@ -87,18 +87,24 @@
     {#if years.length < 2}
       <span class="hint">This release has {s.year} only. Other years arrive with future FAF releases.</span>
     {:else}
-      <span class="hint">{years[0]} to {years[years.length - 1]}. Annual estimates and forecast years are labeled; FAF5 publishes no 2025 to 2029.</span>
+      <span class="hint">{years[0]} to {years[years.length - 1]}. Annual estimates and forecast years are labeled; a gap in the years means the release publishes nothing for them.</span>
     {/if}
   </div>
 
   <fieldset class="field">
     <legend>Scenario</legend>
     <div class="seg">
-      <label><input type="radio" name="scenario" checked disabled={false} /><span>Mid-range</span></label>
-      <label title="High and Low forecast scenarios are not loaded yet"><input type="radio" name="scenario" disabled /><span>High</span></label>
-      <label title="High and Low forecast scenarios are not loaded yet"><input type="radio" name="scenario" disabled /><span>Low</span></label>
+      {#each ['mid', 'high', 'low'] as sc}
+        {@const have = ctrl.scenarioList.includes(sc)}
+        <label title={have ? '' : `FAF ${s.version} publishes no ${sc} scenario`}>
+          <input type="radio" name="scenario" checked={s.scenario === sc} disabled={!have} onchange={() => ctrl.setScenario(sc)} /><span>{sc === 'mid' ? 'Mid-range' : sc === 'high' ? 'High' : 'Low'}</span>
+        </label>
+      {/each}
     </div>
-    <span class="hint">High and Low forecasts are not loaded yet.</span>
+    <span class="hint">
+      {#if ctrl.scenarioList.length > 1}High and Low are published FAF forecast scenarios for forecast years only, with tons and value but no ton-miles or current dollars.
+      {:else}FAF {s.version} publishes no High or Low scenario.{/if}
+    </span>
   </fieldset>
 </section>
 
