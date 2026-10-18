@@ -1,1 +1,98 @@
-{}
+[
+  {
+    "path": "data-raw/faf6/FAF6.0.zip",
+    "source_url": "https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0.zip",
+    "release": "FAF6.0",
+    "sha256": "5322ca3ac1b1fd07d522bc00382a90c47261f80a3af52a4f6bcfbc7a6a503e29",
+    "bytes": 20861180,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf6/FAF6.0_State.zip",
+    "source_url": "https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0_State.zip",
+    "release": "FAF6.0",
+    "sha256": "50c6a8bb857b94998a634306234b805af6a114f7ce76ef0b02f34660d01a3e0d",
+    "bytes": 6823123,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/zones/FAF6.zip",
+    "source_url": "https://faf.ornl.gov/faf6/data/FAF6.zip",
+    "release": "FAF zone geography (see file)",
+    "sha256": "8760985abf55054ede5b563af442d1c8406c58788be7208fb6f789575100494a",
+    "bytes": 17002654,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf6/FAF6 Zone ID with 2022 CFS Area Code.xlsx",
+    "source_url": "https://faf.ornl.gov/faf6/data/FAF6%20Zone%20ID%20with%202022%20CFS%20Area%20Code.xlsx",
+    "release": "FAF6.0",
+    "sha256": "3a08b907a19ce6589c296376533caa1fe6485fc7417a563a86f11a362baa53b9",
+    "bytes": 20247,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf6/FAF6_Metadata.xlsx",
+    "source_url": "https://faf.ornl.gov/faf6/data/FAF6_Metadata.xlsx",
+    "release": "FAF6.0",
+    "sha256": "8c555ebfbd03bccb46f9f80e12f555516bd38dbb93ec75feff5797cd7027479a",
+    "bytes": 28609,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/zones/2017_CFS_Metro_Areas_with_FAF.zip",
+    "source_url": "https://faf.ornl.gov/faf5/data/2017_CFS_Metro_Areas_with_FAF.zip",
+    "release": "FAF zone geography (see file)",
+    "sha256": "77945b513a9b68e1bc21fff357bc5efdab1b409de412366f47b0a6b11659f3d9",
+    "bytes": 19027752,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf5/FAF5_metadata.xlsx",
+    "source_url": "https://faf.ornl.gov/faf5/data/FAF5_metadata.xlsx",
+    "release": "FAF5.7.1",
+    "sha256": "f48e2cc5be9e305a5c4dabe1de6f15632d85744e1c318e172c8989bfd601c119",
+    "bytes": 28768,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/history/FAF5.7.1_Reprocessed_1997-2012_State.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_Reprocessed_1997-2012_State.zip",
+    "release": "FAF5.7.1 reprocessed 1997-2012",
+    "sha256": "eaaad60464894029114596fcf739f7138e09fe125f8261e53284f684a3918f6b",
+    "bytes": 38901646,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf5/FAF5.7.1_State.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State.zip",
+    "release": "FAF5.7.1",
+    "sha256": "1959b40d1b297b7dec827035dd74c0bda429a70fc5510d688f72d4e1620950b6",
+    "bytes": 145261207,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf5/FAF5.7.1.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1.zip",
+    "release": "FAF5.7.1",
+    "sha256": "1429be77a578f2b32913320a1299c0e3de8aa9c6180ce5aacfd65a7886ba55b8",
+    "bytes": 305397783,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/network/FAF5_2017_HighwayAssignmentResults_04_07_2022.zip",
+    "source_url": "https://ops.fhwa.dot.gov/freight/freight_analysis/faf/faf_highway_assignment_results/FAF5_2017_HighwayAssignmentResults_04_07_2022.zip",
+    "release": "FAF5 network / 2017 truck assignment (04_07_2022)",
+    "sha256": "fd3feb83db4f014886a32fa518a7024a34363f4bdf0395cd73605211acac3e13",
+    "bytes": 554411230,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/network/FAF5_Model_Highway_Network.zip",
+    "source_url": "https://ops.fhwa.dot.gov/freight/freight_analysis/faf/faf_highway_assignment_results/FAF5_Model_Highway_Network.zip",
+    "release": "FAF5 network / 2017 truck assignment (04_07_2022)",
+    "sha256": "424b4bfa9c842b8f57558c89901585c3e0f9a8cd1e22ea409b9e57266799513f",
+    "bytes": 224725381,
+    "retrieved": "2026-10-18"
+  }
+]
