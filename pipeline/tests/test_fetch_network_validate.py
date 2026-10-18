@@ -102,3 +102,14 @@ def test_fetch_records_manifest_is_idempotent_and_check_only_reports(tmp_path, s
 
     (www / "thing.zip").write_bytes(b"changed on the server" * 50)
     assert fetch.fetch(ctx, None, True, log=lambda *_: None)[0].startswith("CHANGED")
+
+
+def test_fips_is_not_flagged_inside_yaml_code_tables(fake_ctx, monkeypatch):
+    """A state's 2-digit FIPS can equal a valid SCTG code (e.g. 08); data tables are not code, so only code files are checked for it."""
+    monkeypatch.setattr("faf_pipeline.dims.state_zone_ids", lambda c, p: ["991", "999"])
+    schemas = fake_ctx.paths.root / "pipeline" / "faf_pipeline" / "schemas"
+    schemas.mkdir(parents=True)
+    (schemas / "groups.yml").write_text('groups:\n  Something: {sctg: ["98", "99"]}\n', encoding="utf-8")
+    assert validate.scan_state_literals(fake_ctx) == []
+    (schemas / "oops.yml").write_text('zone: "991"\n', encoding="utf-8")          # a derived zone id is still flagged anywhere
+    assert any("zone id '991'" in h for h in validate.scan_state_literals(fake_ctx))

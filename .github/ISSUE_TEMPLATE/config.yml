@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Sources, definitions and caveats
+    url: https://ar-puuk.github.io/freight-explorer/methodology.html
+    about: Read the methodology page before reporting a data problem; many questions are answered there.

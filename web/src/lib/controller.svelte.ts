@@ -110,7 +110,7 @@ export class Controller {
   private panelReq = 0;
   private tables = new Set<string>();
 
-  locations = new Map<string, ZoneInfo>();
+  locations = $state.raw(new Map<string, ZoneInfo>()); // replaced (not mutated) when a version loads, so lists derived from it update
   private zones: ZoneGeoJSON | null = null;
   private view: MapView | null = null;
   private db = new Db();
@@ -218,6 +218,7 @@ export class Controller {
       center: cam ? [cam[0], cam[1]] : m.state.center,
       zoom: cam ? cam[2] : m.state.zoom,
       callbacks: {
+        onBasemapFailed: () => (this.notice = 'The basemap could not be loaded, so flows are drawn on a plain background. Choose a basemap again to retry.'),
         onFlowHover: (p) => this.onFlowHover(p),
         onFlowClick: (p) => this.onFlowClick(p),
         onZoneClick: (id) => this.select(id),

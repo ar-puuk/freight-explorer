@@ -15,12 +15,17 @@ function serveData(): Plugin {
 
 // Builds into ../docs (GitHub Pages root). Relative base so it works under /<repo>/. emptyOutDir is false so docs/data survives;
 // scripts/clean.mjs removes the previous hashed assets first.
-export default defineConfig({
+//
+// The map (index.html) and the methodology page are two SEPARATE builds (`vite build`, then `vite build --mode methodology`), not one
+// multi-page build: a combined build changes the chunk layout in a way that stops the map from starting (its WebGL contexts are lost
+// at load), so the map's bundle is built alone, exactly as before.
+export default defineConfig(({ mode }) => ({
   base: './',
   plugins: [svelte(), serveData()],
   build: {
     outDir: '../docs',
     emptyOutDir: false,
+    rollupOptions: { input: resolve(import.meta.dirname, mode === 'methodology' ? 'methodology.html' : 'index.html') },
   },
   server: { fs: { allow: ['..'] } },
-});
+}));

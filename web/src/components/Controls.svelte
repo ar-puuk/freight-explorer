@@ -57,6 +57,7 @@
     return { update: (v: boolean) => (node.indeterminate = v) };
   }
 
+  const pickable = $derived([...ctrl.locations.values()].filter((l) => l.type !== 'foreign_region').sort((a, b) => Number(b.is_state_zone) - Number(a.is_state_zone) || a.name.localeCompare(b.name)));
   const shownPct = $derived(ctrl.flowTotals.total > 0 ? ctrl.flowTotals.shownSum / ctrl.flowTotals.total : 0);
   let copied = $state(false);
   async function copyLink() {
@@ -199,6 +200,14 @@
   <div class="field">
     <label class="label" for="minflow">Minimum flow ({rawUnit(s.measure)})</label>
     <input id="minflow" type="number" min="0" step="any" value={s.minFlow} onchange={(e) => ctrl.change({ minFlow: Math.max(0, Number(e.currentTarget.value) || 0) })} />
+  </div>
+  <div class="field">
+    <label class="label" for="zonepick">Isolate flows for a {ctrl.experimental ? 'county or zone' : 'zone'}</label>
+    <select id="zonepick" value={s.selected ?? ''} onchange={(e) => ctrl.select(e.currentTarget.value || null)}>
+      <option value="">All flows</option>
+      {#each pickable as l}<option value={l.id}>{l.name}{l.is_state_zone ? ' (in state)' : ''}</option>{/each}
+    </select>
+    <span class="hint">The same as clicking a zone on the map; use it with the keyboard.</span>
   </div>
   <p class="status" role="status" aria-live="polite">
     {#if ctrl.busy && !ctrl.flowTotals.n}Loading flows…{:else}

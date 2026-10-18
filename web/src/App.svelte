@@ -24,6 +24,7 @@
         await Promise.resolve();
         await ctrl.mountMap(mapEl);
       } catch (e) {
+        console.error('startup failed', e);
         fatal = e instanceof Error ? e.message : String(e);
       }
     })();
@@ -41,12 +42,17 @@
 
 <svelte:window onkeydown={(e) => e.key === 'Escape' && ready && ctrl.closeDetail()} />
 
+<a class="skip" href="#controls">Skip to filters</a>
+<a class="skip" href="#map">Skip to map</a>
+
 <div class="app">
   <header class="top">
     <h1>{ready ? ctrl.meta?.state.site_title : 'Freight Explorer'}</h1>
     {#if ready}
+      {#if fatal}<span class="error" role="alert">{fatal}</span>{/if}
       <button class="btn sheet-toggle" type="button" aria-expanded={sheetOpen} onclick={() => (sheetOpen = !sheetOpen)}>{sheetOpen ? 'Hide' : 'Show'} filters</button>
       <span class="spacer"></span>
+      <a class="btn" href={`methodology.html${ctrl.s.theme !== 'system' ? `?theme=${ctrl.s.theme}` : ''}`}>Methodology and data</a>
       <button class="btn" type="button" aria-expanded={ctrl.s.panel !== 'closed'} onclick={() => ctrl.setPanel(ctrl.s.panel === 'closed' ? 'summary' : 'closed')}>
         {ctrl.s.panel === 'closed' ? 'Charts and tables' : 'Hide charts'}
       </button>
@@ -66,12 +72,17 @@
     {/if}
   </header>
 
-  <aside class="side" class:open={sheetOpen} aria-label="Controls">
+  <aside class="side" id="controls" class:open={sheetOpen} aria-label="Filters and layers" tabindex="-1">
     {#if ready}<Controls {ctrl} />{:else if fatal}<p class="error" role="alert">{fatal}</p>{:else}<p class="muted">Loading…</p>{/if}
   </aside>
 
   <main class="stage" class:drawer-open={ready && ctrl.s.panel !== 'closed'} class:experimental={ready && ctrl.experimental}>
-    <div class="map" bind:this={mapEl} role="application" aria-label="Freight flow map"></div>
+    <div class="map" id="map" bind:this={mapEl} role="application" aria-label="Freight flow map. The largest flows are listed below the map in text, and any flow table is under Charts and tables." aria-describedby="flow-summary"></div>
+    {#if ready}
+      <ul class="sr-only" id="flow-summary" aria-label="Largest flows on the map">
+        {#each ctrl.flows.slice(0, 10) as f}<li>{ctrl.name(f.origin)} to {ctrl.name(f.dest)}: {ctrl.fmtMeasure(f.count)}</li>{/each}
+      </ul>
+    {/if}
     {#if ready}
       {#if ctrl.experimental}
         <div class="card exp-banner" role="note">

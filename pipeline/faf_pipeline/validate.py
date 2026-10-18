@@ -235,6 +235,7 @@ def run(ctx: Context, previous_versions: dict[str, Any] | None = None, log=print
     return fails, report
 
 
+CODE_SUFFIXES = {".py", ".sql", ".ts", ".svelte", ".html"}
 _CODE_GLOBS = ("pipeline/faf_pipeline/**/*.py", "pipeline/faf_pipeline/**/*.sql", "pipeline/faf_pipeline/**/*.yml",
                "pipeline/tests/**/*.py", "web/src/**/*.ts", "web/src/**/*.svelte", "web/*.html", "web/*.ts", "config/sources.yml", "config/app.yml")
 
@@ -246,7 +247,10 @@ def scan_state_literals(ctx: Context) -> list[str]:
     zone_ids = sorted({z for p in ("faf5", "faf6") for z in state_zone_ids(ctx, p)})
     pats = [(re.compile(rf"\b{re.escape(s.name)}\b", re.IGNORECASE), f"state name {s.name!r}"),
             (re.compile(rf"""['"]{re.escape(s.abbrev)}['"]"""), f"abbreviation {s.abbrev!r}"),
-            (re.compile(rf"""['"]{re.escape(s.fips)}['"]"""), f"fips {s.fips!r}")]
+            ]
+    # A 2-digit FIPS code is also a valid SCTG commodity or mode code, so it is only looked for in code files, never in the
+    # YAML code tables (otherwise a state whose FIPS is, say, 08 would flag SCTG 08).
+    fips_rx = (re.compile(rf"""['"]{re.escape(s.fips)}['"]"""), f"fips {s.fips!r}")
     pats += [(re.compile(rf"""['"]{z}['"]"""), f"zone id {z!r}") for z in zone_ids]
     hits = []
     seen: set[Path] = set()
@@ -256,7 +260,7 @@ def scan_state_literals(ctx: Context) -> list[str]:
                 continue
             seen.add(f)
             text = f.read_text(encoding="utf-8", errors="ignore")
-            for rx, what in pats:
+            for rx, what in [*pats, *([fips_rx] if f.suffix in CODE_SUFFIXES else [])]:
                 m = rx.search(text)
                 if m:
                     hits.append(f"state literal in {f.relative_to(ctx.paths.root).as_posix()}: {what}")

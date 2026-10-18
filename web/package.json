@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/clean.mjs && vite build",
+    "build": "node scripts/clean.mjs && vite build && vite build --mode methodology",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run"
@@ -29,5 +29,7 @@
     "@observablehq/plot": "^0.6.17",
     "maplibre-gl": "^6.15.0",
     "pmtiles": "^4.5.0"
-  }
+  },
+  "description": "Static map app for the Freight Analysis Framework (one state at a time)",
+  "license": "MIT"
 }

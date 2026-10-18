@@ -1,13 +1,14 @@
 <script lang="ts">
   import type { Controller } from '../lib/controller.svelte';
   import type { Panel } from '../lib/types';
-  import CompareTab from './CompareTab.svelte';
-  import HistoryTab from './HistoryTab.svelte';
-  import SummaryTab from './SummaryTab.svelte';
-  import TableTab from './TableTab.svelte';
-  import TrendsTab from './TrendsTab.svelte';
 
   let { ctrl }: { ctrl: Controller } = $props();
+  // the chart code (Observable Plot and the tab components) is fetched the first time the drawer opens
+  let tabs = $state<typeof import('./tabs') | null>(null);
+  let loadError = $state(false);
+  $effect(() => {
+    if (ctrl.s.panel !== 'closed' && !tabs) import('./tabs').then((m) => (tabs = m), () => (loadError = true));
+  });
   const LABELS: Record<Exclude<Panel, 'closed'>, string> = { summary: 'Summary', trends: 'Trends', compare: 'Compare', history: 'History', table: 'Table and CSV' };
   const TABS = $derived(ctrl.tabs.map((id) => ({ id, label: LABELS[id] })));
 
@@ -32,11 +33,13 @@
       <button class="btn" type="button" onclick={() => ctrl.setPanel('closed')} aria-label="Close charts">Close</button>
     </div>
     <div class="body" id="panel-body" role="tabpanel" aria-labelledby={`tab-${ctrl.s.panel}`}>
-      {#if ctrl.s.panel === 'summary'}<SummaryTab {ctrl} />
-      {:else if ctrl.s.panel === 'trends'}<TrendsTab {ctrl} />
-      {:else if ctrl.s.panel === 'compare'}<CompareTab {ctrl} />
-      {:else if ctrl.s.panel === 'history'}<HistoryTab {ctrl} />
-      {:else}<TableTab {ctrl} />{/if}
+      {#if loadError}<p class="error" role="alert">The chart code could not be loaded. Check your connection and reload.</p>
+      {:else if !tabs}<p class="muted">Loading charts…</p>
+      {:else if ctrl.s.panel === 'summary'}<tabs.SummaryTab {ctrl} />
+      {:else if ctrl.s.panel === 'trends'}<tabs.TrendsTab {ctrl} />
+      {:else if ctrl.s.panel === 'compare'}<tabs.CompareTab {ctrl} />
+      {:else if ctrl.s.panel === 'history'}<tabs.HistoryTab {ctrl} />
+      {:else}<tabs.TableTab {ctrl} />{/if}
     </div>
   </section>
 {/if}

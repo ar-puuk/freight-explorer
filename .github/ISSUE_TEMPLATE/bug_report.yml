@@ -1,0 +1,23 @@
+name: Bug report
+description: Something in the app or the pipeline does not work.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: URL from your address bar (app bugs)
+  - type: input
+    id: env
+    attributes:
+      label: Browser and device, or OS and uv/Node versions (pipeline bugs)
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: For pipeline bugs include the exact command and the last lines of its output.

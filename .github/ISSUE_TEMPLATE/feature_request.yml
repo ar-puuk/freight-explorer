@@ -1,0 +1,18 @@
+name: Feature request
+description: Suggest an improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Scope reminders: static site on GitHub Pages only (no backend, no paid services, no Actions); public FAF data only; the site shows data and caveats, with no rankings, scores or predictions beyond published scenarios.
+  - type: textarea
+    id: want
+    attributes:
+      label: What would you like to be able to do?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why does it matter, and who is it for?

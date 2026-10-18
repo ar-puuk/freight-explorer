@@ -1,6 +1,8 @@
 [project]
 name = "faf-pipeline"
 version = "0.1.0"
+description = "Builds state-filtered Freight Analysis Framework data products (Parquet, GeoJSON, PMTiles)"
+license = "MIT"
 requires-python = ">=3.14"
 dependencies = [
     "duckdb>=1.5.6",

@@ -1,0 +1,29 @@
+name: Data question or discrepancy
+description: A number looks wrong, or differs from the original FAF source.
+labels: ["data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        FAF values are model estimates and this site only reshapes them. If a number differs from the original BTS/FHWA/ORNL file we will document the cause rather than change the value. Please do not include personal information.
+  - type: input
+    id: url
+    attributes:
+      label: URL from your address bar
+      description: The whole view (version, year, filters, selection) is in it.
+    validations:
+      required: true
+  - type: input
+    id: release
+    attributes:
+      label: FAF release and year
+      placeholder: "FAF5.7.1, 2023 (final)"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected, and what you saw
+      description: Include the original file or table you compared against, with a link if possible.
+    validations:
+      required: true

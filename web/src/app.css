@@ -413,10 +413,14 @@ details > summary {
     border-top: 1px solid var(--border);
     box-shadow: var(--shadow);
     transform: translateY(calc(100% - 0px));
-    transition: transform 0.2s;
+    transition: transform 0.2s, visibility 0s linear 0.2s;
+    /* a closed sheet is off-screen: take it out of the tab order and the accessibility tree too */
+    visibility: hidden;
   }
   .side.open {
     transform: translateY(0);
+    visibility: visible;
+    transition: transform 0.2s;
   }
   .sheet-toggle {
     display: inline-block;
@@ -485,4 +489,45 @@ details > summary {
   .stage.experimental .kpis {
     top: 96px;
   }
+}
+
+/* ---- accessibility: skip links, minimum target size, focus on landmark targets */
+.skip {
+  position: absolute;
+  left: 8px;
+  top: -48px;
+  z-index: 20;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 650;
+}
+.skip:focus {
+  top: 8px;
+}
+a.btn {
+  text-decoration: none;
+  display: inline-block;
+}
+.chips .btn,
+.close,
+.btn {
+  min-height: 24px;
+}
+.chips .btn {
+  min-width: 24px;
+}
+#controls:focus {
+  outline: none;
+}
+
+/* map controls keep a visible keyboard focus ring (MapLibre draws none of its own) */
+.maplibregl-ctrl button:focus-visible,
+.maplibregl-ctrl-attrib-button:focus-visible,
+.maplibregl-canvas:focus-visible,
+#deckgl-overlay:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
 }

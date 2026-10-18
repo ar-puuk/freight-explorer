@@ -3,4 +3,4 @@ import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const docs = resolve(import.meta.dirname, '../../docs');
-for (const p of ['assets', 'index.html']) rmSync(resolve(docs, p), { recursive: true, force: true });
+for (const p of ['assets', 'index.html', 'methodology.html']) rmSync(resolve(docs, p), { recursive: true, force: true });

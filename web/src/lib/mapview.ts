@@ -28,6 +28,7 @@ export interface FlowmapPick {
 }
 
 export interface MapCallbacks {
+  onBasemapFailed: () => void;
   onFlowHover: (pick: FlowmapPick | null) => void;
   onFlowClick: (pick: FlowmapPick) => void;
   onZoneClick: (zoneId: string | null) => void;
@@ -54,6 +55,9 @@ export class MapView {
   private flowsVisible = true;
   private readonly cb: MapCallbacks;
   styleName: string;
+  private styleReady = false;
+  private fallbackActive = false;
+  private styleTimer: ReturnType<typeof setTimeout> | undefined;
 
   constructor(el: HTMLElement, opts: { style: string; theme: Theme; center: [number, number]; zoom: number; callbacks: MapCallbacks }) {
     if (!protocolAdded) {
@@ -71,32 +75,77 @@ export class MapView {
 
     // Everything MapLibre owns (sources and layers) disappears on setStyle, so it is re-added here. The deck.gl overlay
     // has its own canvas and survives.
-    this.map.on('style.load', () => this.installLayers());
+    this.map.on('style.load', () => {
+      clearTimeout(this.styleTimer);
+      this.styleReady = true;
+      this.installLayers();
+    });
+    // If the basemap cannot load (service down, offline, blocked) the flows and zones still work on a plain background.
+    this.map.on('error', (e) => {
+      console.warn('map error before the style loaded:', (e as unknown as { error?: Error }).error?.message ?? e);
+      if (!this.styleReady && !this.fallbackActive) this.useFallbackStyle();
+    });
+    this.armStyleTimeout();
+    // deck.gl's overlay canvas is not an interactive control: keep it out of the keyboard tab order (the controls and the zone picker are)
+    this.map.on('idle', () => document.getElementById('deckgl-overlay')?.setAttribute('tabindex', '-1'));
     this.map.on('moveend', () => {
       const c = this.map.getCenter();
       this.cb.onMoveEnd([c.lng, c.lat, this.map.getZoom()]);
     });
     this.map.on('click', (e) => {
       if (this.overlay.pickObject({ x: e.point.x, y: e.point.y, radius: 6 })) return; // a flow or location was hit; its own handler runs
-      const link = this.map.getLayer('net-lines') && this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0];
+      const link = this.hasLayer('net-lines') && this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0];
       if (link && this.netVisible) return this.cb.onLinkClick(link.properties ?? {});
-      const z = this.map.getLayer('zones-fill') && this.map.queryRenderedFeatures(e.point, { layers: ['zones-fill'] })[0];
+      const z = this.hasLayer('zones-fill') && this.map.queryRenderedFeatures(e.point, { layers: ['zones-fill'] })[0];
       this.cb.onZoneClick(z ? String(z.properties?.zone_id) : null);
     });
     this.map.on('mousemove', (e) => {
-      if (!this.netVisible || !this.map.getLayer('net-lines')) return this.cb.onLinkHover(null, 0, 0);
+      if (!this.netVisible || !this.hasLayer('net-lines')) return this.cb.onLinkHover(null, 0, 0);
       const f = this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0];
       this.map.getCanvas().style.cursor = f ? 'pointer' : '';
       this.cb.onLinkHover(f ? (f.properties ?? {}) : null, e.point.x, e.point.y);
     });
   }
 
+  /**
+   * Push the flow layers to the deck.gl overlay. This must also happen before the style has loaded (the overlay needs its first
+   * props to initialise; holding them back stalls the map), but when the basemap style failed there is no map projection yet and
+   * deck.gl throws, so a failure here is ignored: installLayers() pushes the latest layers again once a style (or the fallback) is in.
+   */
+  private pushOverlay(): void {
+    try {
+      this.overlay.setProps({ layers: this.flowLayers() });
+    } catch {
+      /* retried on the next style.load */
+    }
+  }
+
+  private hasLayer(id: string): boolean {
+    return this.styleReady && !!this.map.getLayer(id);
+  }
+
+  private armStyleTimeout(): void {
+    clearTimeout(this.styleTimer);
+    this.styleTimer = setTimeout(() => {
+      if (!this.styleReady && !this.fallbackActive) this.useFallbackStyle();
+    }, 10_000);
+  }
+
+  private useFallbackStyle(): void {
+    this.fallbackActive = true;
+    this.styleReady = false;
+    const bg = this.theme === 'dark' ? '#1b2027' : '#eceff1';
+    this.map.setStyle({ version: 8, sources: {}, layers: [{ id: 'plain-background', type: 'background', paint: { 'background-color': bg } }] });
+    this.cb.onBasemapFailed();
+  }
+
   /** First symbol layer of the basemap, so overlays sit under labels. */
   private beforeLabels(): string | undefined {
-    return this.map.getStyle().layers?.find((l) => l.type === 'symbol')?.id;
+    return this.map.getStyle()?.layers?.find((l) => l.type === 'symbol')?.id;
   }
 
   private installLayers(): void {
+    if (!this.map.getStyle()) return; // no style yet (or it failed): nothing to attach to; retried on the next style.load
     const before = this.beforeLabels();
     const p = PALETTE[this.theme];
     if (this.zones && !this.map.getSource('zones')) {
@@ -124,49 +173,53 @@ export class MapView {
       this.stylNet();
       this.applyNetValues();
     }
-    this.overlay.setProps({ layers: this.flowLayers() });
+    this.pushOverlay();
   }
 
   setTheme(theme: Theme): void {
     this.theme = theme;
     const p = PALETTE[theme];
-    if (this.map.getLayer('zones-fill')) {
+    if (this.hasLayer('zones-fill')) {
       this.map.setPaintProperty('zones-fill', 'fill-color', ['case', ['get', 'is_state_zone'], p.stateFill, p.otherFill]);
       this.map.setPaintProperty('zones-line', 'line-color', ['case', ['get', 'is_state_zone'], p.stateLine, p.otherLine]);
     }
     this.stylNet();
-    this.overlay.setProps({ layers: this.flowLayers() });
+    this.pushOverlay();
   }
 
   setBasemap(name: string): void {
-    if (name === this.styleName) return;
+    if (name === this.styleName && !this.fallbackActive) return;
     this.styleName = name;
+    this.fallbackActive = false; // an explicit choice tries the real basemap again
+    this.styleReady = false;
     this.map.setStyle(STYLE_URL(name));
+    this.armStyleTimeout();
   }
 
   // ---- zones
   setZones(zones: ZoneGeoJSON): void {
     this.zones = zones;
+    if (!this.styleReady) return; // installed when the style (or the fallback) loads
     const src = this.map.getSource('zones') as maplibregl.GeoJSONSource | undefined;
     if (src) src.setData(zones as unknown as GeoJSON.FeatureCollection);
-    else if (this.map.isStyleLoaded()) this.installLayers();
+    else this.installLayers();
   }
 
   setZonesVisible(v: boolean): void {
     this.zonesVisible = v;
-    for (const id of ['zones-fill', 'zones-line']) if (this.map.getLayer(id)) this.map.setLayoutProperty(id, 'visibility', v ? 'visible' : 'none');
+    for (const id of ['zones-fill', 'zones-line']) if (this.hasLayer(id)) this.map.setLayoutProperty(id, 'visibility', v ? 'visible' : 'none');
   }
 
   // ---- flows (deck.gl + flowmap.gl)
   setFlows(locations: ZoneInfo[], flows: FlowRow[]): void {
     this.locations = locations;
     this.flows = flows;
-    this.overlay.setProps({ layers: this.flowLayers() });
+    this.pushOverlay();
   }
 
   setFlowsVisible(v: boolean): void {
     this.flowsVisible = v;
-    this.overlay.setProps({ layers: this.flowLayers() });
+    this.pushOverlay();
   }
 
   private flowLayers() {
@@ -213,13 +266,13 @@ export class MapView {
     if (!pts.length) return;
     const b = new maplibregl.LngLatBounds([pts[0].lon, pts[0].lat], [pts[0].lon, pts[0].lat]);
     for (const p of pts) b.extend([p.lon, p.lat]);
-    this.map.fitBounds(b, { padding: 80, maxZoom: 7, duration: 600 });
+    this.map.fitBounds(b, { padding: 80, maxZoom: 7, duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600 });
   }
 
   // ---- network (PMTiles + feature-state join)
   setNetworkSource(url: string): void {
     this.netUrl = url;
-    if (this.map.isStyleLoaded()) this.installLayers();
+    if (this.styleReady) this.installLayers();
   }
 
   setNetwork(opts: { visible: boolean; connectors: boolean; values?: Map<number, number> }): void {
@@ -229,14 +282,14 @@ export class MapView {
       this.netValues = opts.values;
       this.netVmax = Math.max(1, ...opts.values.values());
     }
-    if (!this.map.getLayer('net-lines')) return;
+    if (!this.hasLayer('net-lines')) return;
     this.map.setLayoutProperty('net-lines', 'visibility', opts.visible ? 'visible' : 'none');
     this.stylNet();
     if (opts.values) this.applyNetValues();
   }
 
   private stylNet(): void {
-    if (!this.map.getLayer('net-lines')) return;
+    if (!this.hasLayer('net-lines')) return;
     const p = PALETTE[this.theme];
     const v: unknown[] = ['coalesce', ['feature-state', 'v'], 0];
     const root = ['sqrt', v];
@@ -249,7 +302,7 @@ export class MapView {
   }
 
   private applyNetValues(): void {
-    if (!this.map.getSource('net')) return;
+    if (!this.styleReady || !this.map.getSource('net')) return;
     this.map.removeFeatureState({ source: 'net', sourceLayer: NET_SOURCE_LAYER });
     for (const [id, v] of this.netValues) this.map.setFeatureState({ source: 'net', sourceLayer: NET_SOURCE_LAYER, id }, { v });
   }
