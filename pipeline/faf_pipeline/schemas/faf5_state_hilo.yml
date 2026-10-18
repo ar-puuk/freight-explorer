@@ -1,0 +1,27 @@
+# FAF5.7.1 state database with High/Low forecasts.
+# Verified against the real file header on 2026-10-18 (docs/SPIKES.md section 3). Full file plus scenario columns.
+columns:
+  fr_orig: {canonical: fr_orig, type: varchar}
+  dms_origst: {canonical: dms_orig_st, type: state2}
+  dms_destst: {canonical: dms_dest_st, type: state2}
+  fr_dest: {canonical: fr_dest, type: varchar}
+  fr_inmode: {canonical: fr_inmode, type: smallint}
+  dms_mode: {canonical: dms_mode, type: smallint}
+  fr_outmode: {canonical: fr_outmode, type: smallint}
+  sctg2: {canonical: sctg2, type: code2}
+  trade_type: {canonical: trade_type, type: smallint}
+  dist_band: {canonical: dist_band, type: smallint}
+ignore: {}
+# column types: varchar | smallint | zone3 | state2 | code2
+# Plain `<prefix>_<YYYY>` columns are the mid-range values (they repeat the mid-range files and are cross-checked against them).
+year_columns:
+  tons: tons_kt
+  value: value_const_musd
+  current_value: value_current_musd
+  tmiles: tmiles_m
+# `<prefix>_<YYYY>_<scenario>` columns hold the High and Low scenarios. Only tons and value have scenario columns:
+# ton-miles and current-dollar values are not published for High/Low.
+scenario_columns:
+  scenarios: [low, high]
+  prefixes: {tons: tons_kt, value: value_const_musd}
+required_measures: [tons, value]

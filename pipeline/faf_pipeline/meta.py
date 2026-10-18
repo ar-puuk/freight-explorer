@@ -48,7 +48,17 @@ def write_versions(ctx: Context, flow_stats: dict[str, Any] | None, zone_stats: 
             for y, v in st["years"].items():
                 entry["years"][str(y)] = v["data_version"]
                 entry["rows"][f"{folder}/{y}"] = v["rows"]
+            for sc, scd in (st.get("scenarios") or {}).items():
+                e = entry.setdefault("scenarios", {}).setdefault(sc, {"years": {}, "rows": {}})
+                for y, v in scd["years"].items():
+                    e["years"][str(y)] = v["data_version"]
+                    e["rows"][f"{folder}/{y}"] = v["rows"]
             url = spec["files"][level]["url"]
+            hl = spec["files"].get(f"{level}_hilo")
+            if hl:
+                for m in manifest.values():
+                    if m["source_url"] == hl["url"]:
+                        entry["sources"][f"{level}_hilo"] = {"url": m["source_url"], "sha256": m["sha256"], "bytes": m["bytes"]}
             for m in manifest.values():
                 if m["source_url"] == url:
                     entry["sources"][level] = {"url": m["source_url"], "sha256": m["sha256"], "bytes": m["bytes"]}

@@ -41,17 +41,23 @@ def _read_header(con, csv: Path) -> list[str]:
     return [d[0] for d in rel.description]
 
 
-def build_level(ctx: Context, product: str, level: str, log=print) -> dict[str, Any]:
-    """Build one level ('regional' or 'state') of one product. Returns stats for the changelog/validation."""
+def build_level(ctx: Context, product: str, level: str, log=print, hilo: bool = False) -> dict[str, Any]:
+    """Build one level ('regional' or 'state') of one product. `hilo` reads the High/Low file and writes the high and
+    low scenarios (forecast years only); otherwise the mid-range file. Returns stats for the changelog/validation."""
     spec = ctx.sources["products"][product]
-    fspec = spec["files"][level]
+    file_key = f"{level}_hilo" if hilo else level
+    fspec = spec["files"][file_key]
     schema = load_schema(ctx, fspec["schema"])
-    csv = extracted(ctx, product, level)
+    csv = extracted(ctx, product, file_key)
     con = connect()
     header = _read_header(con, csv)
-    years = check_header(schema, header).years
+    chk = check_header(schema, header)
+    years = chk.years
     year_list = sorted(years)
-    statuses = {y: classify_year(spec, y, product) for y in year_list}
+    # (scenario, year) slices to write: mid-range file -> mid; Hi/Lo file -> each scenario's years (its plain columns are the mid
+    # range, which is not rewritten here, only cross-checked against the mid-range files)
+    slices = [(spec["scenario"], y) for y in year_list] if not hilo else [(sc, y) for sc in schema.scenarios for y in sorted(chk.scenario_years[sc])]
+    statuses = {y: classify_year(spec, y, product) for _, y in slices}
 
     keys = [(src, c["canonical"], c["type"]) for src, c in schema.columns.items()]
     canon = [k[1] for k in keys]
@@ -60,6 +66,10 @@ def build_level(ctx: Context, product: str, level: str, log=print) -> dict[str, 
         for prefix, measure in schema.year_columns.items():
             col = years[y].get(prefix)
             sel.append(f"  TRY_CAST(\"{col}\" AS DOUBLE) AS {measure}_{y}" if col else f"  CAST(NULL AS DOUBLE) AS {measure}_{y}")
+    for sc, ymap in chk.scenario_years.items():
+        for y, cols in sorted(ymap.items()):
+            for prefix, measure in schema.scenario_prefixes.items():
+                sel.append(f"  TRY_CAST(\"{cols[prefix]}\" AS DOUBLE) AS {measure}_{y}_{sc}")
 
     if level == "regional":
         zones = state_zone_ids(ctx, product)
@@ -77,30 +87,49 @@ def build_level(ctx: Context, product: str, level: str, log=print) -> dict[str, 
     inbound = con.execute(f"SELECT count(*) FROM touching WHERE NOT ({is_orig}) AND ({is_dest})").fetchone()[0]
     outbound = con.execute(f"SELECT count(*) FROM touching WHERE ({is_orig}) AND NOT ({is_dest})").fetchone()[0]
     if n == 0 or inbound == 0 or outbound == 0:
-        raise ConfigError(f"{product}/{level}: state filter kept {n} rows (inbound {inbound}, outbound {outbound}); "
+        raise ConfigError(f"{product}/{file_key}: state filter kept {n} rows (inbound {inbound}, outbound {outbound}); "
                           "expected non-zero for all. Check the state fips and zone lookup.")
     dup = con.execute(f"SELECT count(*) FROM (SELECT 1 FROM touching GROUP BY {', '.join(canon)} HAVING count(*) > 1)").fetchone()[0]
     if dup:
-        raise ConfigError(f"{product}/{level}: {dup} duplicate keys in the source file")
+        raise ConfigError(f"{product}/{file_key}: {dup} duplicate keys in the source file")
 
     folder = "flows" if level == "regional" else "state_flows"
-    stats: dict[str, Any] = {"rows_touching_wide": n, "inbound": inbound, "outbound": outbound, "years": {}}
+    stats: dict[str, Any] = {"rows_touching_wide": n, "inbound": inbound, "outbound": outbound, "years": {}, "scenarios": {}}
     key_select = "".join(f"  {c},\n" for c in canon)
-    for y in year_list:
+    null = "CAST(NULL AS DOUBLE)"
+    for sc, y in slices:
+        suffix = f"_{y}_{sc}" if hilo else f"_{y}"
         q = render(
             ctx.paths.sql / "flows_long.sql",
             faf_version=sql_literal(spec["faf_version"]), benchmark_year=spec["benchmark_year"],
-            data_version=sql_literal(statuses[y]), scenario=sql_literal(spec["scenario"]), year=y,
-            key_select=key_select, tons=f"tons_kt_{y}", value=f"value_const_musd_{y}",
-            current_value=f"value_current_musd_{y}", tmiles=f"tmiles_m_{y}",
+            data_version=sql_literal(statuses[y]), scenario=sql_literal(sc), year=y,
+            key_select=key_select, tons=f"tons_kt{suffix}", value=f"value_const_musd{suffix}",
+            # High/Low files publish tons and value only
+            current_value=null if hilo else f"value_current_musd_{y}", tmiles=null if hilo else f"tmiles_m_{y}",
             source_file=sql_literal(fspec["member"]), order_by=", ".join(f"{c} NULLS FIRST" for c in canon),
         )
-        dest = ctx.paths.out / product / folder / spec["scenario"] / f"{y}.parquet"
+        dest = ctx.paths.out / product / folder / sc / f"{y}.parquet"
         rows = write_parquet(con, q, dest)
-        tot = con.execute(f"SELECT sum(tons_kt_{y}), sum(value_const_musd_{y}) FROM touching").fetchone()
-        stats["years"][y] = {"rows": rows, "data_version": statuses[y], "tons_kt_all_rows": tot[0], "value_const_musd_all_rows": tot[1]}
-    log(f"  {product}/{level}: {n} state-touching wide rows, years {year_list[0]}..{year_list[-1]} ({len(year_list)}), "
-        f"{sum(v['rows'] for v in stats['years'].values())} long rows")
+        info = {"rows": rows, "data_version": statuses[y]}
+        if sc == spec["scenario"]:
+            stats["years"][y] = info
+        else:
+            stats["scenarios"].setdefault(sc, {"years": {}})["years"][y] = info
+    if hilo:
+        # the plain (mid-range) columns of the Hi/Lo file must agree with the mid-range files already written
+        checks = {}
+        for y in year_list:
+            mid_file = ctx.paths.out / product / folder / spec["scenario"] / f"{y}.parquet"
+            if not mid_file.exists():
+                continue
+            a = con.execute(f"SELECT sum(tons_kt_{y}), sum(value_const_musd_{y}) FROM touching").fetchone()
+            b = con.execute(f"SELECT sum(tons_kt), sum(value_const_musd) FROM read_parquet({sql_literal(mid_file.as_posix())})").fetchone()
+            checks[y] = {"hilo_file_mid_tons": a[0], "mid_file_tons": b[0]}
+            if any(abs((a[i] or 0) - (b[i] or 0)) > 1e-6 * max(1.0, abs(b[i] or 0)) for i in (0, 1)):
+                raise ConfigError(f"{product}/{file_key} {y}: mid-range columns differ from the mid-range file ({a} vs {b})")
+        stats["mid_crosscheck"] = checks
+    log(f"  {product}/{file_key}: {n} state-touching wide rows, {len(slices)} slices, "
+        f"{sum(v['rows'] for v in stats['years'].values()) + sum(v['rows'] for sc in stats['scenarios'].values() for v in sc['years'].values())} long rows")
     stats["year_list"] = year_list
     return stats
 
@@ -118,4 +147,9 @@ def build(ctx: Context, products: list[str], log=print) -> dict[str, Any]:
         if p not in ("faf5", "faf6"):
             continue
         out[p] = {lvl: build_level(ctx, p, lvl, log) for lvl in ("regional", "state")}
+        for lvl in ("regional", "state"):
+            if f"{lvl}_hilo" in ctx.sources["products"][p]["files"]:
+                hl = build_level(ctx, p, lvl, log, hilo=True)
+                out[p][lvl]["scenarios"] = hl["scenarios"]
+                out[p][lvl]["mid_crosscheck"] = hl["mid_crosscheck"]
     return out

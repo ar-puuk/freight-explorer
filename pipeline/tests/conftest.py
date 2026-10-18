@@ -22,6 +22,7 @@ SOURCES = {
             "files": {
                 "regional": {"url": "http://example.invalid/REGIONAL.csv", "member": "REGIONAL.csv", "schema": "faf5_regional"},
                 "state": {"url": "http://example.invalid/STATE.csv", "member": "STATE.csv", "schema": "faf5_state"},
+                "regional_hilo": {"url": "http://example.invalid/HILO.csv", "member": "HILO.csv", "schema": "faf5_regional_hilo"},
             },
         }
     },
@@ -67,3 +68,10 @@ def write_regional(ctx: Context, text: str) -> None:
 
 def write_state_csv(ctx: Context, text: str) -> None:
     (ctx.paths.raw / "faf5" / "STATE.csv").write_text(text, encoding="utf-8")
+
+
+HILO_HEADER = REGIONAL_HEADER + ",tons_2030_low,tons_2030_high,value_2030_low,value_2030_high"
+
+
+def write_hilo(ctx: Context, text: str) -> None:
+    (ctx.paths.raw / "faf5" / "HILO.csv").write_text(text, encoding="utf-8")

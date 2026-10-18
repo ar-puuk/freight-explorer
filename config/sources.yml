@@ -22,6 +22,17 @@ products:
         url: https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State.zip
         member: FAF5.7.1_State.csv
         schema: faf5_state
+      # High/Low forecast scenarios (forecast years only). Their mid-range columns repeat the mid-range files.
+      regional_hilo:
+        url: https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_HiLoForecasts.zip
+        member: FAF5.7.1_HiLoForecasts.csv
+        schema: faf5_regional_hilo
+        level: regional
+      state_hilo:
+        url: https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State_HiLoForecasts.zip
+        member: FAF5.7.1_State_HiLoForecasts.csv
+        schema: faf5_state_hilo
+        level: state
       metadata:
         url: https://faf.ornl.gov/faf5/data/FAF5_metadata.xlsx
     probes:   # HEAD-probed by `fetch --check-only` to notice new releases; never downloaded automatically

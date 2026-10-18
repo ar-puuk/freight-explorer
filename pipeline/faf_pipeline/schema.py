@@ -29,6 +29,8 @@ class Schema:
     year_columns: dict[str, str]                # source prefix -> canonical measure column
     required_measures: list[str]
     raw: dict[str, Any]
+    scenario_prefixes: dict[str, str] = field(default_factory=dict)   # `<prefix>_<YYYY>_<scenario>` -> canonical measure
+    scenarios: list[str] = field(default_factory=list)
 
     def year_regex(self) -> re.Pattern[str]:
         alt = "|".join(sorted((re.escape(p) for p in self.year_columns), key=len, reverse=True))
@@ -38,6 +40,7 @@ class Schema:
 @dataclass
 class HeaderCheck:
     years: dict[int, dict[str, str]] = field(default_factory=dict)   # year -> {source prefix: source column}
+    scenario_years: dict[str, dict[int, dict[str, str]]] = field(default_factory=dict)   # scenario -> year -> {prefix: column}
 
     @property
     def year_list(self) -> list[int]:
@@ -49,12 +52,18 @@ def load_schema(ctx: Context, name: str) -> Schema:
     if not path.exists():
         raise SchemaError(f"no column map {path.name}")
     d = yaml.safe_load(path.read_text(encoding="utf-8"))
+    sc = d.get("scenario_columns") or {}
     return Schema(name=name, columns=d.get("columns") or {}, ignore=d.get("ignore") or {},
-                  year_columns=d.get("year_columns") or {}, required_measures=d.get("required_measures") or [], raw=d)
+                  year_columns=d.get("year_columns") or {}, required_measures=d.get("required_measures") or [], raw=d,
+                  scenario_prefixes=sc.get("prefixes") or {}, scenarios=sc.get("scenarios") or [])
 
 
 def check_header(schema: Schema, header: list[str]) -> HeaderCheck:
     rx = schema.year_regex() if schema.year_columns else None
+    srx = None
+    if schema.scenario_prefixes:
+        alt = "|".join(sorted((re.escape(p) for p in schema.scenario_prefixes), key=len, reverse=True))
+        srx = re.compile(rf"^({alt})_(\d{{4}})_({'|'.join(re.escape(x) for x in schema.scenarios)})$")
     known = set(schema.columns) | set(schema.ignore)
     problems: list[str] = []
     out = HeaderCheck()
@@ -64,6 +73,10 @@ def check_header(schema: Schema, header: list[str]) -> HeaderCheck:
         m = rx.match(col) if rx else None
         if m:
             out.years.setdefault(int(m.group(2)), {})[m.group(1)] = col
+            continue
+        sm = srx.match(col) if srx else None
+        if sm:
+            out.scenario_years.setdefault(sm.group(3), {}).setdefault(int(sm.group(2)), {})[sm.group(1)] = col
             continue
         near = difflib.get_close_matches(col, list(known), n=3, cutoff=0.6)
         hint = f" (did you mean {', '.join(near)}?)" if near else ""
@@ -76,6 +89,18 @@ def check_header(schema: Schema, header: list[str]) -> HeaderCheck:
     for prefix in schema.required_measures:
         if not any(prefix in cols for cols in out.years.values()):
             problems.append(f"no `{prefix}_YYYY` columns found")
+    if schema.scenarios:
+        for sc in schema.scenarios:
+            yrs = out.scenario_years.get(sc, {})
+            if not yrs:
+                problems.append(f"no `<measure>_YYYY_{sc}` columns found")
+            for y, cols in yrs.items():
+                lacking = [p for p in schema.scenario_prefixes if p not in cols]
+                if lacking:
+                    problems.append(f"{sc} {y}: missing {lacking}")
+        sets = [set(out.scenario_years.get(sc, {})) for sc in schema.scenarios]
+        if any(x != sets[0] for x in sets):
+            problems.append("scenarios cover different years")
     if problems:
         raise SchemaError(f"schema {schema.name}: " + "; ".join(problems) +
                           ". Update pipeline/faf_pipeline/schemas/%s.yml (or run build --scaffold-map)." % schema.name)

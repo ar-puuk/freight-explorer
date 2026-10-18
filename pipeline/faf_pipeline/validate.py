@@ -56,95 +56,106 @@ def run(ctx: Context, previous_versions: dict[str, Any] | None = None, log=print
     for p in products:
         spec = ctx.sources["products"][p]
         v = sql_literal(spec["faf_version"])
-        for folder, keys in (("flows", FLOW_KEYS), ("state_flows", STATE_KEYS)):
-            d = out / p / folder / spec["scenario"]
-            files = sorted(d.glob("*.parquet"))
-            if not files:
-                fails.append(f"{p}/{folder}: no files")
-                continue
-            have = _cols(con, sql_literal(files[0].as_posix()))
-            kc = [k for k in keys if k in have]
-            g = _glob(d)
-            tag = f"{p}/{folder}"
-            dups = con.execute(f"SELECT count(*) FROM (SELECT 1 FROM read_parquet({g}) GROUP BY year, {', '.join(kc)} HAVING count(*) > 1)").fetchone()[0]
-            if dups:
-                fails.append(f"{tag}: {dups} duplicate keys")
-            neg = con.execute("SELECT count(*) FROM read_parquet(%s) WHERE %s" % (g, " OR ".join(f"{m} < 0" for m in MEASURES))).fetchone()[0]
-            if neg:
-                fails.append(f"{tag}: {neg} rows with negative measures")
-            # codes in dimensions
-            checks = [("sctg2", "dim_commodity", "sctg2"), ("dms_mode", "dim_mode", "mode"), ("trade_type", "dim_trade_type", "trade_type")]
-            if "dist_band" in have:
-                checks.append(("dist_band", "dim_dist_band", "dist_band"))
-            for col, dname, dcol in checks:
-                bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} IS NOT NULL AND {col} NOT IN "
-                                  f"(SELECT {dcol} FROM read_parquet({dim(dname)}) WHERE faf_version = {v})").fetchone()[0]
-                if bad:
-                    fails.append(f"{tag}: {bad} {col} codes not in {dname}")
-            for col in ("fr_inmode", "fr_outmode"):
-                bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} IS NOT NULL AND {col} NOT IN "
-                                  f"(SELECT mode FROM read_parquet({dim('dim_mode')}) WHERE faf_version = {v})").fetchone()[0]
-                if bad:
-                    fails.append(f"{tag}: {bad} {col} codes not in dim_mode")
-            for col in ("fr_orig", "fr_dest"):
-                bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} IS NOT NULL AND {col} NOT IN "
-                                  f"(SELECT region_id FROM read_parquet({dim('dim_foreign_region')}) WHERE faf_version = {v})").fetchone()[0]
-                if bad:
-                    fails.append(f"{tag}: {bad} {col} codes not in dim_foreign_region")
-            if folder == "flows":
-                for col in ("dms_orig", "dms_dest"):
-                    bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} NOT IN "
-                                      f"(SELECT zone_id FROM read_parquet({dim('dim_zone')}) WHERE faf_version = {v})").fetchone()[0]
+        scenarios = sorted(dd.name for dd in (out / p / "flows").iterdir() if dd.is_dir())
+        for sc in scenarios:
+            for folder, keys in (("flows", FLOW_KEYS), ("state_flows", STATE_KEYS)):
+                d = out / p / folder / sc
+                files = sorted(d.glob("*.parquet"))
+                if not files:
+                    fails.append(f"{p}/{folder}: no files")
+                    continue
+                have = _cols(con, sql_literal(files[0].as_posix()))
+                kc = [k for k in keys if k in have]
+                g = _glob(d)
+                tag = f"{p}/{folder}" + ("" if sc == spec["scenario"] else f"[{sc}]")
+                dups = con.execute(f"SELECT count(*) FROM (SELECT 1 FROM read_parquet({g}) GROUP BY year, {', '.join(kc)} HAVING count(*) > 1)").fetchone()[0]
+                if dups:
+                    fails.append(f"{tag}: {dups} duplicate keys")
+                neg = con.execute("SELECT count(*) FROM read_parquet(%s) WHERE %s" % (g, " OR ".join(f"{m} < 0" for m in MEASURES))).fetchone()[0]
+                if neg:
+                    fails.append(f"{tag}: {neg} rows with negative measures")
+                # codes in dimensions
+                checks = [("sctg2", "dim_commodity", "sctg2"), ("dms_mode", "dim_mode", "mode"), ("trade_type", "dim_trade_type", "trade_type")]
+                if "dist_band" in have:
+                    checks.append(("dist_band", "dim_dist_band", "dist_band"))
+                for col, dname, dcol in checks:
+                    bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} IS NOT NULL AND {col} NOT IN "
+                                      f"(SELECT {dcol} FROM read_parquet({dim(dname)}) WHERE faf_version = {v})").fetchone()[0]
                     if bad:
-                        fails.append(f"{tag}: {bad} {col} zone ids not in dim_zone")
-            # trade-type consistency
-            bad = con.execute(f"""SELECT count(*) FROM read_parquet({g}) WHERE
-                (trade_type = 1 AND (fr_orig IS NOT NULL OR fr_dest IS NOT NULL OR fr_inmode IS NOT NULL OR fr_outmode IS NOT NULL))
-             OR (trade_type = 2 AND (fr_orig IS NULL OR fr_inmode IS NULL OR fr_dest IS NOT NULL OR fr_outmode IS NOT NULL))
-             OR (trade_type = 3 AND (fr_dest IS NULL OR fr_outmode IS NULL OR fr_orig IS NOT NULL OR fr_inmode IS NOT NULL))""").fetchone()[0]
-            if bad:
-                fails.append(f"{tag}: {bad} rows violate trade-type/foreign-field consistency")
-            # NULL patterns (report)
-            report[f"{tag}:null_measure_years"] = {
-                m: [r[0] for r in con.execute(f"SELECT year FROM read_parquet({g}) GROUP BY year HAVING count({m}) = 0 ORDER BY year").fetchall()]
-                for m in MEASURES}
-            # row counts vs previous build
-            prev = ((previous_versions or {}).get("products", {}).get(p, {}).get("rows", {}))
-            for f in files:
-                key = f"{folder}/{f.stem}"
-                now = con.execute(f"SELECT count(*) FROM read_parquet({sql_literal(f.as_posix())})").fetchone()[0]
-                if key in prev and prev[key] > 0 and now < prev[key] * (1 - ROW_DROP_FAIL):
-                    fails.append(f"{tag}/{f.stem}: rows dropped from {prev[key]} to {now} (>{ROW_DROP_FAIL:.0%})")
+                        fails.append(f"{tag}: {bad} {col} codes not in {dname}")
+                for col in ("fr_inmode", "fr_outmode"):
+                    bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} IS NOT NULL AND {col} NOT IN "
+                                      f"(SELECT mode FROM read_parquet({dim('dim_mode')}) WHERE faf_version = {v})").fetchone()[0]
+                    if bad:
+                        fails.append(f"{tag}: {bad} {col} codes not in dim_mode")
+                for col in ("fr_orig", "fr_dest"):
+                    bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} IS NOT NULL AND {col} NOT IN "
+                                      f"(SELECT region_id FROM read_parquet({dim('dim_foreign_region')}) WHERE faf_version = {v})").fetchone()[0]
+                    if bad:
+                        fails.append(f"{tag}: {bad} {col} codes not in dim_foreign_region")
+                if folder == "flows":
+                    for col in ("dms_orig", "dms_dest"):
+                        bad = con.execute(f"SELECT count(DISTINCT {col}) FROM read_parquet({g}) WHERE {col} NOT IN "
+                                          f"(SELECT zone_id FROM read_parquet({dim('dim_zone')}) WHERE faf_version = {v})").fetchone()[0]
+                        if bad:
+                            fails.append(f"{tag}: {bad} {col} zone ids not in dim_zone")
+                # trade-type consistency
+                bad = con.execute(f"""SELECT count(*) FROM read_parquet({g}) WHERE
+                    (trade_type = 1 AND (fr_orig IS NOT NULL OR fr_dest IS NOT NULL OR fr_inmode IS NOT NULL OR fr_outmode IS NOT NULL))
+                 OR (trade_type = 2 AND (fr_orig IS NULL OR fr_inmode IS NULL OR fr_dest IS NOT NULL OR fr_outmode IS NOT NULL))
+                 OR (trade_type = 3 AND (fr_dest IS NULL OR fr_outmode IS NULL OR fr_orig IS NOT NULL OR fr_inmode IS NOT NULL))""").fetchone()[0]
+                if bad:
+                    fails.append(f"{tag}: {bad} rows violate trade-type/foreign-field consistency")
+                # NULL patterns (report)
+                report[f"{tag}:null_measure_years"] = {
+                    m: [r[0] for r in con.execute(f"SELECT year FROM read_parquet({g}) GROUP BY year HAVING count({m}) = 0 ORDER BY year").fetchall()]
+                    for m in MEASURES}
+                # row counts vs previous build
+                prev = ((previous_versions or {}).get("products", {}).get(p, {}).get("rows", {})) if sc == spec["scenario"] else (((previous_versions or {}).get("products", {}).get(p, {}).get("scenarios", {}) or {}).get(sc, {}).get("rows", {}))
+                for f in files:
+                    key = f"{folder}/{f.stem}"
+                    now = con.execute(f"SELECT count(*) FROM read_parquet({sql_literal(f.as_posix())})").fetchone()[0]
+                    if key in prev and prev[key] > 0 and now < prev[key] * (1 - ROW_DROP_FAIL):
+                        fails.append(f"{tag}/{f.stem}: rows dropped from {prev[key]} to {now} (>{ROW_DROP_FAIL:.0%})")
 
-        # reconciliation regional -> state, every year
-        gr, gs = _glob(out / p / "flows" / spec["scenario"]), _glob(out / p / "state_flows" / spec["scenario"])
-        have_r = _cols(con, sql_literal(sorted((out / p / "flows" / spec["scenario"]).glob("*.parquet"))[0].as_posix()))
-        # NULL key parts are coalesced to sentinels so the join treats "not applicable" as a value
-        kn = "coalesce(fr_orig, '') AS fr_orig, {o} AS o, {d} AS d, coalesce(fr_dest, '') AS fr_dest, coalesce(fr_inmode, -1) AS fr_inmode, "              "dms_mode, coalesce(fr_outmode, -1) AS fr_outmode, sctg2, trade_type, coalesce({db}, -1) AS dist_band"
-        db_expr = "dist_band" if "dist_band" in have_r else "CAST(NULL AS SMALLINT)"
-        con.execute(f"""CREATE OR REPLACE TABLE r_agg AS SELECT year, {kn.format(o='left(dms_orig, 2)', d='left(dms_dest, 2)', db=db_expr)},
-            sum(tons_kt) AS t, sum(value_const_musd) AS v, sum(value_current_musd) AS c, sum(tmiles_m) AS m FROM read_parquet({gr}) GROUP BY ALL""")
-        con.execute(f"""CREATE OR REPLACE TABLE s_flat AS SELECT year, {kn.format(o='dms_orig_st', d='dms_dest_st', db=db_expr)},
-            tons_kt AS t, value_const_musd AS v, value_current_musd AS c, tmiles_m AS m FROM read_parquet({gs})""")
-        join = "year, fr_orig, o, d, fr_dest, fr_inmode, dms_mode, fr_outmode, sctg2, trade_type, dist_band"
-        tol = 1e-6
-        row = con.execute(f"""SELECT count(*) FILTER (WHERE r_agg.year IS NULL OR s_flat.year IS NULL) AS unmatched,
-                count(*) FILTER (WHERE r_agg.year IS NOT NULL AND s_flat.year IS NOT NULL AND (
-                   abs(coalesce(r_agg.t,0) - coalesce(s_flat.t,0)) > {tol} OR abs(coalesce(r_agg.v,0) - coalesce(s_flat.v,0)) > {tol}
-                   OR abs(coalesce(r_agg.c,0) - coalesce(s_flat.c,0)) > {tol} OR abs(coalesce(r_agg.m,0) - coalesce(s_flat.m,0)) > {tol})) AS diff,
-                count(*) AS total
-            FROM r_agg FULL OUTER JOIN s_flat USING ({join})""").fetchone()
-        report[f"{p}:reconciliation"] = {"rows_compared": row[2], "unmatched": row[0], "value_mismatches": row[1], "tolerance": tol}
-        if row[0] or row[1]:
-            fails.append(f"{p}: regional vs state reconciliation: {row[0]} unmatched rows, {row[1]} mismatching rows (of {row[2]})")
+            # reconciliation regional -> state, every year
+            gr, gs = _glob(out / p / "flows" / sc), _glob(out / p / "state_flows" / sc)
+            have_r = _cols(con, sql_literal(sorted((out / p / "flows" / sc).glob("*.parquet"))[0].as_posix()))
+            # NULL key parts are coalesced to sentinels so the join treats "not applicable" as a value
+            kn = "coalesce(fr_orig, '') AS fr_orig, {o} AS o, {d} AS d, coalesce(fr_dest, '') AS fr_dest, coalesce(fr_inmode, -1) AS fr_inmode, "              "dms_mode, coalesce(fr_outmode, -1) AS fr_outmode, sctg2, trade_type, coalesce({db}, -1) AS dist_band"
+            db_expr = "dist_band" if "dist_band" in have_r else "CAST(NULL AS SMALLINT)"
+            con.execute(f"""CREATE OR REPLACE TABLE r_agg AS SELECT year, {kn.format(o='left(dms_orig, 2)', d='left(dms_dest, 2)', db=db_expr)},
+                sum(tons_kt) AS t, sum(value_const_musd) AS v, sum(value_current_musd) AS c, sum(tmiles_m) AS m FROM read_parquet({gr}) GROUP BY ALL""")
+            con.execute(f"""CREATE OR REPLACE TABLE s_flat AS SELECT year, {kn.format(o='dms_orig_st', d='dms_dest_st', db=db_expr)},
+                tons_kt AS t, value_const_musd AS v, value_current_musd AS c, tmiles_m AS m FROM read_parquet({gs})""")
+            join = "year, fr_orig, o, d, fr_dest, fr_inmode, dms_mode, fr_outmode, sctg2, trade_type, dist_band"
+            tol = 1e-6
+            row = con.execute(f"""SELECT count(*) FILTER (WHERE r_agg.year IS NULL OR s_flat.year IS NULL) AS unmatched,
+                    count(*) FILTER (WHERE r_agg.year IS NOT NULL AND s_flat.year IS NOT NULL AND (
+                       abs(coalesce(r_agg.t,0) - coalesce(s_flat.t,0)) > {tol} OR abs(coalesce(r_agg.v,0) - coalesce(s_flat.v,0)) > {tol}
+                       OR abs(coalesce(r_agg.c,0) - coalesce(s_flat.c,0)) > {tol} OR abs(coalesce(r_agg.m,0) - coalesce(s_flat.m,0)) > {tol})) AS diff,
+                    count(*) AS total
+                FROM r_agg FULL OUTER JOIN s_flat USING ({join})""").fetchone()
+            report[f"{p}:reconciliation" + ("" if sc == spec["scenario"] else f"[{sc}]")] = {"rows_compared": row[2], "unmatched": row[0], "value_mismatches": row[1], "tolerance": tol}
+            if row[0] or row[1]:
+                fails.append(f"{p}[{sc}]: regional vs state reconciliation: {row[0]} unmatched rows, {row[1]} mismatching rows (of {row[2]})")
+
 
         # year-over-year swings (report only); forecast steps separate
-        rows = con.execute(f"""SELECT year, any_value(data_version), sum(tons_kt) FROM read_parquet({gs}) WHERE trade_type = 1 GROUP BY year ORDER BY year""").fetchall()
+        rows = con.execute(f"""SELECT year, any_value(data_version), sum(tons_kt) FROM read_parquet({_glob(out / p / "state_flows" / spec["scenario"])}) WHERE trade_type = 1 GROUP BY year ORDER BY year""").fetchall()
         swings = []
         for (y0, dv0, t0), (y1, dv1, t1) in zip(rows, rows[1:]):
             if t0 and abs(t1 / t0 - 1) > SWING_FLAG and dv1 != "forecast" and dv0 != "forecast":
                 swings.append(f"{y0}->{y1}: {t1 / t0 - 1:+.0%}")
         report[f"{p}:annual_swings_over_{int(SWING_FLAG * 100)}pct"] = swings
+
+        # High/Low scenarios must bracket the mid-range forecast in aggregate (report-only: a violation is listed, not failed)
+        if {"high", "low"} <= set(scenarios):
+            totals = {}
+            for sc2 in ("low", sc_mid := spec["scenario"], "high"):
+                totals[sc2] = dict(con.execute(f"SELECT year, sum(tons_kt) FROM read_parquet({_glob(out / p / 'state_flows' / sc2)}) GROUP BY year").fetchall())
+            bad = [y for y in totals["low"] if not (totals["low"][y] <= totals[sc_mid].get(y, 0) + 1e-6 <= totals["high"][y] + 2e-6)]
+            report[f"{p}:scenario_order_violations (low <= mid <= high, tons)"] = bad
 
     # ---- FAF5 vs FAF6 2022 (report only)
     if len(products) == 2:

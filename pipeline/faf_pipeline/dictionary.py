@@ -60,7 +60,7 @@ def build(ctx: Context, log=print) -> int:
                 "description VARCHAR, unit VARCHAR, first_year INTEGER, last_year INTEGER, caveat VARCHAR)")
     rows = []
     for ds, table, files in output_tables(ctx):
-        glob = sql_literal((files[0].parent.as_posix() + "/*.parquet") if len(files) > 1 else files[0].as_posix())
+        glob = "[" + ", ".join(sql_literal(f.as_posix()) for f in files) + "]"    # every file of the table, all scenarios
         has_year = "year" in {r[0] for r in con.execute(f"SELECT column_name FROM (DESCRIBE SELECT * FROM read_parquet({glob}))").fetchall()}
         cols = con.execute(f"SELECT column_name FROM (DESCRIBE SELECT * FROM read_parquet({glob}))").fetchall()
         for i, (col,) in enumerate(cols, 1):

@@ -32,6 +32,14 @@
     "retrieved": "2026-10-18"
   },
   {
+    "path": "data-raw/faf5/FAF5.7.1_HiLoForecasts.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_HiLoForecasts.zip",
+    "release": "FAF5.7.1 (2025-08-15)",
+    "sha256": "3dcaff4276b330c942e3f9282283963e6476ad84693d4a966b822c9bf2f5467c",
+    "bytes": 425836892,
+    "retrieved": "2026-10-18"
+  },
+  {
     "path": "data-raw/faf5/FAF5.7.1_State.zip",
     "source_url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State.zip",
     "release": "FAF5.7.1",

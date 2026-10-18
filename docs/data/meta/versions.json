@@ -54,16 +54,70 @@
     "state_flows/2050": 16498
    },
    "scenario": "mid",
+   "scenarios": {
+    "high": {
+     "rows": {
+      "flows/2030": 29077,
+      "flows/2035": 29077,
+      "flows/2040": 29077,
+      "flows/2045": 29077,
+      "flows/2050": 29077,
+      "state_flows/2030": 16498,
+      "state_flows/2035": 16498,
+      "state_flows/2040": 16498,
+      "state_flows/2045": 16498,
+      "state_flows/2050": 16498
+     },
+     "years": {
+      "2030": "forecast",
+      "2035": "forecast",
+      "2040": "forecast",
+      "2045": "forecast",
+      "2050": "forecast"
+     }
+    },
+    "low": {
+     "rows": {
+      "flows/2030": 29077,
+      "flows/2035": 29077,
+      "flows/2040": 29077,
+      "flows/2045": 29077,
+      "flows/2050": 29077,
+      "state_flows/2030": 16498,
+      "state_flows/2035": 16498,
+      "state_flows/2040": 16498,
+      "state_flows/2045": 16498,
+      "state_flows/2050": 16498
+     },
+     "years": {
+      "2030": "forecast",
+      "2035": "forecast",
+      "2040": "forecast",
+      "2045": "forecast",
+      "2050": "forecast"
+     }
+    }
+   },
    "sources": {
     "regional": {
      "bytes": 305397783,
      "sha256": "1429be77a578f2b32913320a1299c0e3de8aa9c6180ce5aacfd65a7886ba55b8",
      "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1.zip"
     },
+    "regional_hilo": {
+     "bytes": 425836892,
+     "sha256": "3dcaff4276b330c942e3f9282283963e6476ad84693d4a966b822c9bf2f5467c",
+     "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_HiLoForecasts.zip"
+    },
     "state": {
      "bytes": 145261207,
      "sha256": "1959b40d1b297b7dec827035dd74c0bda429a70fc5510d688f72d4e1620950b6",
      "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State.zip"
+    },
+    "state_hilo": {
+     "bytes": 203448107,
+     "sha256": "19e9afe48034a68d87fedf2299e6225d3453b98f04438f8fb1f1852329965c43",
+     "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State_HiLoForecasts.zip"
     }
    },
    "years": {

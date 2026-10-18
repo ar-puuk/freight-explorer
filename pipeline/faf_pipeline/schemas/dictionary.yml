@@ -7,7 +7,7 @@ columns:
   faf_version: {label: FAF version, description: "FAF release the row comes from (5.7.1 or 6.0). Versions use different zone systems and benchmark years and are not directly comparable."}
   benchmark_year: {label: Benchmark year, description: "Commodity Flow Survey benchmark year of the FAF version (2017 for FAF5, 2022 for FAF6). Also the dollar year of constant-dollar values.", unit: year}
   data_version: {label: Data status, description: "base = benchmark year; final = final annual estimate; preliminary = preliminary annual estimate; forecast = model forecast. Taken from the BTS version history, not from the data files."}
-  scenario: {label: Forecast scenario, description: "mid = mid-range (the only scenario loaded so far); high/low arrive with the Hi/Lo files."}
+  scenario: {label: Forecast scenario, description: "mid = mid-range; high and low = the FAF5.7.1 High and Low forecast scenarios, which exist for forecast years only (2030-2050) and publish tons and value only.", caveat: "Scenarios are published model forecasts, not predictions made by this site."}
   year: {label: Year, unit: year, description: "Calendar year of the estimate (annual estimate or forecast year). FAF5 has no 2025-2029; FAF6.0 has 2022 only."}
   fr_orig: {label: Foreign origin region, description: "Foreign region of origin for imports (801 Canada ... 808 SE Asia & Oceania); empty otherwise."}
   fr_dest: {label: Foreign destination region, description: "Foreign region of destination for exports; empty otherwise."}
@@ -23,8 +23,8 @@ columns:
   dist_band: {label: Distance band, description: "Distance band of the shipment (1 below 100 miles ... 8 over 2,000 miles). Present in FAF5 only.", caveat: "Not in FAF6.0 files."}
   tons_kt: {label: Tons, unit: thousand tons, description: "Weight of the flow."}
   value_const_musd: {label: Value (constant dollars), unit: million dollars, description: "Value in benchmark-year dollars (2017$ for FAF5, 2022$ for FAF6).", caveat: "Not comparable between FAF versions."}
-  value_current_musd: {label: Value (current dollars), unit: million dollars, description: "Value in nominal dollars of the estimate year.", caveat: "NULL where not published: FAF5 has it for 2018-2024 only; FAF6.0 does not include it."}
-  tmiles_m: {label: Ton-miles, unit: million ton-miles, description: "Tons times miles shipped.", caveat: "NULL where not published: not in the FAF6.0 release."}
+  value_current_musd: {label: Value (current dollars), unit: million dollars, description: "Value in nominal dollars of the estimate year.", caveat: "NULL where not published: FAF5 has it for 2018-2024 only; FAF6.0 and the High/Low scenarios do not include it."}
+  tmiles_m: {label: Ton-miles, unit: million ton-miles, description: "Tons times miles shipped.", caveat: "NULL where not published: not in the FAF6.0 release and not in the High/Low scenarios."}
   source_file: {label: Source file, description: "Name of the source CSV inside the downloaded release."}
 
   # network

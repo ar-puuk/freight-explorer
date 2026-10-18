@@ -5,7 +5,7 @@ import pytest
 
 from faf_pipeline import flows
 from faf_pipeline.config import ConfigError
-from tests.conftest import GOOD_ROWS, REGIONAL_HEADER, regional_csv, write_regional
+from tests.conftest import GOOD_ROWS, HILO_HEADER, REGIONAL_HEADER, regional_csv, write_hilo, write_regional
 
 
 def read(ctx, year):
@@ -83,3 +83,40 @@ def test_schema_drift_in_a_source_file_fails_the_build(fake_ctx):
     from faf_pipeline.schema import SchemaError
     with pytest.raises(SchemaError, match="surprise_col"):
         flows.build_level(fake_ctx, "faf5", "regional", log=lambda *_: None)
+
+
+def hilo_rows(mid_2030_tons: str = "12") -> list[str]:
+    """GOOD_ROWS with scenario columns appended (low = 0.5 x mid, high = 2 x mid for tons and value)."""
+    out = []
+    for r in GOOD_ROWS:
+        c = r.split(",")
+        tons30, val30 = float(c[12]), float(c[15])
+        if r is GOOD_ROWS[0]:
+            c[12] = mid_2030_tons
+        out.append(",".join(c + [str(tons30 * 0.5), str(tons30 * 2), str(val30 * 0.5), str(val30 * 2)]))
+    return out
+
+
+def test_high_low_scenarios_written_with_tons_and_value_only(fake_ctx):
+    write_regional(fake_ctx, regional_csv(GOOD_ROWS))
+    flows.build_level(fake_ctx, "faf5", "regional", log=lambda *_: None)
+    write_hilo(fake_ctx, regional_csv(hilo_rows(), HILO_HEADER))
+    stats = flows.build_level(fake_ctx, "faf5", "regional", log=lambda *_: None, hilo=True)
+    assert sorted(stats["scenarios"]) == ["high", "low"]
+    base = fake_ctx.paths.out / "faf5" / "flows"
+    mid = duckdb.sql(f"SELECT sum(tons_kt) FROM read_parquet('{(base / 'mid' / '2030.parquet').as_posix()}')").fetchone()[0]
+    for sc, factor in (("low", 0.5), ("high", 2.0)):
+        f = (base / sc / "2030.parquet").as_posix()
+        row = duckdb.sql(f"SELECT sum(tons_kt), count(tmiles_m), count(value_current_musd), min(scenario), min(data_version) FROM read_parquet('{f}')").fetchone()
+        assert abs(row[0] - mid * factor) < 1e-9
+        assert row[1] == 0 and row[2] == 0                 # ton-miles and current dollars are not published for High/Low
+        assert row[3] == sc and row[4] == "forecast"
+    assert not (base / "low" / "2017.parquet").exists()     # scenarios exist for forecast years only
+
+
+def test_hilo_mid_columns_must_match_the_mid_range_files(fake_ctx):
+    write_regional(fake_ctx, regional_csv(GOOD_ROWS))
+    flows.build_level(fake_ctx, "faf5", "regional", log=lambda *_: None)
+    write_hilo(fake_ctx, regional_csv(hilo_rows(mid_2030_tons="13"), HILO_HEADER))
+    with pytest.raises(ConfigError, match="differ from the mid-range file"):
+        flows.build_level(fake_ctx, "faf5", "regional", log=lambda *_: None, hilo=True)
