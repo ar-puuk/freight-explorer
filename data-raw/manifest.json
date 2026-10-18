@@ -94,5 +94,29 @@
     "sha256": "424b4bfa9c842b8f57558c89901585c3e0f9a8cd1e22ea409b9e57266799513f",
     "bytes": 224725381,
     "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/faf5/FAF5.7.1_State_HiLoForecasts.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State_HiLoForecasts.zip",
+    "release": "FAF5.7.1",
+    "sha256": "19e9afe48034a68d87fedf2299e6225d3453b98f04438f8fb1f1852329965c43",
+    "bytes": 203448107,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/county/49 - Utah.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/County/49%20-%20Utah.zip",
+    "release": "FAF5.6.1-based experimental county 2022",
+    "sha256": "bf66627c2f5f11824f3a8de42a817e0767c6907cdc7559de77b9c8419bd64246",
+    "bytes": 116725849,
+    "retrieved": "2026-10-18"
+  },
+  {
+    "path": "data-raw/county/All_Experimental_Disaggregation_Factors.zip",
+    "source_url": "https://faf.ornl.gov/faf5/Data/County/All_Experimental_Disaggregation_Factors.zip",
+    "release": "FAF5.6.1-based experimental county 2022",
+    "sha256": "1e44015c98c288167dc15ab7f21609a8139ca94c51a3a3b8002b2747ddbbbb56",
+    "bytes": 570159,
+    "retrieved": "2026-10-18"
   }
 ]

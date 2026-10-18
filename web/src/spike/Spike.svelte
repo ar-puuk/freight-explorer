@@ -78,9 +78,10 @@
   }
 
   async function startDuckDb() {
+    // Ship only the EH build (36 MB); the types demand `mvp`, which we deliberately omit (see docs/DECISIONS.md).
     const bundle = await duckdb.selectBundle({
       eh: { mainModule: duckdbWasmEh, mainWorker: duckdbWorkerEh },
-    });
+    } as unknown as duckdb.DuckDBBundles);
     const worker = new Worker(bundle.mainWorker!);
     const db = new duckdb.AsyncDuckDB(new duckdb.VoidLogger(), worker);
     await db.instantiate(bundle.mainModule, bundle.pthreadWorker);

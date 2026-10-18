@@ -1,8 +1,8 @@
 name: Utah
 abbrev: UT
 fips: "49"
-# [W, S, E, N]. Checked 2026-10-18 against Wikipedia's Utah extremes (37N-42N, 109°3'W-114°3'W);
-# values below are those extremes padded by ~0.01 deg. Not yet checked against Census TIGER state polygon (do in Phase 0).
+# [W, S, E, N]. Verified 2026-10-18 against the real FAF6 and FAF5 zone shapefiles (union of the state's zones =
+# [-114.053, 36.998, -109.041, 42.002]); values below pad that by ~0.01 deg. Also agrees with Wikipedia's extremes.
 bbox: [-114.06, 36.99, -109.04, 42.01]
 center: [-111.65, 39.32]
 zoom: 6
