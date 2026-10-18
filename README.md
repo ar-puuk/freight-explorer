@@ -2,7 +2,7 @@
 
 A map-first, static, zero-cost explorer for Freight Analysis Framework (FAF) data, one state at a time. The state is set by one config file (`config/states/<name>.yml`); Utah is the target. See `HANDOFF.md` for the plan, `docs/SPIKES.md` for the Phase 0 findings and `docs/DECISIONS.md` for deviations.
 
-Status: Phases 1 (pipeline and data) and 2 (map app) are done. Charts, scenarios, table export and the methodology page are still to come (see `HANDOFF.md`).
+Status: Phases 1 to 4 are done (pipeline, map app, charts and High/Low scenarios, 1997-2012 state history, experimental county estimates). The methodology page, accessibility/performance passes and open-source polish remain (see `HANDOFF.md` phase 5).
 
 ## Pipeline quickstart
 
@@ -18,7 +18,7 @@ uv run pytest
 
 Individual steps: `fetch`, `build` (dimensions + flows + dictionary), `zones`, `network`. Output goes to `docs/data/` (committed; every file under 90 MB). Re-running on unchanged inputs produces byte-identical files, so a second `update` leaves no git diff. Commit the outputs only after `validate` passes.
 
-What is built for the configured state: every origin-destination record that touches the state, for FAF5.7.1 (mid-range, 2017 to 2050, regional and state databases) and FAF6.0 (2022), plus zone shapes and anchor points, the FAF5 highway network clipped to the state plus a buffer (PMTiles), and link-level truck flows for the 2017, 2022 and 2050 baseline assignments. Not yet built: High/Low scenarios, 1997-2012 state history, experimental county estimates (see `HANDOFF.md` phases 3 and 4).
+What is built for the configured state: every origin-destination record that touches the state, for FAF5.7.1 (mid-range, 2017 to 2050, regional and state databases) and FAF6.0 (2022), plus zone shapes and anchor points, the FAF5 highway network clipped to the state plus a buffer (PMTiles), and link-level truck flows for the 2017, 2022 and 2050 baseline assignments. It also builds the High and Low forecast scenarios, the FAF5-reprocessed state-level history (1997 to 2012), and the experimental county-level estimates (2022, tons only; state, adjacent-state counties and outside FAF zones) with their disaggregation factors.
 
 ## Web app
 

@@ -8,7 +8,7 @@ const TRUCKS: TruckType[] = ['all', 'su', 'cu'];
 const MARKETS: Market[] = ['total', 'domestic', 'import', 'export'];
 const THEMES: ThemePref[] = ['system', 'light', 'dark'];
 const BASEMAPS = ['liberty', 'bright', 'positron', 'dark', 'fiord'];
-const PANELS: Panel[] = ['closed', 'summary', 'trends', 'compare', 'table'];
+const PANELS: Panel[] = ['closed', 'summary', 'trends', 'compare', 'history', 'table'];
 const COMPARE_KINDS: CompareKind[] = ['zone', 'commodity'];
 export const TABLE_DIMS = ['orig', 'dest', 'sctg2', 'dms_mode', 'trade_type'];
 
@@ -79,6 +79,7 @@ export function decode(search: string, defaults: AppState, allowed: Allowed): Ap
       ids: list(q.get('ci'), /^\d{2,3}$/).slice(0, 6),
     },
     overlayOther: q.get('ov') === '1',
+    historyOverlay: q.get('ho') === '1',
     tableDims: pickDims(q.get('td'), defaults.tableDims),
   };
 }
@@ -117,6 +118,7 @@ export function encode(s: AppState, d: AppState, defaultYear: (version: string) 
     q.set('ci', [...s.compare.ids].sort().join(','));
   } else set('ck', s.compare.kind, d.compare.kind);
   if (s.overlayOther) q.set('ov', '1');
+  if (s.historyOverlay) q.set('ho', '1');
   if (s.tableDims.join() !== d.tableDims.join()) q.set('td', s.tableDims.join(','));
   const out = q.toString();
   return out ? `?${out}` : '';

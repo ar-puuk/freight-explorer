@@ -88,7 +88,7 @@ describe('url state', () => {
     version: '5.7.1', scenario: 'mid', year: 2023, view: 'total', direction: 'both', measure: 'tons', dollars: 'const',
     commodities: [], modes: [], topN: 50, minFlow: 0, selected: null,
     layers: { flows: true, network: false, zones: true }, net: { year: 2017, truck: 'all', market: 'total', connectors: false },
-    basemap: null, theme: 'system', cam: null, panel: 'closed', compare: { kind: 'zone', ids: [] }, overlayOther: false,
+    basemap: null, theme: 'system', cam: null, panel: 'closed', compare: { kind: 'zone', ids: [] }, overlayOther: false, historyOverlay: false,
     tableDims: ['orig', 'dest', 'sctg2'],
   };
   const years: Record<string, number[]> = { '5.7.1': [2017, 2018, 2023, 2024, 2030, 2035], '6.0': [2022] };

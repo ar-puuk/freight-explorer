@@ -31,8 +31,8 @@
       {@const z = loc(d.id)}
       <h2>{z?.name ?? d.id}</h2>
       <p class="muted">
-        {z?.type === 'foreign_region' ? 'Foreign region' : `FAF zone ${d.id}`}{z?.is_state_zone ? ' (in the state)' : ''}.
-        {#if z?.schematic}The map position is schematic, not a real location.{:else}Drawn at a population-weighted anchor point, not a measured location of freight activity.{/if}
+        {z?.type === 'foreign_region' ? 'Foreign region' : z?.type === 'county' ? `County ${d.id}` : `FAF zone ${d.id}`}{z?.is_state_zone ? ' (in the state)' : ''}.
+        {#if z?.schematic}The map position is schematic, not a real location.{:else if z?.type === 'county'}Drawn at the county's Census 2020 center of population, not a measured location of freight activity.{:else}Drawn at a population-weighted anchor point, not a measured location of freight activity.{/if}
       </p>
       <h3>Top trading partners (current filters)</h3>
       <table>
@@ -47,7 +47,7 @@
       <table><tbody>{#each d.byMode as c}<tr><td>{c.label}</td><td class="num">{ctrl.fmtMeasure(c.magnitude)}</td></tr>{/each}</tbody></table>
     {:else if d.kind === 'flow'}
       <h2>{ctrl.name(d.originId)} to {ctrl.name(d.destId)}</h2>
-      <p class="muted">{ctrl.fmtMeasure(d.count)} in FAF {ctrl.s.version} {ctrl.s.year} ({ctrl.dataVersionOfYear}). Domestic leg unless the view is Import or Export.</p>
+      <p class="muted">{ctrl.fmtMeasure(d.count)} in {ctrl.versionLabel} {ctrl.s.year} ({ctrl.dataVersionOfYear}). Domestic leg unless the view is Import or Export.</p>
       <h3>Commodities</h3>
       <table><tbody>{#each d.byCommodity as c}<tr><td>{c.label}</td><td class="num">{ctrl.fmtMeasure(c.magnitude)}</td></tr>{/each}</tbody></table>
       <h3>Domestic modes</h3>

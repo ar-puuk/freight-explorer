@@ -1,7 +1,7 @@
 import * as duckdb from '@duckdb/duckdb-wasm';
 import duckdbWasmEh from '@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url';
 import duckdbWorkerEh from '@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url';
-import type { DimsMeta, StateMeta, VersionsMeta, ZoneInfo } from './types';
+import type { DimsMeta, ProductMeta, StateMeta, VersionsMeta, ZoneInfo } from './types';
 
 export const DATA_BASE = new URL('data/', document.baseURI).href;
 
@@ -26,11 +26,25 @@ export async function loadMeta(): Promise<Meta> {
   return { state, versions, dims };
 }
 
-/** versions.json is keyed by product (faf5, faf6); the UI is keyed by faf_version. */
+/** versions.json is keyed by product (faf5, faf6, county, history); the UI is keyed by faf_version. The history series is not a version. */
 export function productKey(meta: Meta, version: string): string {
-  const hit = Object.entries(meta.versions.products).find(([, p]) => p.faf_version === version);
+  const hit = Object.entries(meta.versions.products).find(([, p]) => p.faf_version === version && p.kind !== 'history');
   if (!hit) throw new Error(`unknown FAF version ${version}`);
   return hit[0];
+}
+
+/** Selectable versions: the FAF releases first (by product key), then the experimental county product. */
+export function versionList(meta: Meta): string[] {
+  const rank = (p: ProductMeta) => (p.kind === 'county' ? 1 : 0);
+  return Object.entries(meta.versions.products)
+    .filter(([, p]) => p.kind !== 'history')
+    .sort((a, b) => rank(a[1]) - rank(b[1]) || a[0].localeCompare(b[0]))
+    .map(([, p]) => p.faf_version);
+}
+
+export function versionLabel(meta: Meta, version: string): string {
+  const p = meta.versions.products[productKey(meta, version)];
+  return p.label ?? `FAF ${p.faf_version}`;
 }
 
 export function yearsFor(meta: Meta, version: string, scenario = 'mid'): number[] {
@@ -66,6 +80,7 @@ export const loadHeadline = (product: string) => loadJson<Headline>(`${product}/
 
 /** Zone anchors (domestic zones for one version) plus the schematic foreign-region anchors, keyed by id. */
 export async function loadLocations(meta: Meta, version: string, zones: ZoneGeoJSON): Promise<Map<string, ZoneInfo>> {
+  if (meta.versions.products[productKey(meta, version)].kind === 'county') return loadCountyLocations();
   const [centroids, foreign] = await Promise.all([
     loadJson<Record<string, Record<string, [number, number]>>>('geo/zone_centroids.json'),
     loadJson<{ region_id: string; label: string; lon: number; lat: number }[]>('geo/foreign_regions.json'),
@@ -82,6 +97,18 @@ export async function loadLocations(meta: Meta, version: string, zones: ZoneGeoJ
   for (const r of foreign) {
     out.set(r.region_id, { id: r.region_id, name: r.label, state_fips: '', type: 'foreign_region', is_state_zone: false, lon: r.lon, lat: r.lat, schematic: true });
   }
+  return out;
+}
+
+/** County product: counties (Census centers of population), the outside FAF zones its rows end in, and the schematic foreign regions. */
+async function loadCountyLocations(): Promise<Map<string, ZoneInfo>> {
+  const [locs, foreign] = await Promise.all([
+    loadJson<{ id: string; name: string; lon: number; lat: number; type: string; state_fips: string; is_state_zone: boolean }[]>('geo/county_locations.json'),
+    loadJson<{ region_id: string; label: string; lon: number; lat: number }[]>('geo/foreign_regions.json'),
+  ]);
+  const out = new Map<string, ZoneInfo>();
+  for (const l of locs) out.set(l.id, { id: l.id, name: l.name, state_fips: l.state_fips, type: l.type, is_state_zone: l.is_state_zone, lon: l.lon, lat: l.lat });
+  for (const r of foreign) out.set(r.region_id, { id: r.region_id, name: r.label, state_fips: '', type: 'foreign_region', is_state_zone: false, lon: r.lon, lat: r.lat, schematic: true });
   return out;
 }
 

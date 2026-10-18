@@ -20,7 +20,7 @@
   const rows = $derived(ctrl.compareSeries.flatMap((s) => s.points.map((p) => [s.label, `${p.year}`, p.data_version, fmt(p.v)])));
 </script>
 
-<p class="muted">Overlay trends for up to six zones or commodities within FAF {ctrl.s.version} (mid-range scenario, all years). The current view, direction, measure and other filters apply; comparing commodities ignores the commodity filter.</p>
+<p class="muted">Overlay trends for up to six zones or commodities within {ctrl.versionLabel} (mid-range scenario, all years). The current view, direction, measure and other filters apply; comparing commodities ignores the commodity filter.</p>
 
 <div class="row">
   <div class="seg" role="group" aria-label="Compare by">

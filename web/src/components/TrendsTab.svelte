@@ -26,13 +26,13 @@
 {#if ctrl.s.overlayOther}
   <p class="notice" role="note">
     <strong>Benchmark break.</strong>
-    {#each Object.values(ctrl.meta?.versions.products ?? {}) as p, i}{i ? ' and ' : ''}FAF {p.faf_version} ({p.benchmark_year} benchmark){/each}
+    {#each Object.values(ctrl.meta?.versions.products ?? {}).filter((p) => p.kind !== 'history' && !p.experimental) as p, i}{i ? ' and ' : ''}FAF {p.faf_version} ({p.benchmark_year} benchmark){/each}
     use different zone systems, benchmark years and dollar years. Their series are drawn separately and never joined; do not read the gap between them as growth or decline.
   </p>
 {/if}
 
 {#if singleYear}
-  <p class="notice" role="note">FAF {ctrl.s.version} publishes {mid[0]?.year ?? ctrl.s.year} only, so there is no trend yet. Future FAF releases add annual years; the other FAF version's series can be shown beside it above.</p>
+  <p class="notice" role="note">{ctrl.versionLabel} publishes {mid[0]?.year ?? ctrl.s.year} only, so there is no trend yet. Future FAF releases add annual years; the other FAF version's series can be shown beside it above.</p>
 {/if}
 
 <h3>{ctrl.s.measure === 'tons' ? 'Tons' : ctrl.s.measure === 'value' ? 'Value' : 'Ton-miles'} by year{ctrl.s.measure === 'value' ? (ctrl.s.dollars === 'const' ? ` (constant ${ctrl.benchmarkYear} dollars)` : ' (current dollars)') : ''}</h3>

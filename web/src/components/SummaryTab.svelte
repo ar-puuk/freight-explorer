@@ -65,7 +65,7 @@
     {/if}
   </section>
 </div>
-<p class="muted note">Numbers describe the current filters for FAF {ctrl.s.version} {ctrl.s.year} ({ctrl.s.scenario === 'mid' ? 'mid-range' : `${ctrl.s.scenario} scenario`}). {formatCount(ctrl.flowTotals.n)} origin-destination pairs match.</p>
+<p class="muted note">Numbers describe the current filters for {ctrl.versionLabel} {ctrl.s.year} ({ctrl.s.scenario === 'mid' ? 'mid-range' : `${ctrl.s.scenario} scenario`}). {formatCount(ctrl.flowTotals.n)} origin-destination pairs match.</p>
 
 <style>
   .grid {

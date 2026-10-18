@@ -70,9 +70,15 @@
     {#if ready}<Controls {ctrl} />{:else if fatal}<p class="error" role="alert">{fatal}</p>{:else}<p class="muted">Loading…</p>{/if}
   </aside>
 
-  <main class="stage" class:drawer-open={ready && ctrl.s.panel !== 'closed'}>
+  <main class="stage" class:drawer-open={ready && ctrl.s.panel !== 'closed'} class:experimental={ready && ctrl.experimental}>
     <div class="map" bind:this={mapEl} role="application" aria-label="Freight flow map"></div>
     {#if ready}
+      {#if ctrl.experimental}
+        <div class="card exp-banner" role="note">
+          <strong>EXPERIMENTAL.</strong> County-level estimates for 2022 (BTS), tons only, built from FAF5.6.1 and allocated to counties with public indicator data.
+          Not FAF6, not directly comparable with the FAF numbers in the other versions, and not measured county flows.
+        </div>
+      {/if}
       <Kpis {ctrl} />
       <Detail {ctrl} />
       <Charts {ctrl} />
@@ -91,13 +97,17 @@
       {#if netBadge}
         <div class="card badge" role="note">
           <strong>FAF5 model assignment ({ctrl.s.net.year === 2017 ? '2017 benchmark' : `${ctrl.s.net.year} baseline projection`}).</strong> Not traffic counts; not updated to FAF6.
-          {#if ctrl.s.version !== '5.7.1'}Network is FAF5-based even while FAF {ctrl.s.version} flows are shown.{/if}
+          {#if ctrl.s.version !== ctrl.defaults.version}The network is a FAF5 product even while {ctrl.versionLabel} flows are shown.{/if}
         </div>
       {/if}
 
       <div class="footer">
         <span>
-          FAF {ctrl.s.version}, {ctrl.benchmarkYear} benchmark; values in {ctrl.benchmarkYear} dollars unless "current" is chosen. Modeled estimates, not counts. Not comparable with the other FAF version.
+          {#if ctrl.experimental}
+            {ctrl.versionLabel}: 2022, tons only (thousand tons). Experimental modeled estimates, not counts. Not comparable with the FAF releases.
+          {:else}
+            {ctrl.versionLabel}, {ctrl.benchmarkYear} benchmark; values in {ctrl.benchmarkYear} dollars unless "current" is chosen. Modeled estimates, not counts. Not comparable with the other FAF version.
+          {/if}
           Sources: BTS, FHWA, ORNL, U.S. Census Bureau. Basemap: OpenFreeMap, OpenStreetMap.
         </span>
       </div>

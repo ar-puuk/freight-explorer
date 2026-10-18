@@ -2,17 +2,14 @@
   import type { Controller } from '../lib/controller.svelte';
   import type { Panel } from '../lib/types';
   import CompareTab from './CompareTab.svelte';
+  import HistoryTab from './HistoryTab.svelte';
   import SummaryTab from './SummaryTab.svelte';
   import TableTab from './TableTab.svelte';
   import TrendsTab from './TrendsTab.svelte';
 
   let { ctrl }: { ctrl: Controller } = $props();
-  const TABS: { id: Exclude<Panel, 'closed'>; label: string }[] = [
-    { id: 'summary', label: 'Summary' },
-    { id: 'trends', label: 'Trends' },
-    { id: 'compare', label: 'Compare' },
-    { id: 'table', label: 'Table and CSV' },
-  ];
+  const LABELS: Record<Exclude<Panel, 'closed'>, string> = { summary: 'Summary', trends: 'Trends', compare: 'Compare', history: 'History', table: 'Table and CSV' };
+  const TABS = $derived(ctrl.tabs.map((id) => ({ id, label: LABELS[id] })));
 
   function onKey(e: KeyboardEvent, i: number) {
     if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
@@ -38,6 +35,7 @@
       {#if ctrl.s.panel === 'summary'}<SummaryTab {ctrl} />
       {:else if ctrl.s.panel === 'trends'}<TrendsTab {ctrl} />
       {:else if ctrl.s.panel === 'compare'}<CompareTab {ctrl} />
+      {:else if ctrl.s.panel === 'history'}<HistoryTab {ctrl} />
       {:else}<TableTab {ctrl} />{/if}
     </div>
   </section>

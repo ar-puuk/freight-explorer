@@ -160,3 +160,58 @@ export function modeStackChart(rows: { year: number; code: string; label: string
     marks: [Plot.barY(rows, { x: 'year', y: 'v', fill: 'label', ...(share ? { offset: 'normalize' as const } : {}), tip: true }), Plot.ruleY([0])],
   });
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// History (FAF5 reprocessed, state level, snapshot years). Separate marks and labels: never one line with the annual series.
+
+import type { HistorySeries } from './controller.svelte';
+
+/** Totals at the four snapshot years, optionally beside the FAF5 annual estimates (a separate, differently marked series). */
+export function historyTotalsChart(
+  totals: { year: number; v: number }[], faf5: TrendPoint[] | null, faf5Label: string, c: ChartColors, width: number, unit: string,
+): Element {
+  const years = [...new Set([...totals.map((t) => t.year), ...(faf5?.map((p) => p.year) ?? [])])].sort((a, b) => a - b);
+  const marks: Plot.Markish[] = [];
+  if (faf5?.length) {
+    const f5 = faf5.slice().sort((a, b) => a.year - b.year);
+    const divider = (Math.max(...totals.map((t) => t.year)) + Math.min(...f5.map((p) => p.year))) / 2;
+    marks.push(Plot.ruleX([divider], { stroke: c.muted, strokeDasharray: '4 4' }));
+    marks.push(Plot.text([{ x: divider, t: `${faf5Label} annual →` }], { x: 'x', text: 't', frameAnchor: 'top', dy: 6, dx: 4, textAnchor: 'start', fill: c.muted }));
+    if (f5.length > 1) marks.push(Plot.lineY(f5, { x: 'year', y: 'v', stroke: c.muted, strokeWidth: 1.5 }));
+    marks.push(Plot.dot(f5, { x: 'year', y: 'v', symbol: 'circle', r: 4, stroke: c.muted, fill: (p: TrendPoint) => (p.data_version === 'preliminary' ? c.surface : c.muted), strokeWidth: 2 }));
+  }
+  marks.push(Plot.lineY(totals, { x: 'year', y: 'v', stroke: c.accent, strokeWidth: 2, strokeDasharray: '2 3' }));
+  marks.push(Plot.dot(totals, { x: 'year', y: 'v', symbol: 'cross', r: 6, stroke: c.accent, strokeWidth: 2.5 }));
+  marks.push(Plot.tip(totals, Plot.pointer({ x: 'year', y: 'v', title: (t: { year: number; v: number }) => `${t.year} (historical snapshot)\n${t.v.toLocaleString('en-US', { maximumFractionDigits: 1 })} ${unit}` })));
+  return Plot.plot({
+    ...base(c, width),
+    height: 300,
+    marginLeft: 56,
+    x: { label: null, tickFormat: 'd', ticks: spacedTicks(years, width), domain: [years[0] - 1, years[years.length - 1] + 1] },
+    y: { label: unit, grid: true, tickFormat: comma, zero: true },
+    marks,
+  });
+}
+
+/** One line per series across the snapshot years (partners or commodities), colorblind-safe colors plus direct labels at the line ends. */
+export function snapshotLinesChart(series: HistorySeries[], c: ChartColors, width: number, unit: string): Element {
+  const rows = series.flatMap((s) => s.points.map((p) => ({ ...p, label: s.label })));
+  const labels = series.map((s) => s.label);
+  const years = [...new Set(rows.map((r) => r.year))].sort((a, b) => a - b);
+  const last = series.flatMap((s) => (s.points.length ? [{ ...s.points[s.points.length - 1], label: s.label }] : []));
+  return Plot.plot({
+    ...base(c, width),
+    height: 300,
+    marginLeft: 56,
+    marginRight: Math.min(190, Math.floor(width * 0.3)),
+    x: { label: null, tickFormat: 'd', ticks: years, domain: [years[0] - 1, years[years.length - 1] + 1] },
+    y: { label: unit, grid: true, tickFormat: comma, zero: true },
+    color: { domain: labels, range: labels.map((_, i) => OKABE_ITO[i % OKABE_ITO.length]) },
+    marks: [
+      Plot.lineY(rows, { x: 'year', y: 'v', stroke: 'label', strokeWidth: 2 }),
+      Plot.dot(rows, { x: 'year', y: 'v', stroke: 'label', fill: 'label', r: 3.5 }),
+      Plot.text(last, { x: 'year', y: 'v', text: 'label', fill: 'label', dx: 8, textAnchor: 'start', lineWidth: 14 }),
+      Plot.tip(rows, Plot.pointer({ x: 'year', y: 'v', title: (r: { label: string; year: number; v: number }) => `${r.label}, ${r.year}\n${r.v.toLocaleString('en-US', { maximumFractionDigits: 1 })} ${unit}` })),
+    ],
+  });
+}

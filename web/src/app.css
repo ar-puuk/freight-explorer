@@ -457,3 +457,32 @@ details > summary {
 .seg.small span {
   padding: 2px 10px;
 }
+
+/* ---- experimental county product */
+.exp-banner {
+  position: absolute;
+  z-index: 4;
+  top: 10px;
+  left: 10px;
+  right: 60px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  border-color: var(--warn-text);
+}
+.stage.experimental .kpis {
+  top: 66px;
+}
+.stage.experimental .detail {
+  top: 132px;
+}
+@media (max-width: 860px) {
+  .exp-banner {
+    right: 10px;
+    font-size: 12px;
+  }
+  .stage.experimental .kpis {
+    top: 96px;
+  }
+}

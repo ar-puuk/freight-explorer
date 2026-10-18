@@ -43,7 +43,7 @@
 
 {#if t}
   <p class="muted">
-    {formatCount(t.total)} row{t.total === 1 ? '' : 's'} for FAF {ctrl.s.version} {ctrl.s.year}, {ctrl.s.scenario === 'mid' ? 'mid-range' : `${ctrl.s.scenario} scenario`} ({ctrl.dataVersionOfYear}), {ctrl.s.view} view, {ctrl.s.direction} direction.
+    {formatCount(t.total)} row{t.total === 1 ? '' : 's'} for {ctrl.versionLabel} {ctrl.s.year}, {ctrl.s.scenario === 'mid' ? 'mid-range' : `${ctrl.s.scenario} scenario`} ({ctrl.dataVersionOfYear}), {ctrl.s.view} view, {ctrl.s.direction} direction.
     {t.total > TABLE_PAGE ? `Showing the largest ${TABLE_PAGE}; the CSV has every row.` : ''}
     The CSV repeats version, scenario, year, status and dollar basis on every row. n/a means not published, not zero.
   </p>

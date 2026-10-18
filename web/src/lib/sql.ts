@@ -23,8 +23,10 @@ export function endpoints(view: View): { o: string; d: string } {
   return { o: 'dms_orig', d: 'dms_dest' };
 }
 
-const ZONE_RX = /^\d{3}$/;
-const SCTG_RX = /^\d{2}$/;
+// Location ids: a 3-digit FAF zone / foreign region, or (county product) a 5-digit county FIPS. Commodity codes: 2-digit SCTG, or a
+// county-product group such as sctg0109.
+const ZONE_RX = /^(\d{3}|\d{5})$/;
+const SCTG_RX = /^(\d{2}|sctg\d{4})$/;
 
 function inList(values: string[], rx: RegExp): string {
   const bad = values.filter((v) => !rx.test(v));
@@ -206,5 +208,67 @@ export function tableSql(src: string, f: FlowFilter, stateZones: string[], dims:
   return (
     `SELECT ${[...sel, 'sum(tons_kt) AS tons_kt', 'sum(value_const_musd) AS value_const_musd', 'sum(value_current_musd) AS value_current_musd', 'sum(tmiles_m) AS tmiles_m'].join(', ')} ` +
     `FROM ${src} WHERE ${whereClause(f, stateZones)} ${by} ORDER BY sum(${order}) DESC NULLS LAST, ${picked.length ? picked.map((_, i) => i + 1).join(', ') : '1'}${limit ? ` LIMIT ${Math.floor(limit)}` : ''}`
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// History (FAF5 reprocessed, state level, 1997-2012): the rows carry state FIPS (dms_orig_st / dms_dest_st), not zones.
+
+const STATE_RX = /^\d{2}$/;
+
+export function historyWhere(f: FlowFilter, fips: string): string {
+  if (!STATE_RX.test(fips)) throw new Error('invalid state code');
+  const parts: string[] = [];
+  if (f.view === 'domestic') parts.push('trade_type = 1');
+  if (f.view === 'import') parts.push('trade_type = 2');
+  if (f.view === 'export') parts.push('trade_type = 3');
+  if (f.direction === 'inbound') parts.push(`(dms_dest_st = '${fips}' AND dms_orig_st <> '${fips}')`);
+  if (f.direction === 'outbound') parts.push(`(dms_orig_st = '${fips}' AND dms_dest_st <> '${fips}')`);
+  if (f.direction === 'within') parts.push(`(dms_orig_st = '${fips}' AND dms_dest_st = '${fips}')`);
+  if (f.commodities.length) parts.push(`sctg2 IN (${inList(f.commodities, SCTG_RX)})`);
+  if (f.modes.length) {
+    if (f.modes.some((m) => !Number.isInteger(m))) throw new Error('invalid mode code');
+    parts.push(`dms_mode IN (${f.modes.join(', ')})`);
+  }
+  return parts.length ? parts.join(' AND ') : 'TRUE';
+}
+
+export function historyTrendSql(tbl: string, f: FlowFilter, fips: string): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return `SELECT year::INTEGER AS year, sum(${m}) AS v FROM ${tbl} WHERE ${historyWhere(f, fips)} GROUP BY 1 HAVING sum(${m}) IS NOT NULL ORDER BY 1`;
+}
+
+export function historyModeSql(tbl: string, f: FlowFilter, fips: string): string {
+  const m = measureColumn(f.measure, f.dollars);
+  const where = historyWhere({ ...f, modes: [] }, fips);
+  return `SELECT year::INTEGER AS year, dms_mode AS code, sum(${m}) AS v FROM ${tbl} WHERE ${where} GROUP BY 1, 2 HAVING sum(${m}) > 0 ORDER BY 1, 2`;
+}
+
+/** Partner of each flow at state level: the non-state end (a state, or a foreign region in the import and export views). */
+export function historyPartnerExpr(view: View, fips: string): string {
+  if (!STATE_RX.test(fips)) throw new Error('invalid state code');
+  const s = `'${fips}'`;
+  if (view === 'import') return `CASE WHEN dms_dest_st = ${s} THEN fr_orig WHEN dms_orig_st = ${s} THEN dms_dest_st END`;
+  if (view === 'export') return `CASE WHEN dms_orig_st = ${s} THEN fr_dest WHEN dms_dest_st = ${s} THEN dms_orig_st END`;
+  return `CASE WHEN dms_dest_st = ${s} AND dms_orig_st <> ${s} THEN dms_orig_st WHEN dms_orig_st = ${s} AND dms_dest_st <> ${s} THEN dms_dest_st END`;
+}
+
+/** The `limit` largest partners (by the sum over all years), then each one's value in every year. */
+export function historyPartnersSql(tbl: string, f: FlowFilter, fips: string, limit = 6): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `WITH p AS (SELECT year::INTEGER AS year, ${historyPartnerExpr(f.view, fips)} AS code, ${m} AS v FROM ${tbl} WHERE ${historyWhere(f, fips)}), ` +
+    `top AS (SELECT code FROM p WHERE code IS NOT NULL GROUP BY 1 HAVING sum(v) > 0 ORDER BY sum(v) DESC, code LIMIT ${Math.floor(limit)}) ` +
+    `SELECT year, code, sum(v) AS v FROM p WHERE code IN (SELECT code FROM top) GROUP BY 1, 2 ORDER BY 2, 1`
+  );
+}
+
+export function historyCommoditiesSql(tbl: string, f: FlowFilter, fips: string, limit = 6): string {
+  const m = measureColumn(f.measure, f.dollars);
+  const where = historyWhere({ ...f, commodities: [] }, fips);
+  return (
+    `WITH p AS (SELECT year::INTEGER AS year, sctg2 AS code, ${m} AS v FROM ${tbl} WHERE ${where}), ` +
+    `top AS (SELECT code FROM p GROUP BY 1 HAVING sum(v) > 0 ORDER BY sum(v) DESC, code LIMIT ${Math.floor(limit)}) ` +
+    `SELECT year, code, sum(v) AS v FROM p WHERE code IN (SELECT code FROM top) GROUP BY 1, 2 ORDER BY 2, 1`
   );
 }

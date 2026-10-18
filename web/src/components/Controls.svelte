@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Controller } from '../lib/controller.svelte';
+  import { versionLabel } from '../lib/data';
   import { formatCount, formatPercent, rawUnit } from '../lib/format';
   import type { Direction, Market, TruckType, View } from '../lib/types';
 
@@ -9,7 +10,7 @@
   const meta = $derived(ctrl.meta!);
   const years = $derived(ctrl.yearList);
   const yearIdx = $derived(Math.max(0, years.indexOf(s.year)));
-  const versions = $derived(Object.values(meta.versions.products).map((p) => p.faf_version));
+  const versions = $derived(ctrl.allowed.versions);
 
   const STATUS: Record<string, string> = {
     base: 'benchmark year',
@@ -31,7 +32,7 @@
   ];
 
   const sctgLabel = (code: string) => ctrl.dim.commodity[code] ?? code;
-  const groups = $derived(meta.dims.commodity_groups.map((g) => ({ ...g, sctg: g.sctg.filter((c) => c in ctrl.dim.commodity) })).filter((g) => g.sctg.length));
+  const groups = $derived((ctrl.dim.commodity_groups ?? meta.dims.commodity_groups).map((g) => ({ ...g, sctg: g.sctg.filter((c) => c in ctrl.dim.commodity) })).filter((g) => g.sctg.length));
   const modeCodes = $derived(Object.keys(ctrl.dim.mode).sort());
 
   function toggleCommodity(code: string, on: boolean) {
@@ -74,10 +75,14 @@
     <legend>FAF version</legend>
     <div class="seg">
       {#each versions as v}
-        <label><input type="radio" name="version" value={v} checked={s.version === v} onchange={() => ctrl.setVersion(v)} /><span>FAF {v}</span></label>
+        <label><input type="radio" name="version" value={v} checked={s.version === v} onchange={() => ctrl.setVersion(v)} /><span>{versionLabel(meta, v)}</span></label>
       {/each}
     </div>
-    <span class="hint">{ctrl.benchmarkYear} benchmark. FAF5 and FAF6 use different zones, benchmark years and dollar years: not directly comparable.</span>
+    {#if ctrl.experimental}
+      <span class="hint"><strong>Experimental.</strong> BTS county-level estimates for 2022, tons only, built from FAF5.6.1 with public indicator data. Not directly comparable with any FAF release.</span>
+    {:else}
+      <span class="hint">{ctrl.benchmarkYear} benchmark. FAF versions use different zones, benchmark years and dollar years: not directly comparable.</span>
+    {/if}
   </fieldset>
 
   <div class="field">
@@ -103,7 +108,7 @@
     </div>
     <span class="hint">
       {#if ctrl.scenarioList.length > 1}High and Low are published FAF forecast scenarios for forecast years only, with tons and value but no ton-miles or current dollars.
-      {:else}FAF {s.version} publishes no High or Low scenario.{/if}
+      {:else}{ctrl.versionLabel} publishes no High or Low scenario.{/if}
     </span>
   </fieldset>
 </section>
@@ -133,12 +138,14 @@
     <legend>Measure</legend>
     <div class="seg">
       <label><input type="radio" name="measure" checked={s.measure === 'tons'} onchange={() => ctrl.change({ measure: 'tons' })} /><span>Tons</span></label>
-      <label><input type="radio" name="measure" checked={s.measure === 'value'} onchange={() => ctrl.change({ measure: 'value' })} /><span>Value</span></label>
+      <label title={ctrl.available.value ? '' : 'Value is not published for this version'}>
+        <input type="radio" name="measure" checked={s.measure === 'value'} disabled={!ctrl.available.value} onchange={() => ctrl.change({ measure: 'value' })} /><span>Value</span>
+      </label>
       <label title={ctrl.available.tmiles ? '' : 'Ton-miles are not published for this version or year'}>
         <input type="radio" name="measure" checked={s.measure === 'tmiles'} disabled={!ctrl.available.tmiles} onchange={() => ctrl.change({ measure: 'tmiles' })} /><span>Ton-miles</span>
       </label>
     </div>
-    {#if !ctrl.available.tmiles}<span class="hint">Ton-miles are not published for FAF {s.version} {s.year}.</span>{/if}
+    {#if !ctrl.available.tmiles || !ctrl.available.value}<span class="hint">{!ctrl.available.value ? 'Value and ton-miles are' : 'Ton-miles are'} not published for {ctrl.versionLabel} {s.year}.</span>{/if}
   </fieldset>
 
   {#if s.measure === 'value'}
@@ -150,7 +157,7 @@
           <input type="radio" name="dollars" checked={s.dollars === 'current'} disabled={!ctrl.available.current} onchange={() => ctrl.change({ dollars: 'current' })} /><span>Current $</span>
         </label>
       </div>
-      {#if !ctrl.available.current}<span class="hint">Current-dollar values are not published for FAF {s.version} {s.year}.</span>{/if}
+      {#if !ctrl.available.current}<span class="hint">Current-dollar values are not published for {ctrl.versionLabel} {s.year}.</span>{/if}
     </fieldset>
   {/if}
 
@@ -171,7 +178,7 @@
       </div>
     {/each}
     <button class="btn" type="button" onclick={() => ctrl.change({ commodities: [] })} disabled={!s.commodities.length}>All commodities</button>
-    <span class="hint">Groups are the 12 FHWA assignment commodity groups. Nothing selected means all.</span>
+    <span class="hint">{ctrl.experimental ? 'The county product has five commodity groups.' : 'Groups are the 12 FHWA assignment commodity groups.'} Nothing selected means all.</span>
   </details>
 
   <details>

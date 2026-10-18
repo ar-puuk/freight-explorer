@@ -5,7 +5,7 @@ export type Dollars = 'const' | 'current';
 export type TruckType = 'all' | 'su' | 'cu';
 export type Market = 'total' | 'domestic' | 'import' | 'export';
 export type ThemePref = 'system' | 'light' | 'dark';
-export type Panel = 'closed' | 'summary' | 'trends' | 'compare' | 'table';
+export type Panel = 'closed' | 'summary' | 'trends' | 'compare' | 'history' | 'table';
 export type CompareKind = 'zone' | 'commodity';
 
 export interface AppState {
@@ -29,6 +29,7 @@ export interface AppState {
   panel: Panel; // charts drawer tab, or closed
   compare: { kind: CompareKind; ids: string[] };
   overlayOther: boolean; // trend chart: also draw the other FAF version (separate series, never connected)
+  historyOverlay: boolean; // history tab: also draw the FAF5 annual estimates (a separate, labeled series)
   tableDims: string[]; // table view group-by columns
 }
 
@@ -46,8 +47,11 @@ export interface StateMeta {
 }
 
 export interface ProductMeta {
+  kind?: 'flows' | 'history' | 'county'; // absent = flows
+  experimental?: boolean;
+  label?: string;
   faf_version: string;
-  benchmark_year: number;
+  benchmark_year: number | null;
   release: string;
   scenario: string;
   years: Record<string, 'base' | 'final' | 'preliminary' | 'forecast'>;
@@ -63,9 +67,17 @@ export interface VersionsMeta {
 export interface DimsMeta {
   versions: Record<
     string,
-    { commodity: Record<string, string>; mode: Record<string, string>; trade_type: Record<string, string>; foreign: Record<string, string>; dist_band: Record<string, string> }
+    {
+      commodity: Record<string, string>;
+      mode: Record<string, string>;
+      trade_type: Record<string, string>;
+      foreign: Record<string, string>;
+      dist_band: Record<string, string>;
+      commodity_groups?: { name: string; slug: string; sctg: string[] }[]; // a version's own groups (the county product has five)
+    }
   >;
   commodity_groups: { name: string; slug: string; sctg: string[] }[];
+  states: Record<string, string>; // state FIPS -> name
 }
 
 export interface ZoneInfo {
