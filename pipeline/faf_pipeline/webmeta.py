@@ -39,12 +39,18 @@ def build(ctx: Context, log=print) -> None:
     versions: dict[str, Any] = {}
     commodity, mode = dim("dim_commodity", "sctg2"), dim("dim_mode", "mode")
     trade, foreign, band = dim("dim_trade_type", "trade_type"), dim("dim_foreign_region", "region_id"), dim("dim_dist_band", "dist_band")
+    states = dim("dim_state", "state_fips")
     for ver in commodity:
         versions[ver] = {"commodity": commodity[ver], "mode": mode[ver], "trade_type": trade[ver], "foreign": foreign[ver], "dist_band": band.get(ver, {})}
+    cs = ctx.sources["products"].get("county")
+    if cs and cs["faf_version"] in versions:
+        # the county product has five commodity groups of its own; each is its own (single-code) group in the UI
+        versions[cs["faf_version"]]["commodity_groups"] = [{"name": lab, "slug": code, "sctg": [code]} for code, lab in cs["dims"]["commodity"].items()]
     write_json({
         "versions": versions,
         # commodity groupings are the 12 FHWA assignment groups (SCTG membership from the FHWA data dictionary)
         "commodity_groups": [{"name": n, "slug": g["slug"], "sctg": g["sctg"]} for n, g in groups.items()],
+        "states": next(iter(states.values())) if states else {},
     }, meta / "dims.json")
 
     for p in ("faf5", "faf6"):

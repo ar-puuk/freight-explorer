@@ -28,6 +28,25 @@ SOURCES = {
     },
     "geo": {"zone_simplify_deg": 0.005, "coord_decimals": 4, "pmtiles_minzoom": 3, "pmtiles_maxzoom": 12},
 }
+SOURCES["products"]["history"] = {
+    "faf_version": "9.9", "benchmark_year": 2017, "scenario": "mid", "release": "fixture history",
+    "data_version": {"historical": [1997, 2002]},
+    "files": {"state": {"url": "http://example.invalid/HISTORY.csv", "member": "HISTORY.csv", "schema": "faf5_history_state"}},
+}
+SOURCES["products"]["county"] = {
+    "faf_version": "county-fx", "label": "County fixture", "year": 2022, "release": "fixture county",
+    "state_files": {"tables": {"url": "http://example.invalid/{fips} - {name}.zip"}},
+    "files": {"factors": {"url": "http://example.invalid/factors.zip"}},
+    "tables": {
+        "c2c": {"member": "1.County-to-County.csv", "schema": "county_c2c"},
+        "c2f": {"member": "2.County-to-FAF.csv", "schema": "county_c2f"},
+        "f2c": {"member": "2.FAF-to-County.csv", "schema": "county_f2c"},
+    },
+    "factor_files": {"truck": "truck", "rail": "rail", "water": "water", "pipeline": "pipeline"},
+    "dims": {"commodity": {"sctg0109": "Agricultural"}, "mode": {"11": "Truck and air"}},
+}
+SOURCES["products"]["census_county_boundaries"] = {"release": "fixture", "files": {"counties": {"url": "http://example.invalid/cb.zip", "member": "cb.shp"}}}
+SOURCES["products"]["census_county_centers"] = {"release": "fixture", "files": {"counties": {"url": "http://example.invalid/centers.txt"}}}
 
 REGIONAL_HEADER = ("fr_orig,dms_orig,dms_dest,fr_dest,fr_inmode,dms_mode,fr_outmode,sctg2,trade_type,dist_band,"
                    "tons_2017,tons_2024,tons_2030,value_2017,value_2024,value_2030,current_value_2024,tmiles_2017,tmiles_2024,tmiles_2030")

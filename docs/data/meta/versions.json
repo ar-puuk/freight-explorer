@@ -20,10 +20,53 @@
   }
  },
  "products": {
+  "county": {
+   "adjacent_states": [
+    "04",
+    "08",
+    "16",
+    "32",
+    "35",
+    "56"
+   ],
+   "benchmark_year": null,
+   "default_year": 2022,
+   "experimental": true,
+   "factors_rows": 4172,
+   "faf_version": "county-exp",
+   "kind": "county",
+   "label": "County estimates (experimental)",
+   "release": "FAF5 experimental county-level estimates, 2022 (BTS, December 2024; based on FAF5.6.1)",
+   "rows": {
+    "flows/2022": 242674
+   },
+   "rows_by_table": {
+    "c2c": 153187,
+    "c2f": 48153,
+    "f2c": 41334
+   },
+   "scenario": "mid",
+   "sources": {
+    "factors": {
+     "bytes": 570159,
+     "sha256": "1e44015c98c288167dc15ab7f21609a8139ca94c51a3a3b8002b2747ddbbbb56",
+     "url": "https://faf.ornl.gov/faf5/Data/County/All_Experimental_Disaggregation_Factors.zip"
+    },
+    "tables": {
+     "bytes": 116725849,
+     "sha256": "bf66627c2f5f11824f3a8de42a817e0767c6907cdc7559de77b9c8419bd64246",
+     "url": "https://faf.ornl.gov/faf5/Data/County/49%20-%20Utah.zip"
+    }
+   },
+   "years": {
+    "2022": "experimental"
+   }
+  },
   "faf5": {
    "benchmark_year": 2017,
    "default_year": 2023,
    "faf_version": "5.7.1",
+   "kind": "flows",
    "release": "FAF5.7.1 (2025-08-15)",
    "rows": {
     "flows/2017": 29089,
@@ -141,6 +184,7 @@
    "benchmark_year": 2022,
    "default_year": 2022,
    "faf_version": "6.0",
+   "kind": "flows",
    "release": "FAF6.0",
    "rows": {
     "flows/2022": 36765,
@@ -163,6 +207,34 @@
     "2022": "base"
    },
    "zones": 134
+  },
+  "history": {
+   "benchmark_year": 2017,
+   "default_year": 1997,
+   "faf_version": "5.7.1",
+   "kind": "history",
+   "release": "FAF5.7.1 reprocessed state history 1997-2012",
+   "rows": {
+    "state_flows/1997": 16261,
+    "state_flows/2002": 9323,
+    "state_flows/2007": 9708,
+    "state_flows/2012": 11951
+   },
+   "scenario": "mid",
+   "sources": {
+    "state": {
+     "bytes": 38901646,
+     "sha256": "eaaad60464894029114596fcf739f7138e09fe125f8261e53284f684a3918f6b",
+     "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_Reprocessed_1997-2012_State.zip"
+    }
+   },
+   "years": {
+    "1997": "historical",
+    "2002": "historical",
+    "2007": "historical",
+    "2012": "historical"
+   },
+   "zones": null
   }
  }
 }

@@ -23,6 +23,14 @@ def output_tables(ctx: Context) -> list[tuple[str, str, list[Path]]]:
             files = sorted((out / ds / folder).glob("*/*.parquet"))
             if files:
                 tables.append((ds, table, files))
+    hist = sorted((out / "history" / "state_flows").glob("*/*.parquet"))
+    if hist:
+        tables.append(("history", "faf_state_history", hist))
+    county_flows = sorted((out / "county" / "flows").glob("*/*.parquet"))
+    if county_flows:
+        tables.append(("county", "county_flows", county_flows))
+    if (out / "county" / "factors.parquet").exists():
+        tables.append(("county", "county_factors", [out / "county" / "factors.parquet"]))
     for sub, table in (("link_attrs.parquet", "network_links"),):
         if (out / "network" / sub).exists():
             tables.append(("network", table, [out / "network" / sub]))

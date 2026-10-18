@@ -14,7 +14,7 @@ import httpx
 
 from faf_pipeline.config import ConfigError, Context
 
-_DIR_FOR_PRODUCT = {"census_county_centers": "census"}    # everything else lives in data-raw/<product>/
+_DIR_FOR_PRODUCT = {"census_county_centers": "census", "census_county_boundaries": "census"}    # everything else lives in data-raw/<product>/
 
 
 @dataclass(frozen=True)
@@ -42,6 +42,11 @@ def plan(ctx: Context, products: list[str] | None = None) -> list[Item]:
             sub = _DIR_FOR_PRODUCT.get(product, product)
             items.append(Item(product, role, f["url"], release, ctx.paths.raw / sub / _basename(f["url"]),
                               f.get("member"), f.get("member_dir")))
+        for role, f in (spec.get("state_files") or {}).items():
+            # the file name depends on the state: "<fips> - <name>.zip" (config overrides.county_zip_name when BTS names differ)
+            name = ctx.state.overrides.get("county_zip_name", ctx.state.name)
+            url = f["url"].format(fips=ctx.state.fips, name=name).replace(" ", "%20")
+            items.append(Item(product, role, url, release, ctx.paths.raw / sub / _basename(url)))
         if "zones" in spec:
             z = spec["zones"]
             items.append(Item(product, "zones", z["url"], release, ctx.paths.raw / "zones" / _basename(z["url"]), z.get("member")))

@@ -115,6 +115,59 @@
    "slug": "mixed_freight"
   }
  ],
+ "states": {
+  "01": "Alabama",
+  "02": "Alaska",
+  "04": "Arizona",
+  "05": "Arkansas",
+  "06": "California",
+  "08": "Colorado",
+  "09": "Connecticut",
+  "10": "Delaware",
+  "11": "Washington DC",
+  "12": "Florida",
+  "13": "Georgia",
+  "15": "Hawaii",
+  "16": "Idaho",
+  "17": "Illinois",
+  "18": "Indiana",
+  "19": "Iowa",
+  "20": "Kansas",
+  "21": "Kentucky",
+  "22": "Louisiana",
+  "23": "Maine",
+  "24": "Maryland",
+  "25": "Massachusetts",
+  "26": "Michigan",
+  "27": "Minnesota",
+  "28": "Mississippi",
+  "29": "Missouri",
+  "30": "Montana",
+  "31": "Nebraska",
+  "32": "Nevada",
+  "33": "New Hampshire",
+  "34": "New Jersey",
+  "35": "New Mexico",
+  "36": "New York",
+  "37": "North Carolina",
+  "38": "North Dakota",
+  "39": "Ohio",
+  "40": "Oklahoma",
+  "41": "Oregon",
+  "42": "Pennsylvania",
+  "44": "Rhode Island",
+  "45": "South Carolina",
+  "46": "South Dakota",
+  "47": "Tennessee",
+  "48": "Texas",
+  "49": "Utah",
+  "50": "Vermont",
+  "51": "Virginia",
+  "53": "Washington",
+  "54": "West Virginia",
+  "55": "Wisconsin",
+  "56": "Wyoming"
+ },
  "versions": {
   "5.7.1": {
    "commodity": {
@@ -271,6 +324,75 @@
     "6": "Pipeline",
     "7": "Other and unknown",
     "8": "No domestic mode"
+   },
+   "trade_type": {
+    "1": "Domestic flows (freight shipments moved from US domestic origins to US domestic destinations)",
+    "2": "Import flows (freight shipments moved from foreign origins to US domestic destinations)",
+    "3": "Export flows (freight shipments moved from US domestic origins to foreign destinations)"
+   }
+  },
+  "county-exp": {
+   "commodity": {
+    "sctg0109": "Agricultural products (SCTG 01-09)",
+    "sctg1014": "Gravel and mining products (SCTG 10-14)",
+    "sctg1519": "Coal and other energy products (SCTG 15-19)",
+    "sctg2033": "Chemicals, wood and metals (SCTG 20-33)",
+    "sctg3499": "Manufactured goods, mixed freight, waste and unknown (SCTG 34-99)"
+   },
+   "commodity_groups": [
+    {
+     "name": "Agricultural products (SCTG 01-09)",
+     "sctg": [
+      "sctg0109"
+     ],
+     "slug": "sctg0109"
+    },
+    {
+     "name": "Gravel and mining products (SCTG 10-14)",
+     "sctg": [
+      "sctg1014"
+     ],
+     "slug": "sctg1014"
+    },
+    {
+     "name": "Coal and other energy products (SCTG 15-19)",
+     "sctg": [
+      "sctg1519"
+     ],
+     "slug": "sctg1519"
+    },
+    {
+     "name": "Chemicals, wood and metals (SCTG 20-33)",
+     "sctg": [
+      "sctg2033"
+     ],
+     "slug": "sctg2033"
+    },
+    {
+     "name": "Manufactured goods, mixed freight, waste and unknown (SCTG 34-99)",
+     "sctg": [
+      "sctg3499"
+     ],
+     "slug": "sctg3499"
+    }
+   ],
+   "dist_band": {},
+   "foreign": {
+    "801": "Canada",
+    "802": "Mexico",
+    "803": "Rest of Americas",
+    "804": "Europe",
+    "805": "Africa",
+    "806": "SW & Central Asia",
+    "807": "Eastern Asia",
+    "808": "SE Asia & Oceania"
+   },
+   "mode": {
+    "11": "Truck and air",
+    "2": "Rail",
+    "3": "Water",
+    "5": "Multiple modes and mail",
+    "6": "Pipeline"
    },
    "trade_type": {
     "1": "Domestic flows (freight shipments moved from US domestic origins to US domestic destinations)",

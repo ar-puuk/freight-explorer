@@ -79,3 +79,27 @@ columns:
   anchor_n_counties: {label: Anchor county count, description: "Number of county population centers used for the anchor."}
 
   # dim_dist_band shares `label`; dim tables reuse sctg2/trade_type/dist_band above.
+
+  # history (state level, 1997-2012)
+  faf_state_history.year: {label: Year, unit: year, description: "1997, 2002, 2007 or 2012 only: the FAF5-methodology reprocessed history has these four years, not an annual series.", caveat: "State level only; do not read it as an annual series."}
+  faf_state_history.data_version: {label: Data status, description: "historical = FAF5 reprocessed state-level history (1997, 2002, 2007, 2012), produced with FAF5 methodology and data sources for a more consistent time series."}
+  faf_state_history.benchmark_year: {label: Dollar year, unit: year, description: "Constant-dollar values are in 2017 dollars (FAF5 User Guide, `value` field).", caveat: "Not a benchmark year: the history reprocesses FAF5 methods for 1997-2012."}
+
+  # experimental county product
+  county_flows.faf_version: {label: Product, description: "county-exp: BTS experimental county-level estimates (2022), based on FAF5.6.1.", caveat: "EXPERIMENTAL. Not FAF6, not comparable with FAF5.7.1 or FAF6.0 numbers."}
+  county_flows.data_version: {label: Data status, description: "experimental"}
+  county_flows.dms_orig: {label: Origin (county or FAF zone), description: "5-character county FIPS where the table is county-level at the origin; otherwise a 3-character FAF5 zone id (zones outside the state's multistate area)."}
+  county_flows.dms_dest: {label: Destination (county or FAF zone), description: "5-character county FIPS where county-level; otherwise a 3-character FAF5 zone id."}
+  county_flows.sctg2: {label: Commodity group, description: "One of the five county-product commodity groups: sctg0109 agricultural products, sctg1014 gravel and mining, sctg1519 coal and other energy, sctg2033 chemicals/wood/metals, sctg3499 manufactured goods, mixed freight, waste and unknown. (Column name kept for compatibility with the FAF flow tables.)"}
+  county_flows.dms_mode: {label: Mode, description: "2 rail, 3 water, 5 multiple modes and mail, 6 pipeline, 11 truck and air (FAF modes 1 + 4). FAF modes 7 and 8 are not in the release."}
+  county_flows.tons_kt: {label: Tons, unit: thousand tons, description: "Annual 2022 tons in thousand tons (BTS technical report: tons means kilotons).", caveat: "Experimental estimate."}
+  county_flows.dist_band: {label: Distance band, description: "Not in the county product (always NULL)."}
+  orig_zone: {label: Origin FAF zone, description: "FAF5 zone the origin belongs to (for a county origin, the zone containing that county)."}
+  dest_zone: {label: Destination FAF zone, description: "FAF5 zone the destination belongs to."}
+  table_kind: {label: Source table, description: "c2c county-to-county, c2f county-to-FAF zone, f2c FAF zone-to-county: the three county-product tables that can touch the state. Rows are kept only when the state is an endpoint, so nothing is counted twice."}
+  mode_group: {label: Mode group, description: "truck, rail, water or pipeline: which factor file the row comes from."}
+  direction: {label: Factor direction, description: "origin or destination factor."}
+  county_factors.faf_zone: {label: FAF zone, description: "FAF5 zone id (3 characters; the source files drop the leading zero for some zones, restored here)."}
+  county_factors.county_fips: {label: County FIPS, description: "5-character county FIPS (leading zero restored)."}
+  county_factors.commodity_group: {label: Commodity group, description: "County-product commodity group (sctg0109, sctg1014, sctg1519, sctg2033, sctg3499)."}
+  factor: {label: Disaggregation factor, description: "Share of the FAF zone's tons (for this commodity group and mode group) that originates in, or is destined to, the county. Factors sum to 1 within a zone, direction, mode group and commodity group.", caveat: "Experimental: built by BTS from public indicator data, not measured county flows."}

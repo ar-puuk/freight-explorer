@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from faf_pipeline import dictionary, dims, fetch, flows, meta, network, validate, webmeta, zones
+from faf_pipeline import county, dictionary, dims, fetch, flows, meta, network, validate, webmeta, zones
 from faf_pipeline.config import Context
 
 FLOW_PRODUCTS = ["faf5", "faf6"]
@@ -12,7 +12,7 @@ FLOW_PRODUCTS = ["faf5", "faf6"]
 
 def build_all(ctx: Context, products: list[str] | None = None, log=print) -> dict[str, Any]:
     """Dimension tables + flows for the selected FAF products (default: all), then state.json and versions.json."""
-    prods = [p for p in (products or FLOW_PRODUCTS) if p in FLOW_PRODUCTS]
+    prods = [p for p in (products or [*FLOW_PRODUCTS, "history"]) if p in (*FLOW_PRODUCTS, "history")]
     log("dimensions")
     dims.build_dims(ctx, FLOW_PRODUCTS, log)
     log("flows")
@@ -48,13 +48,15 @@ def update(ctx: Context, log=print) -> int:
     flow_stats = build_all(ctx, None, log)
     log("== zones")
     zone_stats = zones.build(ctx, FLOW_PRODUCTS, log)
+    log("== county (experimental)")
+    county_stats = county.build(ctx, log)
     log("== network")
     net_stats = network.build(ctx, log)
     log("== dictionary / meta / web files")
     dictionary.build(ctx, log)
     webmeta.build(ctx, log)
-    meta.write_state(ctx)
-    after = meta.write_versions(ctx, flow_stats, zone_stats, net_stats)
+    meta.write_state(ctx, county_stats["state_counties"])
+    after = meta.write_versions(ctx, flow_stats, zone_stats, net_stats, county_stats)
     log("== validate")
     fails, report = validate.run(ctx, before, log)
     log("\n== changelog")

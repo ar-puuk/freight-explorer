@@ -72,6 +72,65 @@ products:
       id_field: FAF6
       name_field: FAF6_SHORT
 
+  history:
+    # FAF5-methodology reprocessed history, state level only, four benchmark-style years. Kept separate from the annual series.
+    faf_version: "5.7.1"
+    benchmark_year: 2017      # values are in 2017 dollars (FAF5 User Guide, `value` field)
+    scenario: mid
+    release: "FAF5.7.1 reprocessed state history 1997-2012"
+    data_version:
+      historical: [1997, 2002, 2007, 2012]
+    files:
+      state:
+        url: https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_Reprocessed_1997-2012_State.zip
+        member: FAF5.7.1_Reprocessed_1997-2012_State.csv
+        schema: faf5_history_state
+
+  county:
+    # Experimental county-level estimates (FAF5.6.1-based, 2022, tons only; tons are kilotons per the BTS technical report).
+    faf_version: "county-exp"
+    label: "County estimates (experimental)"
+    year: 2022
+    release: "FAF5 experimental county-level estimates, 2022 (BTS, December 2024; based on FAF5.6.1)"
+    # the state zip name comes from the state config: "<fips> - <name>.zip" (override with overrides.county_zip_name)
+    state_files:
+      tables:
+        url: "https://faf.ornl.gov/faf5/Data/County/{fips} - {name}.zip"
+    files:
+      factors:
+        url: https://faf.ornl.gov/faf5/Data/County/All_Experimental_Disaggregation_Factors.zip
+    tables:
+      c2c: {member: "1.County-to-County.csv", schema: county_c2c}
+      c2f: {member: "2.County-to-FAF.csv", schema: county_c2f}
+      f2c: {member: "2.FAF-to-County.csv", schema: county_f2c}
+    factor_files:    # file stem -> mode group
+      truck: truck
+      rail: rail
+      water: water
+      pipeline: pipeline
+    # Code labels from the BTS technical report (Tables 12 and 13). Commodity groups are SCTG ranges; mode 11 bundles FAF
+    # modes 1 (truck) and 4 (air); FAF modes 7 and 8 are not in the release.
+    dims:
+      commodity:
+        sctg0109: "Agricultural products (SCTG 01-09)"
+        sctg1014: "Gravel and mining products (SCTG 10-14)"
+        sctg1519: "Coal and other energy products (SCTG 15-19)"
+        sctg2033: "Chemicals, wood and metals (SCTG 20-33)"
+        sctg3499: "Manufactured goods, mixed freight, waste and unknown (SCTG 34-99)"
+      mode:
+        "2": "Rail"
+        "3": "Water"
+        "5": "Multiple modes and mail"
+        "6": "Pipeline"
+        "11": "Truck and air"
+
+  census_county_boundaries:
+    release: "Census 2022 cartographic boundary files, counties (1:500,000)"
+    files:
+      counties:
+        url: https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_500k.zip
+        member: cb_2022_us_county_500k.shp
+
   census_county_centers:
     # Census 2020 county population-weighted centers of population; used only to place zone anchor points.
     release: "Census 2020 centers of population"

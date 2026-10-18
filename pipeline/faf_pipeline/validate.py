@@ -12,6 +12,7 @@ from typing import Any
 from faf_pipeline import dictionary
 from faf_pipeline.config import Context
 from faf_pipeline.duck import connect, sql_literal
+from faf_pipeline.validate_extra import check_county, check_history
 
 MAX_BYTES = 90 * 1024 * 1024
 FLOW_KEYS = ["fr_orig", "dms_orig", "dms_dest", "fr_dest", "fr_inmode", "dms_mode", "fr_outmode", "sctg2", "trade_type", "dist_band"]
@@ -211,6 +212,10 @@ def run(ctx: Context, previous_versions: dict[str, Any] | None = None, log=print
                           f"(anchor_lon BETWEEN {w - pad} AND {e + pad} AND anchor_lat BETWEEN {s - pad} AND {n + pad})").fetchone()[0]
         if bad:
             fails.append(f"zones: {bad} state zone anchors outside the state bbox + buffer")
+
+    # ---- history series and experimental county product
+    check_history(ctx, con, fails, report)
+    check_county(ctx, con, fails, report)
 
     # ---- file sizes
     big = [f"{p.relative_to(out)} ({p.stat().st_size} bytes)" for p in out.rglob("*") if p.is_file() and p.stat().st_size >= MAX_BYTES]

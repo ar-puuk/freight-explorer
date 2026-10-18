@@ -16,6 +16,7 @@ SHEETS = {
     "mode": ("Mode", ["Numeric Label", "Description"]),
     "trade_type": ("Trade Type", ["Numeric Label", "Description"]),
     "dist_band": ("Distance Band", ["Numeric Label", "Description"]),
+    "state": ("State", ["Numeric Label", "Description"]),
 }
 
 
@@ -83,6 +84,7 @@ def build_dims(ctx: Context, products: list[str], log=print) -> dict[str, int]:
         "trade_type": ("dim_trade_type", "trade_type", "label"),
         "foreign": ("dim_foreign_region", "region_id", "label"),
         "dist_band": ("dim_dist_band", "dist_band", "label"),
+        "state": ("dim_state", "state_fips", "label"),
     }
     counts: dict[str, int] = {}
     for key, (name, code_col, label_col) in tables.items():
@@ -90,11 +92,20 @@ def build_dims(ctx: Context, products: list[str], log=print) -> dict[str, int]:
         for product in products:
             for code, label in _sheet(con, metadata_path(ctx, product), key):
                 code = str(code).strip()
-                if key == "commodity":
+                if key in ("commodity", "state"):
                     code = code.zfill(2)
                 if key in ("mode", "trade_type", "dist_band"):
                     code = int(code)
                 rows.append((versions[product], code, (label or "").strip()))
+        cs = ctx.sources["products"].get("county")
+        if cs and key in ("commodity", "mode", "trade_type", "foreign") and rows:
+            ver = cs["faf_version"]
+            if key == "commodity":
+                rows += [(ver, c, lab) for c, lab in cs["dims"]["commodity"].items()]
+            elif key == "mode":
+                rows += [(ver, int(c), lab) for c, lab in cs["dims"]["mode"].items()]
+            else:  # trade types and foreign regions are the FAF5 ones
+                rows += [(ver, code, lab) for (v0, code, lab) in rows if v0 == versions[products[0]]]
         con.execute(f"CREATE OR REPLACE TABLE t ({'faf_version VARCHAR'}, {code_col} {'INTEGER' if isinstance(rows[0][1], int) else 'VARCHAR'}, {label_col} VARCHAR)")
         con.executemany("INSERT INTO t VALUES (?, ?, ?)", rows)
         counts[name] = write_parquet(con, f"SELECT * FROM t ORDER BY faf_version, {code_col}", ctx.paths.out / "meta" / f"{name}.parquet")

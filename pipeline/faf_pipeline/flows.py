@@ -16,7 +16,7 @@ MEASURES = ("tons_kt", "value_const_musd", "value_current_musd", "tmiles_m")
 
 def classify_year(spec: dict[str, Any], year: int, product: str) -> str:
     dv = spec["data_version"]
-    for label in ("base", "final", "preliminary"):
+    for label in ("base", "final", "preliminary", "historical"):
         if year in (dv.get(label) or []):
             return label
     if "forecast_from" in dv and year >= dv["forecast_from"]:
@@ -32,6 +32,7 @@ def _typed(col: str, typ: str) -> str:
         "smallint": f"CAST({c} AS SMALLINT)",
         "zone3": f"lpad({c}, 3, '0')",
         "state2": f"lpad({c}, 2, '0')",
+        "county5": f"lpad({c}, 5, '0')",
         "code2": f"lpad({c}, 2, '0')",
     }[typ]
 
@@ -144,10 +145,11 @@ def _src(schema: Schema, canonical: str) -> str:
 def build(ctx: Context, products: list[str], log=print) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for p in products:
-        if p not in ("faf5", "faf6"):
+        if p not in ("faf5", "faf6", "history"):
             continue
-        out[p] = {lvl: build_level(ctx, p, lvl, log) for lvl in ("regional", "state")}
-        for lvl in ("regional", "state"):
+        levels = ("state",) if p == "history" else ("regional", "state")
+        out[p] = {lvl: build_level(ctx, p, lvl, log) for lvl in levels}
+        for lvl in levels:
             if f"{lvl}_hilo" in ctx.sources["products"][p]["files"]:
                 hl = build_level(ctx, p, lvl, log, hilo=True)
                 out[p][lvl]["scenarios"] = hl["scenarios"]

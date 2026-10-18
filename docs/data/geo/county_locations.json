@@ -1,0 +1,3107 @@
+[
+ {
+  "id": "04001",
+  "is_state_zone": false,
+  "lat": 35.54365,
+  "lon": -109.41902,
+  "name": "Apache County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04003",
+  "is_state_zone": false,
+  "lat": 31.60349,
+  "lon": -110.07283,
+  "name": "Cochise County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04005",
+  "is_state_zone": false,
+  "lat": 35.47611,
+  "lon": -111.60183,
+  "name": "Coconino County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04007",
+  "is_state_zone": false,
+  "lat": 33.84444,
+  "lon": -111.015,
+  "name": "Gila County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04009",
+  "is_state_zone": false,
+  "lat": 32.86715,
+  "lon": -109.80811,
+  "name": "Graham County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04011",
+  "is_state_zone": false,
+  "lat": 32.98515,
+  "lon": -109.25955,
+  "name": "Greenlee County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04012",
+  "is_state_zone": false,
+  "lat": 33.95419,
+  "lon": -114.18377,
+  "name": "La Paz County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04013",
+  "is_state_zone": false,
+  "lat": 33.49015,
+  "lon": -112.04402,
+  "name": "Maricopa County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04015",
+  "is_state_zone": false,
+  "lat": 35.03451,
+  "lon": -114.26242,
+  "name": "Mohave County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04017",
+  "is_state_zone": false,
+  "lat": 34.86215,
+  "lon": -110.20516,
+  "name": "Navajo County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04019",
+  "is_state_zone": false,
+  "lat": 32.21643,
+  "lon": -110.95803,
+  "name": "Pima County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04021",
+  "is_state_zone": false,
+  "lat": 33.06932,
+  "lon": -111.60214,
+  "name": "Pinal County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04023",
+  "is_state_zone": false,
+  "lat": 31.43923,
+  "lon": -110.94595,
+  "name": "Santa Cruz County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04025",
+  "is_state_zone": false,
+  "lat": 34.62873,
+  "lon": -112.27384,
+  "name": "Yavapai County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "04027",
+  "is_state_zone": false,
+  "lat": 32.64139,
+  "lon": -114.60544,
+  "name": "Yuma County, AZ",
+  "state_fips": "04",
+  "type": "county"
+ },
+ {
+  "id": "08001",
+  "is_state_zone": false,
+  "lat": 39.87695,
+  "lon": -104.92094,
+  "name": "Adams County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08003",
+  "is_state_zone": false,
+  "lat": 37.48189,
+  "lon": -105.87763,
+  "name": "Alamosa County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08005",
+  "is_state_zone": false,
+  "lat": 39.64658,
+  "lon": -104.83857,
+  "name": "Arapahoe County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08007",
+  "is_state_zone": false,
+  "lat": 37.24027,
+  "lon": -107.08981,
+  "name": "Archuleta County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08009",
+  "is_state_zone": false,
+  "lat": 37.3681,
+  "lon": -102.53204,
+  "name": "Baca County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08011",
+  "is_state_zone": false,
+  "lat": 38.07292,
+  "lon": -103.16601,
+  "name": "Bent County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08013",
+  "is_state_zone": false,
+  "lat": 40.06299,
+  "lon": -105.18022,
+  "name": "Boulder County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08014",
+  "is_state_zone": false,
+  "lat": 39.93987,
+  "lon": -105.05813,
+  "name": "Broomfield County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08015",
+  "is_state_zone": false,
+  "lat": 38.67681,
+  "lon": -106.08513,
+  "name": "Chaffee County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08017",
+  "is_state_zone": false,
+  "lat": 38.81766,
+  "lon": -102.47005,
+  "name": "Cheyenne County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08019",
+  "is_state_zone": false,
+  "lat": 39.71346,
+  "lon": -105.53253,
+  "name": "Clear Creek County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08021",
+  "is_state_zone": false,
+  "lat": 37.19961,
+  "lon": -105.98732,
+  "name": "Conejos County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08023",
+  "is_state_zone": false,
+  "lat": 37.29223,
+  "lon": -105.4443,
+  "name": "Costilla County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08025",
+  "is_state_zone": false,
+  "lat": 38.19378,
+  "lon": -103.85639,
+  "name": "Crowley County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08027",
+  "is_state_zone": false,
+  "lat": 38.1332,
+  "lon": -105.38253,
+  "name": "Custer County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08029",
+  "is_state_zone": false,
+  "lat": 38.7982,
+  "lon": -107.91377,
+  "name": "Delta County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08031",
+  "is_state_zone": false,
+  "lat": 39.72486,
+  "lon": -104.95003,
+  "name": "Denver County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08033",
+  "is_state_zone": false,
+  "lat": 37.74693,
+  "lon": -108.75872,
+  "name": "Dolores County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08035",
+  "is_state_zone": false,
+  "lat": 39.48202,
+  "lon": -104.87357,
+  "name": "Douglas County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08037",
+  "is_state_zone": false,
+  "lat": 39.60052,
+  "lon": -106.73342,
+  "name": "Eagle County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08039",
+  "is_state_zone": false,
+  "lat": 39.38855,
+  "lon": -104.52311,
+  "name": "Elbert County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08041",
+  "is_state_zone": false,
+  "lat": 38.87731,
+  "lon": -104.75212,
+  "name": "El Paso County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08043",
+  "is_state_zone": false,
+  "lat": 38.42694,
+  "lon": -105.2143,
+  "name": "Fremont County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08045",
+  "is_state_zone": false,
+  "lat": 39.5071,
+  "lon": -107.54902,
+  "name": "Garfield County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08047",
+  "is_state_zone": false,
+  "lat": 39.85606,
+  "lon": -105.48322,
+  "name": "Gilpin County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08049",
+  "is_state_zone": false,
+  "lat": 40.05114,
+  "lon": -105.9785,
+  "name": "Grand County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08051",
+  "is_state_zone": false,
+  "lat": 38.66,
+  "lon": -106.94438,
+  "name": "Gunnison County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08053",
+  "is_state_zone": false,
+  "lat": 38.00255,
+  "lon": -107.29875,
+  "name": "Hinsdale County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08055",
+  "is_state_zone": false,
+  "lat": 37.61254,
+  "lon": -104.88758,
+  "name": "Huerfano County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08057",
+  "is_state_zone": false,
+  "lat": 40.69019,
+  "lon": -106.29548,
+  "name": "Jackson County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08059",
+  "is_state_zone": false,
+  "lat": 39.72369,
+  "lon": -105.13031,
+  "name": "Jefferson County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08061",
+  "is_state_zone": false,
+  "lat": 38.47008,
+  "lon": -102.70097,
+  "name": "Kiowa County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08063",
+  "is_state_zone": false,
+  "lat": 39.31042,
+  "lon": -102.46203,
+  "name": "Kit Carson County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08065",
+  "is_state_zone": false,
+  "lat": 39.24481,
+  "lon": -106.30747,
+  "name": "Lake County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08067",
+  "is_state_zone": false,
+  "lat": 37.26602,
+  "lon": -107.80395,
+  "name": "La Plata County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08069",
+  "is_state_zone": false,
+  "lat": 40.5044,
+  "lon": -105.08916,
+  "name": "Larimer County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08071",
+  "is_state_zone": false,
+  "lat": 37.19205,
+  "lon": -104.50132,
+  "name": "Las Animas County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08073",
+  "is_state_zone": false,
+  "lat": 39.18005,
+  "lon": -103.61422,
+  "name": "Lincoln County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08075",
+  "is_state_zone": false,
+  "lat": 40.64034,
+  "lon": -103.18598,
+  "name": "Logan County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08077",
+  "is_state_zone": false,
+  "lat": 39.09294,
+  "lon": -108.54667,
+  "name": "Mesa County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08079",
+  "is_state_zone": false,
+  "lat": 37.77914,
+  "lon": -106.94206,
+  "name": "Mineral County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08081",
+  "is_state_zone": false,
+  "lat": 40.51606,
+  "lon": -107.61398,
+  "name": "Moffat County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08083",
+  "is_state_zone": false,
+  "lat": 37.37191,
+  "lon": -108.55446,
+  "name": "Montezuma County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08085",
+  "is_state_zone": false,
+  "lat": 38.4813,
+  "lon": -107.92235,
+  "name": "Montrose County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08087",
+  "is_state_zone": false,
+  "lat": 40.25423,
+  "lon": -103.78907,
+  "name": "Morgan County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08089",
+  "is_state_zone": false,
+  "lat": 38.02324,
+  "lon": -103.65578,
+  "name": "Otero County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08091",
+  "is_state_zone": false,
+  "lat": 38.14604,
+  "lon": -107.75189,
+  "name": "Ouray County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08093",
+  "is_state_zone": false,
+  "lat": 39.30574,
+  "lon": -105.62536,
+  "name": "Park County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08095",
+  "is_state_zone": false,
+  "lat": 40.59936,
+  "lon": -102.38588,
+  "name": "Phillips County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08097",
+  "is_state_zone": false,
+  "lat": 39.23176,
+  "lon": -106.90872,
+  "name": "Pitkin County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08099",
+  "is_state_zone": false,
+  "lat": 38.08303,
+  "lon": -102.54862,
+  "name": "Prowers County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08101",
+  "is_state_zone": false,
+  "lat": 38.26577,
+  "lon": -104.64698,
+  "name": "Pueblo County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08103",
+  "is_state_zone": false,
+  "lat": 40.05108,
+  "lon": -108.26874,
+  "name": "Rio Blanco County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08105",
+  "is_state_zone": false,
+  "lat": 37.61185,
+  "lon": -106.24207,
+  "name": "Rio Grande County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08107",
+  "is_state_zone": false,
+  "lat": 40.4555,
+  "lon": -106.89741,
+  "name": "Routt County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08109",
+  "is_state_zone": false,
+  "lat": 37.92535,
+  "lon": -106.00611,
+  "name": "Saguache County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08111",
+  "is_state_zone": false,
+  "lat": 37.80188,
+  "lon": -107.6736,
+  "name": "San Juan County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08113",
+  "is_state_zone": false,
+  "lat": 37.97182,
+  "lon": -107.95811,
+  "name": "San Miguel County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08115",
+  "is_state_zone": false,
+  "lat": 40.96216,
+  "lon": -102.32567,
+  "name": "Sedgwick County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08117",
+  "is_state_zone": false,
+  "lat": 39.57238,
+  "lon": -106.05567,
+  "name": "Summit County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08119",
+  "is_state_zone": false,
+  "lat": 38.94478,
+  "lon": -105.1399,
+  "name": "Teller County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08121",
+  "is_state_zone": false,
+  "lat": 40.09831,
+  "lon": -103.15712,
+  "name": "Washington County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08123",
+  "is_state_zone": false,
+  "lat": 40.32243,
+  "lon": -104.80701,
+  "name": "Weld County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "08125",
+  "is_state_zone": false,
+  "lat": 40.06585,
+  "lon": -102.48082,
+  "name": "Yuma County, CO",
+  "state_fips": "08",
+  "type": "county"
+ },
+ {
+  "id": "16001",
+  "is_state_zone": false,
+  "lat": 43.61209,
+  "lon": -116.31314,
+  "name": "Ada County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16003",
+  "is_state_zone": false,
+  "lat": 44.84388,
+  "lon": -116.38325,
+  "name": "Adams County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16005",
+  "is_state_zone": false,
+  "lat": 42.87112,
+  "lon": -112.42509,
+  "name": "Bannock County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16007",
+  "is_state_zone": false,
+  "lat": 42.30748,
+  "lon": -111.34121,
+  "name": "Bear Lake County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16009",
+  "is_state_zone": false,
+  "lat": 47.27306,
+  "lon": -116.64463,
+  "name": "Benewah County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16011",
+  "is_state_zone": false,
+  "lat": 43.22311,
+  "lon": -112.34626,
+  "name": "Bingham County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16013",
+  "is_state_zone": false,
+  "lat": 43.54812,
+  "lon": -114.29902,
+  "name": "Blaine County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16015",
+  "is_state_zone": false,
+  "lat": 43.90651,
+  "lon": -115.98532,
+  "name": "Boise County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16017",
+  "is_state_zone": false,
+  "lat": 48.23649,
+  "lon": -116.6302,
+  "name": "Bonner County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16019",
+  "is_state_zone": false,
+  "lat": 43.49482,
+  "lon": -111.99443,
+  "name": "Bonneville County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16021",
+  "is_state_zone": false,
+  "lat": 48.7106,
+  "lon": -116.30264,
+  "name": "Boundary County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16023",
+  "is_state_zone": false,
+  "lat": 43.69732,
+  "lon": -113.30219,
+  "name": "Butte County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16025",
+  "is_state_zone": false,
+  "lat": 43.35291,
+  "lon": -114.75445,
+  "name": "Camas County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16027",
+  "is_state_zone": false,
+  "lat": 43.61248,
+  "lon": -116.62505,
+  "name": "Canyon County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16029",
+  "is_state_zone": false,
+  "lat": 42.64616,
+  "lon": -111.65212,
+  "name": "Caribou County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16031",
+  "is_state_zone": false,
+  "lat": 42.48736,
+  "lon": -113.74776,
+  "name": "Cassia County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16033",
+  "is_state_zone": false,
+  "lat": 44.19472,
+  "lon": -112.26213,
+  "name": "Clark County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16035",
+  "is_state_zone": false,
+  "lat": 46.48909,
+  "lon": -116.19075,
+  "name": "Clearwater County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16037",
+  "is_state_zone": false,
+  "lat": 44.28031,
+  "lon": -114.09628,
+  "name": "Custer County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16039",
+  "is_state_zone": false,
+  "lat": 43.11766,
+  "lon": -115.68506,
+  "name": "Elmore County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16041",
+  "is_state_zone": false,
+  "lat": 42.09821,
+  "lon": -111.87183,
+  "name": "Franklin County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16043",
+  "is_state_zone": false,
+  "lat": 44.01288,
+  "lon": -111.61688,
+  "name": "Fremont County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16045",
+  "is_state_zone": false,
+  "lat": 43.88306,
+  "lon": -116.50773,
+  "name": "Gem County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16047",
+  "is_state_zone": false,
+  "lat": 42.85349,
+  "lon": -114.7504,
+  "name": "Gooding County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16049",
+  "is_state_zone": false,
+  "lat": 45.97203,
+  "lon": -116.10552,
+  "name": "Idaho County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16051",
+  "is_state_zone": false,
+  "lat": 43.68709,
+  "lon": -111.95904,
+  "name": "Jefferson County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16053",
+  "is_state_zone": false,
+  "lat": 42.69951,
+  "lon": -114.46497,
+  "name": "Jerome County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16055",
+  "is_state_zone": false,
+  "lat": 47.73859,
+  "lon": -116.8374,
+  "name": "Kootenai County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16057",
+  "is_state_zone": false,
+  "lat": 46.74259,
+  "lon": -116.93484,
+  "name": "Latah County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16059",
+  "is_state_zone": false,
+  "lat": 45.13044,
+  "lon": -113.86099,
+  "name": "Lemhi County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16061",
+  "is_state_zone": false,
+  "lat": 46.23756,
+  "lon": -116.26404,
+  "name": "Lewis County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16063",
+  "is_state_zone": false,
+  "lat": 42.9717,
+  "lon": -114.33332,
+  "name": "Lincoln County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16065",
+  "is_state_zone": false,
+  "lat": 43.81919,
+  "lon": -111.79385,
+  "name": "Madison County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16067",
+  "is_state_zone": false,
+  "lat": 42.61117,
+  "lon": -113.71263,
+  "name": "Minidoka County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16069",
+  "is_state_zone": false,
+  "lat": 46.39395,
+  "lon": -116.9521,
+  "name": "Nez Perce County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16071",
+  "is_state_zone": false,
+  "lat": 42.18223,
+  "lon": -112.29549,
+  "name": "Oneida County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16073",
+  "is_state_zone": false,
+  "lat": 43.39339,
+  "lon": -116.70466,
+  "name": "Owyhee County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16075",
+  "is_state_zone": false,
+  "lat": 44.01956,
+  "lon": -116.89334,
+  "name": "Payette County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16077",
+  "is_state_zone": false,
+  "lat": 42.77458,
+  "lon": -112.82733,
+  "name": "Power County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16079",
+  "is_state_zone": false,
+  "lat": 47.51492,
+  "lon": -116.09178,
+  "name": "Shoshone County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16081",
+  "is_state_zone": false,
+  "lat": 43.69241,
+  "lon": -111.12207,
+  "name": "Teton County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16083",
+  "is_state_zone": false,
+  "lat": 42.56026,
+  "lon": -114.49963,
+  "name": "Twin Falls County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16085",
+  "is_state_zone": false,
+  "lat": 44.76623,
+  "lon": -116.07474,
+  "name": "Valley County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "16087",
+  "is_state_zone": false,
+  "lat": 44.29827,
+  "lon": -116.92098,
+  "name": "Washington County, ID",
+  "state_fips": "16",
+  "type": "county"
+ },
+ {
+  "id": "32001",
+  "is_state_zone": false,
+  "lat": 39.47447,
+  "lon": -118.79605,
+  "name": "Churchill County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32003",
+  "is_state_zone": false,
+  "lat": 36.14114,
+  "lon": -115.15298,
+  "name": "Clark County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32005",
+  "is_state_zone": false,
+  "lat": 38.95747,
+  "lon": -119.75622,
+  "name": "Douglas County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32007",
+  "is_state_zone": false,
+  "lat": 40.8563,
+  "lon": -115.53427,
+  "name": "Elko County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32009",
+  "is_state_zone": false,
+  "lat": 37.70441,
+  "lon": -117.67064,
+  "name": "Esmeralda County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32011",
+  "is_state_zone": false,
+  "lat": 39.94699,
+  "lon": -116.20913,
+  "name": "Eureka County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32013",
+  "is_state_zone": false,
+  "lat": 41.01756,
+  "lon": -117.7443,
+  "name": "Humboldt County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32015",
+  "is_state_zone": false,
+  "lat": 40.49846,
+  "lon": -116.94953,
+  "name": "Lander County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32017",
+  "is_state_zone": false,
+  "lat": 37.71009,
+  "lon": -114.62644,
+  "name": "Lincoln County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32019",
+  "is_state_zone": false,
+  "lat": 39.35576,
+  "lon": -119.32715,
+  "name": "Lyon County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32021",
+  "is_state_zone": false,
+  "lat": 38.60161,
+  "lon": -118.6434,
+  "name": "Mineral County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32023",
+  "is_state_zone": false,
+  "lat": 36.4143,
+  "lon": -116.12567,
+  "name": "Nye County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32027",
+  "is_state_zone": false,
+  "lat": 40.33465,
+  "lon": -118.29422,
+  "name": "Pershing County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32029",
+  "is_state_zone": false,
+  "lat": 39.38983,
+  "lon": -119.62243,
+  "name": "Storey County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32031",
+  "is_state_zone": false,
+  "lat": 39.53449,
+  "lon": -119.79353,
+  "name": "Washoe County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32033",
+  "is_state_zone": false,
+  "lat": 39.27832,
+  "lon": -114.87546,
+  "name": "White Pine County, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "32510",
+  "is_state_zone": false,
+  "lat": 39.1661,
+  "lon": -119.75408,
+  "name": "Carson City, NV",
+  "state_fips": "32",
+  "type": "county"
+ },
+ {
+  "id": "35001",
+  "is_state_zone": false,
+  "lat": 35.10946,
+  "lon": -106.61778,
+  "name": "Bernalillo County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35003",
+  "is_state_zone": false,
+  "lat": 33.95871,
+  "lon": -108.53149,
+  "name": "Catron County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35005",
+  "is_state_zone": false,
+  "lat": 33.36567,
+  "lon": -104.51473,
+  "name": "Chaves County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35006",
+  "is_state_zone": false,
+  "lat": 35.10701,
+  "lon": -107.81885,
+  "name": "Cibola County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35007",
+  "is_state_zone": false,
+  "lat": 36.69808,
+  "lon": -104.65662,
+  "name": "Colfax County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35009",
+  "is_state_zone": false,
+  "lat": 34.42108,
+  "lon": -103.21323,
+  "name": "Curry County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35011",
+  "is_state_zone": false,
+  "lat": 34.46069,
+  "lon": -104.24799,
+  "name": "De Baca County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35013",
+  "is_state_zone": false,
+  "lat": 32.24837,
+  "lon": -106.72884,
+  "name": "Doña Ana County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35015",
+  "is_state_zone": false,
+  "lat": 32.53816,
+  "lon": -104.2886,
+  "name": "Eddy County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35017",
+  "is_state_zone": false,
+  "lat": 32.78105,
+  "lon": -108.24321,
+  "name": "Grant County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35019",
+  "is_state_zone": false,
+  "lat": 34.93259,
+  "lon": -104.76445,
+  "name": "Guadalupe County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35021",
+  "is_state_zone": false,
+  "lat": 35.85304,
+  "lon": -103.97856,
+  "name": "Harding County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35023",
+  "is_state_zone": false,
+  "lat": 32.28652,
+  "lon": -108.77122,
+  "name": "Hidalgo County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35025",
+  "is_state_zone": false,
+  "lat": 32.75172,
+  "lon": -103.19053,
+  "name": "Lea County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35027",
+  "is_state_zone": false,
+  "lat": 33.41957,
+  "lon": -105.63111,
+  "name": "Lincoln County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35028",
+  "is_state_zone": false,
+  "lat": 35.86918,
+  "lon": -106.27231,
+  "name": "Los Alamos County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35029",
+  "is_state_zone": false,
+  "lat": 32.22303,
+  "lon": -107.74187,
+  "name": "Luna County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35031",
+  "is_state_zone": false,
+  "lat": 35.51323,
+  "lon": -108.63428,
+  "name": "McKinley County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35033",
+  "is_state_zone": false,
+  "lat": 36.00418,
+  "lon": -105.23707,
+  "name": "Mora County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35035",
+  "is_state_zone": false,
+  "lat": 32.77852,
+  "lon": -106.00032,
+  "name": "Otero County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35037",
+  "is_state_zone": false,
+  "lat": 35.17833,
+  "lon": -103.66236,
+  "name": "Quay County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35039",
+  "is_state_zone": false,
+  "lat": 36.20398,
+  "lon": -106.20516,
+  "name": "Rio Arriba County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35041",
+  "is_state_zone": false,
+  "lat": 34.16855,
+  "lon": -103.34754,
+  "name": "Roosevelt County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35043",
+  "is_state_zone": false,
+  "lat": 35.31967,
+  "lon": -106.64922,
+  "name": "Sandoval County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35045",
+  "is_state_zone": false,
+  "lat": 36.72398,
+  "lon": -108.22015,
+  "name": "San Juan County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35047",
+  "is_state_zone": false,
+  "lat": 35.57634,
+  "lon": -105.30787,
+  "name": "San Miguel County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35049",
+  "is_state_zone": false,
+  "lat": 35.63263,
+  "lon": -106.00477,
+  "name": "Santa Fe County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35051",
+  "is_state_zone": false,
+  "lat": 33.10695,
+  "lon": -107.28172,
+  "name": "Sierra County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35053",
+  "is_state_zone": false,
+  "lat": 34.15488,
+  "lon": -106.96036,
+  "name": "Socorro County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35055",
+  "is_state_zone": false,
+  "lat": 36.4351,
+  "lon": -105.60791,
+  "name": "Taos County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35057",
+  "is_state_zone": false,
+  "lat": 34.87056,
+  "lon": -106.1027,
+  "name": "Torrance County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35059",
+  "is_state_zone": false,
+  "lat": 36.46819,
+  "lon": -103.26589,
+  "name": "Union County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "35061",
+  "is_state_zone": false,
+  "lat": 34.75571,
+  "lon": -106.72281,
+  "name": "Valencia County, NM",
+  "state_fips": "35",
+  "type": "county"
+ },
+ {
+  "id": "49001",
+  "is_state_zone": true,
+  "lat": 38.29808,
+  "lon": -112.76254,
+  "name": "Beaver County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49003",
+  "is_state_zone": true,
+  "lat": 41.59263,
+  "lon": -112.09841,
+  "name": "Box Elder County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49005",
+  "is_state_zone": true,
+  "lat": 41.74542,
+  "lon": -111.83972,
+  "name": "Cache County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49007",
+  "is_state_zone": true,
+  "lat": 39.60245,
+  "lon": -110.77757,
+  "name": "Carbon County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49009",
+  "is_state_zone": true,
+  "lat": 40.9671,
+  "lon": -109.6471,
+  "name": "Daggett County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49011",
+  "is_state_zone": true,
+  "lat": 41.01994,
+  "lon": -111.96088,
+  "name": "Davis County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49013",
+  "is_state_zone": true,
+  "lat": 40.28946,
+  "lon": -110.16236,
+  "name": "Duchesne County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49015",
+  "is_state_zone": true,
+  "lat": 39.21758,
+  "lon": -110.92994,
+  "name": "Emery County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49017",
+  "is_state_zone": true,
+  "lat": 37.76544,
+  "lon": -112.10046,
+  "name": "Garfield County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49019",
+  "is_state_zone": true,
+  "lat": 38.56906,
+  "lon": -109.52869,
+  "name": "Grand County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49021",
+  "is_state_zone": true,
+  "lat": 37.70887,
+  "lon": -113.07616,
+  "name": "Iron County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49023",
+  "is_state_zone": true,
+  "lat": 39.7484,
+  "lon": -111.87864,
+  "name": "Juab County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49025",
+  "is_state_zone": true,
+  "lat": 37.11217,
+  "lon": -112.453,
+  "name": "Kane County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49027",
+  "is_state_zone": true,
+  "lat": 39.20926,
+  "lon": -112.48563,
+  "name": "Millard County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49029",
+  "is_state_zone": true,
+  "lat": 41.08368,
+  "lon": -111.72498,
+  "name": "Morgan County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49031",
+  "is_state_zone": true,
+  "lat": 38.27717,
+  "lon": -112.21441,
+  "name": "Piute County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49033",
+  "is_state_zone": true,
+  "lat": 41.77649,
+  "lon": -111.28576,
+  "name": "Rich County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49035",
+  "is_state_zone": true,
+  "lat": 40.63851,
+  "lon": -111.92769,
+  "name": "Salt Lake County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49037",
+  "is_state_zone": true,
+  "lat": 37.52052,
+  "lon": -109.5455,
+  "name": "San Juan County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49039",
+  "is_state_zone": true,
+  "lat": 39.38453,
+  "lon": -111.6052,
+  "name": "Sanpete County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49041",
+  "is_state_zone": true,
+  "lat": 38.77179,
+  "lon": -112.04469,
+  "name": "Sevier County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49043",
+  "is_state_zone": true,
+  "lat": 40.72685,
+  "lon": -111.47096,
+  "name": "Summit County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49045",
+  "is_state_zone": true,
+  "lat": 40.56824,
+  "lon": -112.363,
+  "name": "Tooele County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49047",
+  "is_state_zone": true,
+  "lat": 40.42645,
+  "lon": -109.59027,
+  "name": "Uintah County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49049",
+  "is_state_zone": true,
+  "lat": 40.2783,
+  "lon": -111.74994,
+  "name": "Utah County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49051",
+  "is_state_zone": true,
+  "lat": 40.51144,
+  "lon": -111.41218,
+  "name": "Wasatch County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49053",
+  "is_state_zone": true,
+  "lat": 37.13018,
+  "lon": -113.52404,
+  "name": "Washington County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49055",
+  "is_state_zone": true,
+  "lat": 38.36171,
+  "lon": -111.47388,
+  "name": "Wayne County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "49057",
+  "is_state_zone": true,
+  "lat": 41.22761,
+  "lon": -111.9927,
+  "name": "Weber County, UT",
+  "state_fips": "49",
+  "type": "county"
+ },
+ {
+  "id": "56001",
+  "is_state_zone": false,
+  "lat": 41.31344,
+  "lon": -105.59607,
+  "name": "Albany County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56003",
+  "is_state_zone": false,
+  "lat": 44.6353,
+  "lon": -108.25097,
+  "name": "Big Horn County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56005",
+  "is_state_zone": false,
+  "lat": 44.25705,
+  "lon": -105.49552,
+  "name": "Campbell County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56007",
+  "is_state_zone": false,
+  "lat": 41.65987,
+  "lon": -107.07812,
+  "name": "Carbon County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56009",
+  "is_state_zone": false,
+  "lat": 42.78853,
+  "lon": -105.52074,
+  "name": "Converse County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56011",
+  "is_state_zone": false,
+  "lat": 44.43492,
+  "lon": -104.61974,
+  "name": "Crook County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56013",
+  "is_state_zone": false,
+  "lat": 43.0107,
+  "lon": -108.60947,
+  "name": "Fremont County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56015",
+  "is_state_zone": false,
+  "lat": 42.05014,
+  "lon": -104.22017,
+  "name": "Goshen County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56017",
+  "is_state_zone": false,
+  "lat": 43.66152,
+  "lon": -108.23264,
+  "name": "Hot Springs County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56019",
+  "is_state_zone": false,
+  "lat": 44.28828,
+  "lon": -106.69571,
+  "name": "Johnson County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56021",
+  "is_state_zone": false,
+  "lat": 41.15394,
+  "lon": -104.77134,
+  "name": "Laramie County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56023",
+  "is_state_zone": false,
+  "lat": 42.64829,
+  "lon": -110.87287,
+  "name": "Lincoln County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56025",
+  "is_state_zone": false,
+  "lat": 42.84218,
+  "lon": -106.33531,
+  "name": "Natrona County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56027",
+  "is_state_zone": false,
+  "lat": 42.8109,
+  "lon": -104.45099,
+  "name": "Niobrara County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56029",
+  "is_state_zone": false,
+  "lat": 44.61401,
+  "lon": -108.97254,
+  "name": "Park County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56031",
+  "is_state_zone": false,
+  "lat": 42.10651,
+  "lon": -104.92982,
+  "name": "Platte County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56033",
+  "is_state_zone": false,
+  "lat": 44.78099,
+  "lon": -106.97785,
+  "name": "Sheridan County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56035",
+  "is_state_zone": false,
+  "lat": 42.80728,
+  "lon": -109.94351,
+  "name": "Sublette County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56037",
+  "is_state_zone": false,
+  "lat": 41.58056,
+  "lon": -109.30252,
+  "name": "Sweetwater County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56039",
+  "is_state_zone": false,
+  "lat": 43.49174,
+  "lon": -110.78581,
+  "name": "Teton County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56041",
+  "is_state_zone": false,
+  "lat": 41.2715,
+  "lon": -110.7604,
+  "name": "Uinta County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56043",
+  "is_state_zone": false,
+  "lat": 44.01222,
+  "lon": -107.90506,
+  "name": "Washakie County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "56045",
+  "is_state_zone": false,
+  "lat": 43.90845,
+  "lon": -104.30438,
+  "name": "Weston County, WY",
+  "state_fips": "56",
+  "type": "county"
+ },
+ {
+  "id": "011",
+  "is_state_zone": false,
+  "lat": 33.50411,
+  "lon": -86.71486,
+  "name": "Birmingham AL",
+  "state_fips": "01",
+  "type": "metro"
+ },
+ {
+  "id": "012",
+  "is_state_zone": false,
+  "lat": 30.63148,
+  "lon": -88.02689,
+  "name": "Mobile AL",
+  "state_fips": "01",
+  "type": "metro"
+ },
+ {
+  "id": "019",
+  "is_state_zone": false,
+  "lat": 34.743,
+  "lon": -86.61533,
+  "name": "Rest of AL",
+  "state_fips": "01",
+  "type": "remainder"
+ },
+ {
+  "id": "020",
+  "is_state_zone": false,
+  "lat": 61.46195,
+  "lon": -149.00364,
+  "name": "Alaska",
+  "state_fips": "02",
+  "type": "whole_state"
+ },
+ {
+  "id": "050",
+  "is_state_zone": false,
+  "lat": 35.19925,
+  "lon": -92.71503,
+  "name": "Arkansas",
+  "state_fips": "05",
+  "type": "whole_state"
+ },
+ {
+  "id": "061",
+  "is_state_zone": false,
+  "lat": 33.99807,
+  "lon": -117.95976,
+  "name": "Los Angeles CA",
+  "state_fips": "06",
+  "type": "metro"
+ },
+ {
+  "id": "062",
+  "is_state_zone": false,
+  "lat": 38.68717,
+  "lon": -121.33261,
+  "name": "Sacramento CA",
+  "state_fips": "06",
+  "type": "metro"
+ },
+ {
+  "id": "063",
+  "is_state_zone": false,
+  "lat": 32.88442,
+  "lon": -117.11235,
+  "name": "San Diego CA",
+  "state_fips": "06",
+  "type": "metro"
+ },
+ {
+  "id": "064",
+  "is_state_zone": false,
+  "lat": 37.71901,
+  "lon": -122.07162,
+  "name": "San Francisco CA",
+  "state_fips": "06",
+  "type": "metro"
+ },
+ {
+  "id": "065",
+  "is_state_zone": false,
+  "lat": 36.78318,
+  "lon": -119.79809,
+  "name": "Fresno CA",
+  "state_fips": "06",
+  "type": "metro"
+ },
+ {
+  "id": "069",
+  "is_state_zone": false,
+  "lat": 35.36981,
+  "lon": -118.94179,
+  "name": "Rest of CA",
+  "state_fips": "06",
+  "type": "remainder"
+ },
+ {
+  "id": "091",
+  "is_state_zone": false,
+  "lat": 41.73299,
+  "lon": -72.6555,
+  "name": "Hartford CT",
+  "state_fips": "09",
+  "type": "metro"
+ },
+ {
+  "id": "092",
+  "is_state_zone": false,
+  "lat": 41.33618,
+  "lon": -73.16786,
+  "name": "New York NY-NJ-CT-PA (CT Part)",
+  "state_fips": "09",
+  "type": "metro"
+ },
+ {
+  "id": "099",
+  "is_state_zone": false,
+  "lat": 41.55268,
+  "lon": -72.06608,
+  "name": "Rest of CT",
+  "state_fips": "09",
+  "type": "remainder"
+ },
+ {
+  "id": "101",
+  "is_state_zone": false,
+  "lat": 39.54552,
+  "lon": -75.61689,
+  "name": "Philadelphia PA-NJ-DE-MD (DE Part)",
+  "state_fips": "10",
+  "type": "metro"
+ },
+ {
+  "id": "109",
+  "is_state_zone": false,
+  "lat": 38.66179,
+  "lon": -75.33147,
+  "name": "Rest of DE",
+  "state_fips": "10",
+  "type": "remainder"
+ },
+ {
+  "id": "111",
+  "is_state_zone": false,
+  "lat": 38.91017,
+  "lon": -77.01399,
+  "name": "Washington DC-VA-MD-WV (DC Part)",
+  "state_fips": "11",
+  "type": "whole_state"
+ },
+ {
+  "id": "121",
+  "is_state_zone": false,
+  "lat": 30.20762,
+  "lon": -81.62827,
+  "name": "Jacksonville FL-GA  CFS Area (FL Part)",
+  "state_fips": "12",
+  "type": "metro"
+ },
+ {
+  "id": "122",
+  "is_state_zone": false,
+  "lat": 26.21949,
+  "lon": -80.25333,
+  "name": "Miami FL",
+  "state_fips": "12",
+  "type": "metro"
+ },
+ {
+  "id": "123",
+  "is_state_zone": false,
+  "lat": 28.67353,
+  "lon": -81.39451,
+  "name": "Orlando FL",
+  "state_fips": "12",
+  "type": "metro"
+ },
+ {
+  "id": "124",
+  "is_state_zone": false,
+  "lat": 28.0314,
+  "lon": -82.52357,
+  "name": "Tampa FL",
+  "state_fips": "12",
+  "type": "metro"
+ },
+ {
+  "id": "129",
+  "is_state_zone": false,
+  "lat": 26.57602,
+  "lon": -81.85184,
+  "name": "Rest of FL",
+  "state_fips": "12",
+  "type": "remainder"
+ },
+ {
+  "id": "131",
+  "is_state_zone": false,
+  "lat": 33.8416,
+  "lon": -84.30366,
+  "name": "Atlanta GA",
+  "state_fips": "13",
+  "type": "metro"
+ },
+ {
+  "id": "132",
+  "is_state_zone": false,
+  "lat": 32.0853,
+  "lon": -81.3295,
+  "name": "Savannah GA",
+  "state_fips": "13",
+  "type": "metro"
+ },
+ {
+  "id": "139",
+  "is_state_zone": false,
+  "lat": 32.76522,
+  "lon": -83.5098,
+  "name": "Rest of GA",
+  "state_fips": "13",
+  "type": "remainder"
+ },
+ {
+  "id": "151",
+  "is_state_zone": false,
+  "lat": 21.37152,
+  "lon": -157.91722,
+  "name": "Honolulu HI",
+  "state_fips": "15",
+  "type": "metro"
+ },
+ {
+  "id": "159",
+  "is_state_zone": false,
+  "lat": 20.512,
+  "lon": -156.4979,
+  "name": "Rest of HI",
+  "state_fips": "15",
+  "type": "remainder"
+ },
+ {
+  "id": "171",
+  "is_state_zone": false,
+  "lat": 41.87365,
+  "lon": -87.92978,
+  "name": "Chicago IL-IN-WI (IL Part)",
+  "state_fips": "17",
+  "type": "metro"
+ },
+ {
+  "id": "172",
+  "is_state_zone": false,
+  "lat": 38.704,
+  "lon": -89.92427,
+  "name": "St. Louis MO-IL (IL Part)",
+  "state_fips": "17",
+  "type": "metro"
+ },
+ {
+  "id": "179",
+  "is_state_zone": false,
+  "lat": 40.29202,
+  "lon": -89.26074,
+  "name": "Rest of IL",
+  "state_fips": "17",
+  "type": "remainder"
+ },
+ {
+  "id": "181",
+  "is_state_zone": false,
+  "lat": 41.50733,
+  "lon": -87.25033,
+  "name": "Chicago IL-IN-WI (IN Part)",
+  "state_fips": "18",
+  "type": "metro"
+ },
+ {
+  "id": "182",
+  "is_state_zone": false,
+  "lat": 39.78474,
+  "lon": -86.0709,
+  "name": "Indianapolis IN",
+  "state_fips": "18",
+  "type": "metro"
+ },
+ {
+  "id": "183",
+  "is_state_zone": false,
+  "lat": 41.1281,
+  "lon": -85.16401,
+  "name": "Fort Wayne IN",
+  "state_fips": "18",
+  "type": "metro"
+ },
+ {
+  "id": "189",
+  "is_state_zone": false,
+  "lat": 41.67642,
+  "lon": -86.22708,
+  "name": "Rest of IN",
+  "state_fips": "18",
+  "type": "remainder"
+ },
+ {
+  "id": "190",
+  "is_state_zone": false,
+  "lat": 41.95126,
+  "lon": -93.0571,
+  "name": "Iowa",
+  "state_fips": "19",
+  "type": "whole_state"
+ },
+ {
+  "id": "201",
+  "is_state_zone": false,
+  "lat": 38.97031,
+  "lon": -94.83459,
+  "name": "Kansas City MO-KS (KS Part)",
+  "state_fips": "20",
+  "type": "metro"
+ },
+ {
+  "id": "202",
+  "is_state_zone": false,
+  "lat": 37.66441,
+  "lon": -97.30549,
+  "name": "Wichita KS",
+  "state_fips": "20",
+  "type": "metro"
+ },
+ {
+  "id": "209",
+  "is_state_zone": false,
+  "lat": 38.51323,
+  "lon": -97.30473,
+  "name": "Rest of KS",
+  "state_fips": "20",
+  "type": "remainder"
+ },
+ {
+  "id": "211",
+  "is_state_zone": false,
+  "lat": 38.95718,
+  "lon": -84.53113,
+  "name": "Cincinnati OH-KY-IN (KY Part)",
+  "state_fips": "21",
+  "type": "metro"
+ },
+ {
+  "id": "212",
+  "is_state_zone": false,
+  "lat": 38.13272,
+  "lon": -85.66287,
+  "name": "Louisville KY-IN (KY Part)",
+  "state_fips": "21",
+  "type": "metro"
+ },
+ {
+  "id": "219",
+  "is_state_zone": false,
+  "lat": 37.52155,
+  "lon": -85.20162,
+  "name": "Rest of KY",
+  "state_fips": "21",
+  "type": "remainder"
+ },
+ {
+  "id": "221",
+  "is_state_zone": false,
+  "lat": 30.45103,
+  "lon": -91.05271,
+  "name": "Baton Rouge LA",
+  "state_fips": "22",
+  "type": "metro"
+ },
+ {
+  "id": "222",
+  "is_state_zone": false,
+  "lat": 30.22118,
+  "lon": -93.19194,
+  "name": "Lake Charles-Jennings LA",
+  "state_fips": "22",
+  "type": "metro"
+ },
+ {
+  "id": "223",
+  "is_state_zone": false,
+  "lat": 30.11915,
+  "lon": -90.13008,
+  "name": "New Orleans LA-MS (LA Part)",
+  "state_fips": "22",
+  "type": "metro"
+ },
+ {
+  "id": "229",
+  "is_state_zone": false,
+  "lat": 31.25072,
+  "lon": -92.38141,
+  "name": "Rest of LA",
+  "state_fips": "22",
+  "type": "remainder"
+ },
+ {
+  "id": "230",
+  "is_state_zone": false,
+  "lat": 44.2674,
+  "lon": -69.75596,
+  "name": "Maine",
+  "state_fips": "23",
+  "type": "whole_state"
+ },
+ {
+  "id": "241",
+  "is_state_zone": false,
+  "lat": 39.29577,
+  "lon": -76.62979,
+  "name": "Baltimore MD",
+  "state_fips": "24",
+  "type": "metro"
+ },
+ {
+  "id": "242",
+  "is_state_zone": false,
+  "lat": 39.00374,
+  "lon": -77.03228,
+  "name": "Washington DC-VA-MD-WV (MD Part)",
+  "state_fips": "24",
+  "type": "metro"
+ },
+ {
+  "id": "249",
+  "is_state_zone": false,
+  "lat": 39.61869,
+  "lon": -77.73148,
+  "name": "Rest of MD",
+  "state_fips": "24",
+  "type": "remainder"
+ },
+ {
+  "id": "251",
+  "is_state_zone": false,
+  "lat": 42.28166,
+  "lon": -71.1786,
+  "name": "Boston MA-RI-NH-CT (MA Part)",
+  "state_fips": "25",
+  "type": "metro"
+ },
+ {
+  "id": "259",
+  "is_state_zone": false,
+  "lat": 42.21652,
+  "lon": -72.58086,
+  "name": "Rest of MA",
+  "state_fips": "25",
+  "type": "remainder"
+ },
+ {
+  "id": "261",
+  "is_state_zone": false,
+  "lat": 42.49588,
+  "lon": -83.29855,
+  "name": "Detroit MI",
+  "state_fips": "26",
+  "type": "metro"
+ },
+ {
+  "id": "262",
+  "is_state_zone": false,
+  "lat": 42.97459,
+  "lon": -85.7304,
+  "name": "Grand Rapids MI",
+  "state_fips": "26",
+  "type": "metro"
+ },
+ {
+  "id": "269",
+  "is_state_zone": false,
+  "lat": 42.68838,
+  "lon": -84.48625,
+  "name": "Rest of MI",
+  "state_fips": "26",
+  "type": "remainder"
+ },
+ {
+  "id": "271",
+  "is_state_zone": false,
+  "lat": 45.00574,
+  "lon": -93.34789,
+  "name": "Minneapolis-St. Paul MN-WI (MN Part)",
+  "state_fips": "27",
+  "type": "metro"
+ },
+ {
+  "id": "279",
+  "is_state_zone": false,
+  "lat": 47.07843,
+  "lon": -92.30737,
+  "name": "Rest of MN",
+  "state_fips": "27",
+  "type": "remainder"
+ },
+ {
+  "id": "280",
+  "is_state_zone": false,
+  "lat": 32.57536,
+  "lon": -89.56673,
+  "name": "Mississippi",
+  "state_fips": "28",
+  "type": "whole_state"
+ },
+ {
+  "id": "291",
+  "is_state_zone": false,
+  "lat": 39.11357,
+  "lon": -94.44598,
+  "name": "Kansas City MO-KS (MO Part)",
+  "state_fips": "29",
+  "type": "metro"
+ },
+ {
+  "id": "292",
+  "is_state_zone": false,
+  "lat": 38.61205,
+  "lon": -90.48945,
+  "name": "St. Louis MO-IL (MO Part)",
+  "state_fips": "29",
+  "type": "metro"
+ },
+ {
+  "id": "299",
+  "is_state_zone": false,
+  "lat": 37.87772,
+  "lon": -92.49551,
+  "name": "Rest of MO",
+  "state_fips": "29",
+  "type": "remainder"
+ },
+ {
+  "id": "300",
+  "is_state_zone": false,
+  "lat": 46.76051,
+  "lon": -111.33472,
+  "name": "Montana",
+  "state_fips": "30",
+  "type": "whole_state"
+ },
+ {
+  "id": "311",
+  "is_state_zone": false,
+  "lat": 41.2417,
+  "lon": -96.09771,
+  "name": "Omaha NE-IA (NE Part)",
+  "state_fips": "31",
+  "type": "metro"
+ },
+ {
+  "id": "319",
+  "is_state_zone": false,
+  "lat": 41.10757,
+  "lon": -98.14457,
+  "name": "Rest of NE",
+  "state_fips": "31",
+  "type": "remainder"
+ },
+ {
+  "id": "331",
+  "is_state_zone": false,
+  "lat": 43.02959,
+  "lon": -71.34117,
+  "name": "Boston MA-RI-NH-CT (NH Part)",
+  "state_fips": "33",
+  "type": "metro"
+ },
+ {
+  "id": "339",
+  "is_state_zone": false,
+  "lat": 43.59358,
+  "lon": -71.88214,
+  "name": "Rest of NH",
+  "state_fips": "33",
+  "type": "remainder"
+ },
+ {
+  "id": "341",
+  "is_state_zone": false,
+  "lat": 40.61798,
+  "lon": -74.29266,
+  "name": "New York NY-NJ-CT-PA (NJ Part)",
+  "state_fips": "34",
+  "type": "metro"
+ },
+ {
+  "id": "342",
+  "is_state_zone": false,
+  "lat": 39.72826,
+  "lon": -74.938,
+  "name": "Philadelphia PA-NJ-DE-MD (NJ Part)",
+  "state_fips": "34",
+  "type": "metro"
+ },
+ {
+  "id": "361",
+  "is_state_zone": false,
+  "lat": 42.84112,
+  "lon": -73.83021,
+  "name": "Albany NY  CFS Area",
+  "state_fips": "36",
+  "type": "metro"
+ },
+ {
+  "id": "362",
+  "is_state_zone": false,
+  "lat": 42.8914,
+  "lon": -78.7913,
+  "name": "Buffalo NY  CFS Area",
+  "state_fips": "36",
+  "type": "metro"
+ },
+ {
+  "id": "363",
+  "is_state_zone": false,
+  "lat": 40.82563,
+  "lon": -73.80399,
+  "name": "New York NY-NJ-CT-PA (NY Part)",
+  "state_fips": "36",
+  "type": "metro"
+ },
+ {
+  "id": "364",
+  "is_state_zone": false,
+  "lat": 43.08885,
+  "lon": -77.56924,
+  "name": "Rochester NY",
+  "state_fips": "36",
+  "type": "metro"
+ },
+ {
+  "id": "369",
+  "is_state_zone": false,
+  "lat": 42.95561,
+  "lon": -75.99824,
+  "name": "Rest of NY",
+  "state_fips": "36",
+  "type": "remainder"
+ },
+ {
+  "id": "371",
+  "is_state_zone": false,
+  "lat": 35.3005,
+  "lon": -80.82591,
+  "name": "Charlotte NC-SC (NC Part)",
+  "state_fips": "37",
+  "type": "metro"
+ },
+ {
+  "id": "372",
+  "is_state_zone": false,
+  "lat": 36.06881,
+  "lon": -80.00634,
+  "name": "Greensboro--Winston-Salem--High Point NC",
+  "state_fips": "37",
+  "type": "metro"
+ },
+ {
+  "id": "373",
+  "is_state_zone": false,
+  "lat": 35.81512,
+  "lon": -78.74399,
+  "name": "Raleigh-Durham NC",
+  "state_fips": "37",
+  "type": "metro"
+ },
+ {
+  "id": "379",
+  "is_state_zone": false,
+  "lat": 35.30025,
+  "lon": -79.38835,
+  "name": "Rest of NC",
+  "state_fips": "37",
+  "type": "remainder"
+ },
+ {
+  "id": "380",
+  "is_state_zone": false,
+  "lat": 47.33954,
+  "lon": -99.45327,
+  "name": "North Dakota",
+  "state_fips": "38",
+  "type": "whole_state"
+ },
+ {
+  "id": "391",
+  "is_state_zone": false,
+  "lat": 39.25622,
+  "lon": -84.40388,
+  "name": "Cincinnati OH-KY-IN (OH Part)",
+  "state_fips": "39",
+  "type": "metro"
+ },
+ {
+  "id": "392",
+  "is_state_zone": false,
+  "lat": 41.28787,
+  "lon": -81.61465,
+  "name": "Cleveland OH",
+  "state_fips": "39",
+  "type": "metro"
+ },
+ {
+  "id": "393",
+  "is_state_zone": false,
+  "lat": 40.01096,
+  "lon": -82.89162,
+  "name": "Columbus OH",
+  "state_fips": "39",
+  "type": "metro"
+ },
+ {
+  "id": "394",
+  "is_state_zone": false,
+  "lat": 39.8504,
+  "lon": -84.13215,
+  "name": "Dayton OH",
+  "state_fips": "39",
+  "type": "metro"
+ },
+ {
+  "id": "399",
+  "is_state_zone": false,
+  "lat": 40.72185,
+  "lon": -82.63404,
+  "name": "Rest of OH",
+  "state_fips": "39",
+  "type": "remainder"
+ },
+ {
+  "id": "401",
+  "is_state_zone": false,
+  "lat": 35.44777,
+  "lon": -97.49567,
+  "name": "Oklahoma City OK",
+  "state_fips": "40",
+  "type": "metro"
+ },
+ {
+  "id": "402",
+  "is_state_zone": false,
+  "lat": 36.10328,
+  "lon": -95.84651,
+  "name": "Tulsa OK",
+  "state_fips": "40",
+  "type": "metro"
+ },
+ {
+  "id": "409",
+  "is_state_zone": false,
+  "lat": 34.63304,
+  "lon": -98.41945,
+  "name": "Rest of OK",
+  "state_fips": "40",
+  "type": "remainder"
+ },
+ {
+  "id": "411",
+  "is_state_zone": false,
+  "lat": 45.30945,
+  "lon": -122.79093,
+  "name": "Portland OR-WA (OR Part)",
+  "state_fips": "41",
+  "type": "metro"
+ },
+ {
+  "id": "419",
+  "is_state_zone": false,
+  "lat": 43.82097,
+  "lon": -122.2428,
+  "name": "Rest of OR",
+  "state_fips": "41",
+  "type": "remainder"
+ },
+ {
+  "id": "421",
+  "is_state_zone": false,
+  "lat": 40.08887,
+  "lon": -75.31503,
+  "name": "Philadelphia PA-NJ-DE-MD (PA Part)",
+  "state_fips": "42",
+  "type": "metro"
+ },
+ {
+  "id": "422",
+  "is_state_zone": false,
+  "lat": 40.46407,
+  "lon": -79.91481,
+  "name": "Pittsburgh PA-OH-WV (PA Part)",
+  "state_fips": "42",
+  "type": "metro"
+ },
+ {
+  "id": "423",
+  "is_state_zone": false,
+  "lat": 40.76625,
+  "lon": -75.3959,
+  "name": "New York NY-NJ-CT-PA (PA Part)",
+  "state_fips": "42",
+  "type": "metro"
+ },
+ {
+  "id": "429",
+  "is_state_zone": false,
+  "lat": 40.70806,
+  "lon": -77.33252,
+  "name": "Rest of PA",
+  "state_fips": "42",
+  "type": "remainder"
+ },
+ {
+  "id": "441",
+  "is_state_zone": false,
+  "lat": 41.75568,
+  "lon": -71.45046,
+  "name": "Boston MA-RI-NH-CT (RI Part)",
+  "state_fips": "44",
+  "type": "whole_state"
+ },
+ {
+  "id": "451",
+  "is_state_zone": false,
+  "lat": 32.92728,
+  "lon": -80.04186,
+  "name": "Charleston SC",
+  "state_fips": "45",
+  "type": "metro"
+ },
+ {
+  "id": "452",
+  "is_state_zone": false,
+  "lat": 34.77503,
+  "lon": -82.30717,
+  "name": "Greenville SC",
+  "state_fips": "45",
+  "type": "metro"
+ },
+ {
+  "id": "459",
+  "is_state_zone": false,
+  "lat": 33.92911,
+  "lon": -80.57279,
+  "name": "Rest of SC",
+  "state_fips": "45",
+  "type": "remainder"
+ },
+ {
+  "id": "460",
+  "is_state_zone": false,
+  "lat": 43.98651,
+  "lon": -98.92957,
+  "name": "South Dakota",
+  "state_fips": "46",
+  "type": "whole_state"
+ },
+ {
+  "id": "471",
+  "is_state_zone": false,
+  "lat": 35.15424,
+  "lon": -89.86179,
+  "name": "Memphis TN-MS-AR (TN Part)",
+  "state_fips": "47",
+  "type": "metro"
+ },
+ {
+  "id": "472",
+  "is_state_zone": false,
+  "lat": 36.04771,
+  "lon": -86.69554,
+  "name": "Nashville TN",
+  "state_fips": "47",
+  "type": "metro"
+ },
+ {
+  "id": "473",
+  "is_state_zone": false,
+  "lat": 35.97432,
+  "lon": -83.91818,
+  "name": "Knoxville TN",
+  "state_fips": "47",
+  "type": "metro"
+ },
+ {
+  "id": "479",
+  "is_state_zone": false,
+  "lat": 35.83133,
+  "lon": -85.68411,
+  "name": "Rest of TN",
+  "state_fips": "47",
+  "type": "remainder"
+ },
+ {
+  "id": "481",
+  "is_state_zone": false,
+  "lat": 30.33156,
+  "lon": -97.74087,
+  "name": "Austin TX",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "482",
+  "is_state_zone": false,
+  "lat": 30.09358,
+  "lon": -94.04255,
+  "name": "Beaumont TX",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "483",
+  "is_state_zone": false,
+  "lat": 27.7584,
+  "lon": -97.48077,
+  "name": "Corpus Christi TX",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "484",
+  "is_state_zone": false,
+  "lat": 32.86834,
+  "lon": -96.92929,
+  "name": "Dallas-Fort Worth TX-OK (TX Part)",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "485",
+  "is_state_zone": false,
+  "lat": 31.7815,
+  "lon": -106.36253,
+  "name": "El Paso TX-NM (TX Part)",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "486",
+  "is_state_zone": false,
+  "lat": 29.79933,
+  "lon": -95.4456,
+  "name": "Houston TX",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "487",
+  "is_state_zone": false,
+  "lat": 27.52298,
+  "lon": -99.47555,
+  "name": "Laredo TX",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "488",
+  "is_state_zone": false,
+  "lat": 29.50126,
+  "lon": -98.49345,
+  "name": "San Antonio TX",
+  "state_fips": "48",
+  "type": "metro"
+ },
+ {
+  "id": "489",
+  "is_state_zone": false,
+  "lat": 30.80017,
+  "lon": -98.23543,
+  "name": "Rest of TX",
+  "state_fips": "48",
+  "type": "remainder"
+ },
+ {
+  "id": "500",
+  "is_state_zone": false,
+  "lat": 44.10195,
+  "lon": -72.82431,
+  "name": "Vermont",
+  "state_fips": "50",
+  "type": "whole_state"
+ },
+ {
+  "id": "511",
+  "is_state_zone": false,
+  "lat": 37.50723,
+  "lon": -77.49008,
+  "name": "Richmond VA",
+  "state_fips": "51",
+  "type": "metro"
+ },
+ {
+  "id": "512",
+  "is_state_zone": false,
+  "lat": 36.92754,
+  "lon": -76.3284,
+  "name": "Virginia Beach-Norfolk VA-NC (VA Part)",
+  "state_fips": "51",
+  "type": "metro"
+ },
+ {
+  "id": "513",
+  "is_state_zone": false,
+  "lat": 38.78424,
+  "lon": -77.37026,
+  "name": "Washington DC-VA-MD-WV (VA Part)",
+  "state_fips": "51",
+  "type": "metro"
+ },
+ {
+  "id": "519",
+  "is_state_zone": false,
+  "lat": 37.52624,
+  "lon": -79.37892,
+  "name": "Rest of VA",
+  "state_fips": "51",
+  "type": "remainder"
+ },
+ {
+  "id": "531",
+  "is_state_zone": false,
+  "lat": 47.53146,
+  "lon": -122.34443,
+  "name": "Seattle WA",
+  "state_fips": "53",
+  "type": "metro"
+ },
+ {
+  "id": "532",
+  "is_state_zone": false,
+  "lat": 45.7612,
+  "lon": -122.60915,
+  "name": "Portland OR-WA (WA Part)",
+  "state_fips": "53",
+  "type": "metro"
+ },
+ {
+  "id": "539",
+  "is_state_zone": false,
+  "lat": 47.32081,
+  "lon": -119.68952,
+  "name": "Rest of WA",
+  "state_fips": "53",
+  "type": "remainder"
+ },
+ {
+  "id": "540",
+  "is_state_zone": false,
+  "lat": 38.82328,
+  "lon": -80.66391,
+  "name": "West Virginia",
+  "state_fips": "54",
+  "type": "whole_state"
+ },
+ {
+  "id": "551",
+  "is_state_zone": false,
+  "lat": 43.03638,
+  "lon": -88.12511,
+  "name": "Milwaukee WI",
+  "state_fips": "55",
+  "type": "metro"
+ },
+ {
+  "id": "559",
+  "is_state_zone": false,
+  "lat": 44.0911,
+  "lon": -89.53265,
+  "name": "Rest of WI",
+  "state_fips": "55",
+  "type": "remainder"
+ }
+]

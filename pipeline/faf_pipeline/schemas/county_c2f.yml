@@ -1,0 +1,18 @@
+# Experimental county product, table c2f. Verified against the real file header on 2026-10-18 (docs/SPIKES.md section 10).
+columns:
+  trade_type: {canonical: trade_type, type: smallint}
+  fr_orig: {canonical: fr_orig, type: varchar}
+  fr_inmode: {canonical: fr_inmode, type: smallint}
+  fr_dest: {canonical: fr_dest, type: varchar}
+  fr_outmode: {canonical: fr_outmode, type: smallint}
+  dms_orig: {canonical: orig_zone, type: zone3}
+  dms_orig_cnty: {canonical: orig_county, type: county5}
+  dms_dest: {canonical: dest_zone, type: zone3}
+  sctgG5: {canonical: sctg_group, type: varchar}
+  dms_mode: {canonical: dms_mode, type: smallint}
+ignore: {}
+# column types: varchar | smallint | zone3 | county5 (5-char county FIPS)
+# `tons_2022` is in thousand tons (BTS technical report: "tons" means kilotons).
+year_columns:
+  tons: tons_kt
+required_measures: [tons]
