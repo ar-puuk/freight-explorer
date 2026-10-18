@@ -1,15 +1,14 @@
 import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { resolve } from 'node:path';
 
-// Phase 0: only the spike page is built. Phase 2 replaces `input` with index.html.
+// Builds into ../docs (GitHub Pages root). Relative base so it works under /<repo>/. emptyOutDir is false so docs/data survives;
+// scripts/clean.mjs removes the previous hashed assets first.
 export default defineConfig({
   base: './',
   plugins: [svelte()],
   build: {
     outDir: '../docs',
     emptyOutDir: false,
-    rollupOptions: { input: { spike: resolve(__dirname, 'spike.html') } },
   },
   server: { fs: { allow: ['..'] } },
 });

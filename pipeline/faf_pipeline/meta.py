@@ -9,6 +9,7 @@ from faf_pipeline.config import Context
 from faf_pipeline.dims import state_zone_ids
 from faf_pipeline.duck import write_json
 from faf_pipeline.fetch import load_manifest
+from faf_pipeline.webmeta import default_year
 
 
 def load_previous_versions(ctx: Context) -> dict[str, Any]:
@@ -40,6 +41,8 @@ def write_versions(ctx: Context, flow_stats: dict[str, Any] | None, zone_stats: 
             "scenario": spec["scenario"], "years": {}, "rows": {}, "sources": {},
             "zones": (zone_stats or {}).get(p, {}).get("zones") or out["products"].get(p, {}).get("zones"),
         }
+        all_years = sorted({y for st in levels.values() for y in st["years"]})
+        entry["default_year"] = default_year(spec["data_version"], all_years)
         for level, st in levels.items():
             folder = "flows" if level == "regional" else "state_flows"
             for y, v in st["years"].items():

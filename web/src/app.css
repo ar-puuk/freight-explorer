@@ -1,0 +1,445 @@
+/* Design tokens. Light is the default; dark applies when <html data-theme="dark">. Text/background pairs meet WCAG AA (4.5:1). */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f4;
+  --text: #1c2530;
+  --text-muted: #4a5663;
+  --border: #cfd6de;
+  --accent: #0b6a94;
+  --accent-contrast: #ffffff;
+  --accent-soft: #dcecf4;
+  --warn-bg: #fff4d6;
+  --warn-text: #5c4300;
+  --focus: #0b6a94;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.15), 0 4px 14px rgb(0 0 0 / 0.1);
+  --radius: 8px;
+  --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --panel-w: 340px;
+}
+
+:root[data-theme='dark'] {
+  --bg: #11151a;
+  --surface: #1a2028;
+  --surface-2: #242c36;
+  --text: #e8ecf1;
+  --text-muted: #aab4c0;
+  --border: #364250;
+  --accent: #66c2ea;
+  --accent-contrast: #08222f;
+  --accent-soft: #1d3a49;
+  --warn-bg: #3a2f10;
+  --warn-text: #f5dc9a;
+  --focus: #66c2ea;
+  --shadow: 0 1px 3px rgb(0 0 0 / 0.5), 0 4px 14px rgb(0 0 0 / 0.4);
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.45 var(--font);
+}
+button,
+input,
+select {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.muted {
+  color: var(--text-muted);
+}
+
+/* ---- shell */
+.app {
+  display: grid;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: var(--panel-w) minmax(0, 1fr);
+  grid-template-areas: 'top top' 'side stage';
+}
+.top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.top h1 {
+  font-size: 16px;
+  margin: 0 8px 0 0;
+}
+.top .spacer {
+  flex: 1;
+}
+.side {
+  grid-area: side;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 10px 14px 24px;
+}
+.stage {
+  grid-area: stage;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+.map {
+  position: absolute;
+  inset: 0;
+}
+
+/* ---- controls */
+.field {
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+}
+.field > legend,
+.field > .label {
+  font-weight: 650;
+  padding: 0;
+  margin-bottom: 4px;
+  display: block;
+}
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.seg label {
+  position: relative;
+}
+.seg input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  cursor: pointer;
+}
+.seg span {
+  display: inline-block;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  cursor: pointer;
+}
+.seg input:checked + span {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+.seg input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.seg input:disabled + span {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+.hint {
+  display: block;
+  margin-top: 3px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+input[type='number'],
+select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+.btn {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+.btn:hover {
+  border-color: var(--accent);
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
+}
+details {
+  margin: 0 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 10px;
+  background: var(--surface);
+}
+details > summary {
+  cursor: pointer;
+  font-weight: 650;
+  padding: 6px 0;
+}
+.check {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 2px 0;
+}
+.check input {
+  margin-top: 3px;
+}
+.group {
+  margin: 6px 0;
+}
+.group > .check {
+  font-weight: 600;
+}
+.group ul {
+  list-style: none;
+  margin: 0 0 4px 22px;
+  padding: 0;
+}
+.notice {
+  background: var(--warn-bg);
+  color: var(--warn-text);
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  margin: 0 0 12px;
+}
+.error {
+  background: #ffe1e1;
+  color: #6b1010;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  margin: 0 0 12px;
+}
+:root[data-theme='dark'] .error {
+  background: #4a1d1d;
+  color: #ffd7d7;
+}
+.status {
+  font-size: 13px;
+  padding: 6px 10px;
+  background: var(--accent-soft);
+  border-radius: var(--radius);
+  margin: 0 0 12px;
+}
+
+/* ---- overlays on the map */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.kpis {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  left: 10px;
+  right: 60px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  pointer-events: none;
+}
+.kpi {
+  pointer-events: auto;
+  flex: 0 0 auto;
+  min-width: 128px;
+  padding: 6px 10px;
+}
+.kpi .k {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.kpi .v {
+  font-size: 15px;
+  font-weight: 650;
+}
+.bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+  background: var(--surface-2);
+}
+.bar i {
+  display: block;
+  height: 100%;
+}
+.detail {
+  position: absolute;
+  z-index: 4;
+  right: 10px;
+  top: 76px;
+  bottom: 40px;
+  width: 320px;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+.detail h2 {
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+.detail h3 {
+  font-size: 13px;
+  margin: 10px 0 4px;
+}
+.detail table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+.detail th,
+.detail td {
+  text-align: left;
+  padding: 2px 6px 2px 0;
+  vertical-align: top;
+}
+.detail td.num,
+.detail th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+.close {
+  float: right;
+}
+.footer {
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  right: 150px;
+  bottom: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.footer > span {
+  pointer-events: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2px 8px;
+  display: inline-block;
+}
+.badge {
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  bottom: 64px;
+  max-width: 340px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+}
+.tooltip {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  padding: 4px 8px;
+  font-size: 12.5px;
+  max-width: 260px;
+}
+.legend {
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  bottom: 118px;
+  max-width: 300px;
+  padding: 6px 10px;
+  font-size: 12.5px;
+}
+.ramp {
+  display: inline-block;
+  width: 70px;
+  height: 8px;
+  border-radius: 4px;
+  vertical-align: middle;
+  background: linear-gradient(90deg, #f6a35c, #c2410c);
+}
+:root[data-theme='dark'] .ramp {
+  background: linear-gradient(90deg, #fdba74, #ea580c);
+}
+.sheet-toggle {
+  display: none;
+}
+
+/* ---- small screens: controls become a bottom sheet, detail a full-width card */
+@media (max-width: 860px) {
+  .app {
+    grid-template-columns: 1fr;
+    grid-template-areas: 'top' 'stage';
+  }
+  .side {
+    position: fixed;
+    z-index: 8;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 52vh;
+    border-right: 0;
+    border-top: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transform: translateY(calc(100% - 0px));
+    transition: transform 0.2s;
+  }
+  .side.open {
+    transform: translateY(0);
+  }
+  .sheet-toggle {
+    display: inline-block;
+  }
+  .detail {
+    left: 10px;
+    right: 10px;
+    width: auto;
+    top: auto;
+    bottom: 44px;
+    max-height: 40vh;
+  }
+  .legend,
+  .badge {
+    display: none;
+  }
+  .kpis {
+    right: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}

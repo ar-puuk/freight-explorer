@@ -61,10 +61,11 @@ def main(argv: list[str] | None = None) -> int:
                 header = _read_header(connect(), Path(args.scaffold_map[1]))
                 print("wrote", scaffold_map(ctx, args.scaffold_map[0], header, args.scaffold_map[2]))
                 return 0
-            from faf_pipeline import dictionary
+            from faf_pipeline import dictionary, webmeta
             from faf_pipeline.update import build_all
             build_all(ctx, args.product)
             dictionary.build(ctx)
+            webmeta.build(ctx)
             return 0
         if args.command == "zones":
             from faf_pipeline import meta, zones

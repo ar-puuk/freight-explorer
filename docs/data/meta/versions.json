@@ -22,6 +22,7 @@
  "products": {
   "faf5": {
    "benchmark_year": 2017,
+   "default_year": 2023,
    "faf_version": "5.7.1",
    "release": "FAF5.7.1 (2025-08-15)",
    "rows": {
@@ -84,6 +85,7 @@
   },
   "faf6": {
    "benchmark_year": 2022,
+   "default_year": 2022,
    "faf_version": "6.0",
    "release": "FAF6.0",
    "rows": {

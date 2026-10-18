@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from faf_pipeline import dictionary, dims, fetch, flows, meta, network, validate, zones
+from faf_pipeline import dictionary, dims, fetch, flows, meta, network, validate, webmeta, zones
 from faf_pipeline.config import Context
 
 FLOW_PRODUCTS = ["faf5", "faf6"]
@@ -50,8 +50,9 @@ def update(ctx: Context, log=print) -> int:
     zone_stats = zones.build(ctx, FLOW_PRODUCTS, log)
     log("== network")
     net_stats = network.build(ctx, log)
-    log("== dictionary / meta")
+    log("== dictionary / meta / web files")
     dictionary.build(ctx, log)
+    webmeta.build(ctx, log)
     meta.write_state(ctx)
     after = meta.write_versions(ctx, flow_stats, zone_stats, net_stats)
     log("== validate")

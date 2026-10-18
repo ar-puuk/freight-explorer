@@ -1,0 +1,282 @@
+{
+ "commodity_groups": [
+  {
+   "name": "Farm Products",
+   "sctg": [
+    "01",
+    "02",
+    "03",
+    "04",
+    "05"
+   ],
+   "slug": "farm_products"
+  },
+  {
+   "name": "Food, Bev and Tobacco",
+   "sctg": [
+    "06",
+    "07",
+    "08",
+    "09"
+   ],
+   "slug": "food_bev_tobacco"
+  },
+  {
+   "name": "Stone Sand Gravel & Ores",
+   "sctg": [
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15"
+   ],
+   "slug": "stone_sand_gravel_ores"
+  },
+  {
+   "name": "Liquid and Gases",
+   "sctg": [
+    "16",
+    "17",
+    "18",
+    "19"
+   ],
+   "slug": "liquid_gases"
+  },
+  {
+   "name": "Chemicals",
+   "sctg": [
+    "20",
+    "21",
+    "22"
+   ],
+   "slug": "chemicals"
+  },
+  {
+   "name": "Logs & Oth Wood Prods",
+   "sctg": [
+    "25"
+   ],
+   "slug": "logs_other_wood"
+  },
+  {
+   "name": "Waste and Scrap",
+   "sctg": [
+    "41"
+   ],
+   "slug": "waste_scrap"
+  },
+  {
+   "name": "Consumer Manuf",
+   "sctg": [
+    "23",
+    "24",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30"
+   ],
+   "slug": "consumer_manuf"
+  },
+  {
+   "name": "Durable Manuf (low tech)",
+   "sctg": [
+    "31",
+    "32",
+    "33",
+    "34",
+    "39"
+   ],
+   "slug": "durable_low_tech"
+  },
+  {
+   "name": "Durable Manuf (high tech)",
+   "sctg": [
+    "35",
+    "37",
+    "38"
+   ],
+   "slug": "durable_high_tech"
+  },
+  {
+   "name": "Motor and Other Veh",
+   "sctg": [
+    "36"
+   ],
+   "slug": "motor_vehicles"
+  },
+  {
+   "name": "Mixed Freight",
+   "sctg": [
+    "40",
+    "43"
+   ],
+   "slug": "mixed_freight"
+  }
+ ],
+ "versions": {
+  "5.7.1": {
+   "commodity": {
+    "01": "Live animals/fish",
+    "02": "Cereal grains",
+    "03": "Other ag prods.",
+    "04": "Animal feed",
+    "05": "Meat/seafood",
+    "06": "Milled grain prods.",
+    "07": "Other foodstuffs",
+    "08": "Alcoholic beverages",
+    "09": "Tobacco prods.",
+    "10": "Building stone",
+    "11": "Natural sands",
+    "12": "Gravel",
+    "13": "Nonmetallic minerals",
+    "14": "Metallic ores",
+    "15": "Coal",
+    "16": "Crude petroleum",
+    "17": "Gasoline",
+    "18": "Fuel oils",
+    "19": "Natural gas and other fossil products",
+    "20": "Basic chemicals",
+    "21": "Pharmaceuticals",
+    "22": "Fertilizers",
+    "23": "Chemical prods.",
+    "24": "Plastics/rubber",
+    "25": "Logs",
+    "26": "Wood prods.",
+    "27": "Newsprint/paper",
+    "28": "Paper articles",
+    "29": "Printed prods.",
+    "30": "Textiles/leather",
+    "31": "Nonmetal min. prods.",
+    "32": "Base metals",
+    "33": "Articles-base metal",
+    "34": "Machinery",
+    "35": "Electronics",
+    "36": "Motorized vehicles",
+    "37": "Transport equip.",
+    "38": "Precision instruments",
+    "39": "Furniture",
+    "40": "Misc. mfg. prods.",
+    "41": "Waste/scrap",
+    "43": "Mixed freight"
+   },
+   "dist_band": {
+    "1": "Below 100",
+    "2": "100 - 249",
+    "3": "250 - 499",
+    "4": "500 - 749",
+    "5": "750 - 999",
+    "6": "1,000 - 1,499",
+    "7": "1,500 - 2,000",
+    "8": "Over 2,000"
+   },
+   "foreign": {
+    "801": "Canada",
+    "802": "Mexico",
+    "803": "Rest of Americas",
+    "804": "Europe",
+    "805": "Africa",
+    "806": "SW & Central Asia",
+    "807": "Eastern Asia",
+    "808": "SE Asia & Oceania"
+   },
+   "mode": {
+    "1": "Truck",
+    "2": "Rail",
+    "3": "Water",
+    "4": "Air (include truck-air)",
+    "5": "Multiple modes & mail",
+    "6": "Pipeline",
+    "7": "Other and unknown",
+    "8": "No domestic mode"
+   },
+   "trade_type": {
+    "1": "Domestic flows (freight shipments moved from US domestic origins to US domestic destinations)",
+    "2": "Import flows (freight shipments moved from foreign origins to US domestic destinations)",
+    "3": "Export flows (freight shipments moved from US domestic origins to foreign destinations)"
+   }
+  },
+  "6.0": {
+   "commodity": {
+    "01": "Live animals/fish",
+    "02": "Cereal grains",
+    "03": "Other ag prods.",
+    "04": "Animal feed",
+    "05": "Meat/seafood",
+    "06": "Milled grain prods.",
+    "07": "Other foodstuffs",
+    "08": "Alcoholic beverages",
+    "09": "Tobacco prods.",
+    "10": "Building stone",
+    "11": "Natural sands",
+    "12": "Gravel",
+    "13": "Nonmetallic minerals",
+    "14": "Metallic ores",
+    "15": "Coal",
+    "16": "Crude petroleum",
+    "17": "Gasoline",
+    "18": "Fuel oils",
+    "19": "Natural gas and other fossil products",
+    "20": "Basic chemicals",
+    "21": "Pharmaceuticals",
+    "22": "Fertilizers",
+    "23": "Chemical prods.",
+    "24": "Plastics/rubber",
+    "25": "Logs",
+    "26": "Wood prods.",
+    "27": "Newsprint/paper",
+    "28": "Paper articles",
+    "29": "Printed prods.",
+    "30": "Textiles/leather",
+    "31": "Nonmetal min. prods.",
+    "32": "Base metals",
+    "33": "Articles-base metal",
+    "34": "Machinery",
+    "35": "Electronics",
+    "36": "Motorized vehicles",
+    "37": "Transport equip.",
+    "38": "Precision instruments",
+    "39": "Furniture",
+    "40": "Misc. mfg. prods.",
+    "41": "Waste/scrap",
+    "43": "Mixed freight"
+   },
+   "dist_band": {
+    "1": "Below 100 miles",
+    "2": "100 - 249 miles",
+    "3": "250 - 499 miles",
+    "4": "500 - 749 miles",
+    "5": "750 - 999 miles",
+    "6": "1,000 - 1,499 miles",
+    "7": "1,500 - 2,000 miles",
+    "8": "Over 2,000 miles"
+   },
+   "foreign": {
+    "801": "Canada",
+    "802": "Mexico",
+    "803": "Rest of Americas",
+    "804": "Europe",
+    "805": "Africa",
+    "806": "SW & Central Asia",
+    "807": "Eastern Asia",
+    "808": "SE Asia & Oceania"
+   },
+   "mode": {
+    "1": "Truck (include customer pick-up)",
+    "2": "Rail",
+    "3": "Water",
+    "4": "Air (include truck-air)",
+    "5": "Multiple modes & mail",
+    "6": "Pipeline",
+    "7": "Other and unknown",
+    "8": "No domestic mode"
+   },
+   "trade_type": {
+    "1": "Domestic flows (freight shipments moved from US domestic origins to US domestic destinations)",
+    "2": "Import flows (freight shipments moved from foreign origins to US domestic destinations)",
+    "3": "Export flows (freight shipments moved from US domestic origins to foreign destinations)"
+   }
+  }
+ }
+}
