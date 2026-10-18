@@ -1,0 +1,22 @@
+# FAF5.7.1 regional database (zone level, mid-range).
+# Verified against the real file header on 2026-10-18 (docs/SPIKES.md section 3).
+columns:
+  fr_orig: {canonical: fr_orig, type: varchar}
+  dms_orig: {canonical: dms_orig, type: zone3}
+  dms_dest: {canonical: dms_dest, type: zone3}
+  fr_dest: {canonical: fr_dest, type: varchar}
+  fr_inmode: {canonical: fr_inmode, type: smallint}
+  dms_mode: {canonical: dms_mode, type: smallint}
+  fr_outmode: {canonical: fr_outmode, type: smallint}
+  sctg2: {canonical: sctg2, type: code2}
+  trade_type: {canonical: trade_type, type: smallint}
+  dist_band: {canonical: dist_band, type: smallint}
+ignore: {}
+# column types: varchar | smallint | zone3 (3-char zero-padded FAF zone id) | state2 (2-char state FIPS) | code2 (2-char code, e.g. SCTG)
+# Wide year columns: `<prefix>_<YYYY>` -> canonical measure. Values are NULL where a prefix has no column for a year.
+year_columns:
+  tons: tons_kt
+  value: value_const_musd
+  current_value: value_current_musd
+  tmiles: tmiles_m
+required_measures: [tons, value]

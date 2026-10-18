@@ -1,0 +1,16 @@
+# The 12 commodity groups used in the FAF5 assignment flow tables, with SCTG membership.
+# Source: "FAF5 Assignment Flow Tables Data Dictionary.pdf" (FHWA), read 2026-10-18. Group names must match the
+# column names exactly; an unknown group in a table header fails the build.
+groups:
+  "Farm Products": {slug: farm_products, sctg: ["01", "02", "03", "04", "05"]}
+  "Food, Bev and Tobacco": {slug: food_bev_tobacco, sctg: ["06", "07", "08", "09"]}
+  "Stone Sand Gravel & Ores": {slug: stone_sand_gravel_ores, sctg: ["10", "11", "12", "13", "14", "15"]}
+  "Liquid and Gases": {slug: liquid_gases, sctg: ["16", "17", "18", "19"]}
+  "Chemicals": {slug: chemicals, sctg: ["20", "21", "22"]}
+  "Logs & Oth Wood Prods": {slug: logs_other_wood, sctg: ["25"]}
+  "Waste and Scrap": {slug: waste_scrap, sctg: ["41"]}
+  "Consumer Manuf": {slug: consumer_manuf, sctg: ["23", "24", "26", "27", "28", "29", "30"]}
+  "Durable Manuf (low tech)": {slug: durable_low_tech, sctg: ["31", "32", "33", "34", "39"]}
+  "Durable Manuf (high tech)": {slug: durable_high_tech, sctg: ["35", "37", "38"]}
+  "Motor and Other Veh": {slug: motor_vehicles, sctg: ["36"]}
+  "Mixed Freight": {slug: mixed_freight, sctg: ["40", "43"]}

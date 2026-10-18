@@ -1,0 +1,58 @@
+# FAF5 model network link layer (FAF5Network.gdb). Verified against the real layer on 2026-10-18.
+# Units/codes: "FAF5 Network Data Dictionary.pdf" inside the network zip (LENGTH is in miles).
+columns:
+  ID: {canonical: link_id, type: integer}
+  LENGTH: {canonical: length_mi, type: double}
+  DIR: {canonical: dir, type: smallint}
+  Class: {canonical: road_class, type: smallint}
+  Class_Description: {canonical: road_class_desc, type: varchar}
+  Road_Name: {canonical: road_name, type: varchar}
+  Sign_Rte: {canonical: sign_rte, type: varchar}
+  Rte_Type: {canonical: rte_type, type: varchar}
+  Rte_Number: {canonical: rte_number, type: varchar}
+  Country: {canonical: country, type: varchar}
+  STATE: {canonical: state_abbrev, type: varchar}
+  STFIPS: {canonical: state_fips, type: varchar}
+  CTFIPS: {canonical: county_fips, type: varchar}          # 5-digit state+county FIPS
+  FAFZONE: {canonical: faf_zone, type: zone3}          # stored as INTEGER in the source; padded to 3
+  Status: {canonical: status, type: smallint}
+  F_Class: {canonical: f_class, type: smallint}
+  Facility_Type: {canonical: facility_type, type: smallint}
+  NHS: {canonical: nhs, type: smallint}
+  STRAHNET: {canonical: strahnet, type: smallint}
+  NHFN: {canonical: nhfn, type: smallint}
+  Truck: {canonical: truck_access, type: varchar}
+  AB_Lanes: {canonical: ab_lanes, type: smallint}
+  BA_Lanes: {canonical: ba_lanes, type: smallint}
+  Speed_Limit: {canonical: speed_limit, type: smallint}
+  Toll_Type: {canonical: toll_type, type: smallint}
+  SHAPE: {canonical: geom, type: geometry}
+ignore:
+  OBJECTID: "internal GDB row id"
+  DATA: "tracking id to the source database (source dictionary: not needed for most applications)"
+  VERSION: "database version string"
+  Rte_Qualifier: "not needed for v1 UI"
+  County_Name: "redundant with CTFIPS and not needed for v1 UI"
+  Urban_Code: "not needed for v1 UI"
+  Toll_Name: "not needed for v1 UI"
+  Toll_Link: "not needed for v1 UI"
+  Toll_Link_Name: "not needed for v1 UI"
+  HPMS_USA_RouteID: "HPMS linkage is out of scope (HANDOFF section 14)"
+  HPMS_Begin_Point: "HPMS linkage is out of scope"
+  HPMS_End_Point: "HPMS linkage is out of scope"
+  BorderState1: "not needed for v1 UI"
+  BorderState2: "not needed for v1 UI"
+  BorderFAF1: "not needed for v1 UI"
+  BorderFAF2: "not needed for v1 UI"
+  TRUCKTOLL: "model input, not needed for v1 UI"
+  BorderLink: "model input, not needed for v1 UI"
+  AddedBorderTime: "model input, not needed for v1 UI"
+  AdjustSpeed: "model input, not needed for v1 UI"
+  AdjustReason: "model input, not needed for v1 UI"
+  AB_FinalSpeed: "model speed, not needed for v1 UI"
+  BA_FinalSpeed: "model speed, not needed for v1 UI"
+  AB_CombinedSpeed: "model speed, not needed for v1 UI"
+  BA_CombinedSpeed: "model speed, not needed for v1 UI"
+  AB_FreeFlowTime: "model time, not needed for v1 UI"
+  BA_FreeFlowTime: "model time, not needed for v1 UI"
+  SHAPE_Length: "geometry length in degrees (not a distance)"

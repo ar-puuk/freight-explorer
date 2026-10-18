@@ -1,0 +1,112 @@
+{
+ "network": {
+  "buffer_km": 25.0,
+  "links_in_clip": 4244,
+  "links_in_state": 3939,
+  "release": "FAF5 model network and 2017/2022/2050 baseline truck assignments",
+  "years": {
+   "2017": {
+    "links_with_flow": 2615,
+    "rows": 190957
+   },
+   "2022": {
+    "links_with_flow": 2615,
+    "rows": 190892
+   },
+   "2050": {
+    "links_with_flow": 2615,
+    "rows": 169429
+   }
+  }
+ },
+ "products": {
+  "faf5": {
+   "benchmark_year": 2017,
+   "faf_version": "5.7.1",
+   "release": "FAF5.7.1 (2025-08-15)",
+   "rows": {
+    "flows/2017": 29089,
+    "flows/2018": 30128,
+    "flows/2019": 30439,
+    "flows/2020": 29304,
+    "flows/2021": 28747,
+    "flows/2022": 29371,
+    "flows/2023": 28870,
+    "flows/2024": 29181,
+    "flows/2030": 29077,
+    "flows/2035": 29077,
+    "flows/2040": 29077,
+    "flows/2045": 29077,
+    "flows/2050": 29077,
+    "state_flows/2017": 16506,
+    "state_flows/2018": 16861,
+    "state_flows/2019": 16904,
+    "state_flows/2020": 16198,
+    "state_flows/2021": 15911,
+    "state_flows/2022": 16215,
+    "state_flows/2023": 15967,
+    "state_flows/2024": 16062,
+    "state_flows/2030": 16498,
+    "state_flows/2035": 16498,
+    "state_flows/2040": 16498,
+    "state_flows/2045": 16498,
+    "state_flows/2050": 16498
+   },
+   "scenario": "mid",
+   "sources": {
+    "regional": {
+     "bytes": 305397783,
+     "sha256": "1429be77a578f2b32913320a1299c0e3de8aa9c6180ce5aacfd65a7886ba55b8",
+     "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1.zip"
+    },
+    "state": {
+     "bytes": 145261207,
+     "sha256": "1959b40d1b297b7dec827035dd74c0bda429a70fc5510d688f72d4e1620950b6",
+     "url": "https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State.zip"
+    }
+   },
+   "years": {
+    "2017": "base",
+    "2018": "final",
+    "2019": "final",
+    "2020": "final",
+    "2021": "final",
+    "2022": "final",
+    "2023": "final",
+    "2024": "preliminary",
+    "2030": "forecast",
+    "2035": "forecast",
+    "2040": "forecast",
+    "2045": "forecast",
+    "2050": "forecast"
+   },
+   "zones": 132
+  },
+  "faf6": {
+   "benchmark_year": 2022,
+   "faf_version": "6.0",
+   "release": "FAF6.0",
+   "rows": {
+    "flows/2022": 36765,
+    "state_flows/2022": 14888
+   },
+   "scenario": "mid",
+   "sources": {
+    "regional": {
+     "bytes": 20861180,
+     "sha256": "5322ca3ac1b1fd07d522bc00382a90c47261f80a3af52a4f6bcfbc7a6a503e29",
+     "url": "https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0.zip"
+    },
+    "state": {
+     "bytes": 6823123,
+     "sha256": "50c6a8bb857b94998a634306234b805af6a114f7ce76ef0b02f34660d01a3e0d",
+     "url": "https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0_State.zip"
+    }
+   },
+   "years": {
+    "2022": "base"
+   },
+   "zones": 134
+  }
+ }
+}

@@ -1,0 +1,30 @@
+{
+ "abbrev": "UT",
+ "bbox": [
+  -114.06,
+  36.99,
+  -109.04,
+  42.01
+ ],
+ "center": [
+  -111.65,
+  39.32
+ ],
+ "fips": "49",
+ "name": "Utah",
+ "network_buffer_km": 25.0,
+ "network_pmtiles": "network/utah_network.pmtiles",
+ "site_title": "Utah Freight Explorer",
+ "slug": "utah",
+ "zones": {
+  "5.7.1": [
+   "491",
+   "499"
+  ],
+  "6.0": [
+   "491",
+   "499"
+  ]
+ },
+ "zoom": 6.0
+}

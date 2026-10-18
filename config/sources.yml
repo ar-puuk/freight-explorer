@@ -1,0 +1,107 @@
+# Source products. URLs and member names were verified against the live sources on 2026-10-18 (docs/SPIKES.md).
+# `data_version` comes from the BTS version history (https://www.bts.gov/faf/versions), not from the files.
+# A year that appears in a file but is not classified here fails the build on purpose.
+
+products:
+  faf5:
+    faf_version: "5.7.1"
+    benchmark_year: 2017
+    scenario: mid
+    release: "FAF5.7.1 (2025-08-15)"
+    data_version:
+      base: [2017]
+      final: [2018, 2019, 2020, 2021, 2022, 2023]
+      preliminary: [2024]
+      forecast_from: 2025
+    files:
+      regional:
+        url: https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1.zip
+        member: FAF5.7.1.csv
+        schema: faf5_regional
+      state:
+        url: https://faf.ornl.gov/faf5/Data/Download_Files/FAF5.7.1_State.zip
+        member: FAF5.7.1_State.csv
+        schema: faf5_state
+      metadata:
+        url: https://faf.ornl.gov/faf5/data/FAF5_metadata.xlsx
+    probes:   # HEAD-probed by `fetch --check-only` to notice new releases; never downloaded automatically
+      - pattern: "https://faf.ornl.gov/faf5/Data/Download_Files/FAF{v}.zip"
+        candidates: ["5.7.2", "5.8", "5.8.1"]
+    zones:
+      url: https://faf.ornl.gov/faf5/data/2017_CFS_Metro_Areas_with_FAF.zip
+      member: 2017_CFS_Metro_Areas_with_FAF.shp
+      id_field: FAF_Zone
+      name_field: FAF_Zone_D
+
+  faf6:
+    faf_version: "6.0"
+    benchmark_year: 2022
+    scenario: mid
+    release: "FAF6.0"
+    data_version:
+      base: [2022]
+      forecast_from: 2023
+    files:
+      regional:
+        url: https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0.zip
+        member: FAF6.0.csv
+        schema: faf6_regional
+      state:
+        url: https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF6.0_State.zip
+        member: FAF6.0_State.csv
+        schema: faf6_state
+      metadata:
+        url: https://faf.ornl.gov/faf6/data/FAF6_Metadata.xlsx
+    probes:
+      - pattern: "https://faf.ornl.gov/faf6/data/Download_Files/ZIP/FAF{v}.zip"
+        candidates: ["6.0.1", "6.1", "6.1.1", "6.2"]
+    zones:
+      url: https://faf.ornl.gov/faf6/data/FAF6.zip
+      member: FAF6.shp
+      id_field: FAF6
+      name_field: FAF6_SHORT
+
+  census_county_centers:
+    # Census 2020 county population-weighted centers of population; used only to place zone anchor points.
+    release: "Census 2020 centers of population"
+    files:
+      counties:
+        url: https://www2.census.gov/geo/docs/reference/cenpop2020/county/CenPop2020_Mean_CO.txt
+
+  network:
+    release: "FAF5 model network and 2017/2022/2050 baseline truck assignments"
+    files:
+      links:
+        url: https://ops.fhwa.dot.gov/freight/freight_analysis/faf/faf_highway_assignment_results/FAF5_Model_Highway_Network.zip
+        member_dir: "Networks/Geodatabase Format/FAF5Network.gdb"
+    assignments:
+      # `token` is how the year appears inside the column names of the assignment tables.
+      - year: 2017
+        token: "17"
+        url: https://ops.fhwa.dot.gov/freight/freight_analysis/faf/faf_highway_assignment_results/FAF5_2017_HighwayAssignmentResults_04_07_2022.zip
+        member_dir: "Assignment Flow Tables/CSV Format/"
+        file_suffix: "_2017.csv"
+      - year: 2022
+        token: "22"
+        url: https://ops.fhwa.dot.gov/freight/freight_analysis/faf/faf_highway_assignment_results/FAF5_2022_HighwayAssignmentResults_04_07_2022.zip
+        member_dir: "Assignment Flow Tables/CSV Format/"
+        file_suffix: "_2022.csv"
+      - year: 2050
+        token: "50Base"
+        url: https://ops.fhwa.dot.gov/freight/freight_analysis/faf/faf_highway_assignment_results/FAF5_2050_HighwayAssignmentResults_09_17_2022.zip
+        member_dir: "Forecast2050BaselineNetworksAndAssignments/Assignment Flow Tables/CSV Format/"
+        file_suffix: "_2050Base.csv"
+    # table file stem -> (truck_type, market); the `type` token in the column names is checked against this.
+    tables:
+      "FAF5 Total Truck Flows by Commodity": {truck_type: all, market: total, token: All}
+      "FAF5 Domestic Truck Flows by Commodity": {truck_type: all, market: domestic, token: Dom}
+      "FAF5 Import Truck Flows by Commodity": {truck_type: all, market: import, token: Imp}
+      "FAF5 Export Truck Flows by Commodity": {truck_type: all, market: export, token: Exp}
+      "FAF5 Total SU Truck Flows by Commodity": {truck_type: su, market: total, token: SU}
+      "FAF5 Total CU Truck Flows by Commodity": {truck_type: cu, market: total, token: CU}
+
+geo:
+  zone_simplify_deg: 0.005     # Douglas-Peucker tolerance for zone GeoJSON (~500 m)
+  coord_decimals: 4
+  pmtiles_minzoom: 3
+  pmtiles_maxzoom: 12

@@ -1,0 +1,81 @@
+# Curated column dictionary. Sources: FAF6 User's Guide / FAF5 metadata workbooks, the FHWA assignment and network
+# data dictionaries, and the Phase 0 profiling (docs/SPIKES.md). Lookup order: "<table>.<column>" then "<column>".
+# `dictionary.parquet` is built from this plus first_year/last_year measured from the data; the build fails if any
+# output column has no entry here.
+
+columns:
+  faf_version: {label: FAF version, description: "FAF release the row comes from (5.7.1 or 6.0). Versions use different zone systems and benchmark years and are not directly comparable."}
+  benchmark_year: {label: Benchmark year, description: "Commodity Flow Survey benchmark year of the FAF version (2017 for FAF5, 2022 for FAF6). Also the dollar year of constant-dollar values.", unit: year}
+  data_version: {label: Data status, description: "base = benchmark year; final = final annual estimate; preliminary = preliminary annual estimate; forecast = model forecast. Taken from the BTS version history, not from the data files."}
+  scenario: {label: Forecast scenario, description: "mid = mid-range (the only scenario loaded so far); high/low arrive with the Hi/Lo files."}
+  year: {label: Year, unit: year, description: "Calendar year of the estimate (annual estimate or forecast year). FAF5 has no 2025-2029; FAF6.0 has 2022 only."}
+  fr_orig: {label: Foreign origin region, description: "Foreign region of origin for imports (801 Canada ... 808 SE Asia & Oceania); empty otherwise."}
+  fr_dest: {label: Foreign destination region, description: "Foreign region of destination for exports; empty otherwise."}
+  dms_orig: {label: Domestic origin zone, description: "FAF zone id (3 characters; first two are the state FIPS). For imports this is the U.S. zone of entry, not the foreign origin."}
+  dms_dest: {label: Domestic destination zone, description: "FAF zone id. For exports this is the U.S. zone of exit, not the foreign destination."}
+  dms_orig_st: {label: Domestic origin state, description: "State FIPS of the domestic origin (state database). For imports, the state of entry."}
+  dms_dest_st: {label: Domestic destination state, description: "State FIPS of the domestic destination (state database). For exports, the state of exit."}
+  fr_inmode: {label: "Mode, foreign origin to entry", description: "Mode used from the foreign origin to the U.S. entry point (imports only).", caveat: "Foreign legs are shown separately; adding them to totals double counts."}
+  dms_mode: {label: Domestic mode, description: "Mode used for the domestic leg (1 Truck, 2 Rail, 3 Water, 4 Air incl. truck-air, 5 Multiple modes and mail, 6 Pipeline, 7 Other and unknown, 8 No domestic mode)."}
+  fr_outmode: {label: "Mode, exit to foreign destination", description: "Mode used from the U.S. exit point to the foreign destination (exports only)."}
+  sctg2: {label: Commodity (SCTG 2-digit), description: "Standard Classification of Transported Goods 2-digit code, kept as text with the leading zero (01-41, 43; no 42)."}
+  trade_type: {label: Trade type, description: "1 domestic, 2 import, 3 export. Import and export rows describe the domestic leg only."}
+  dist_band: {label: Distance band, description: "Distance band of the shipment (1 below 100 miles ... 8 over 2,000 miles). Present in FAF5 only.", caveat: "Not in FAF6.0 files."}
+  tons_kt: {label: Tons, unit: thousand tons, description: "Weight of the flow."}
+  value_const_musd: {label: Value (constant dollars), unit: million dollars, description: "Value in benchmark-year dollars (2017$ for FAF5, 2022$ for FAF6).", caveat: "Not comparable between FAF versions."}
+  value_current_musd: {label: Value (current dollars), unit: million dollars, description: "Value in nominal dollars of the estimate year.", caveat: "NULL where not published: FAF5 has it for 2018-2024 only; FAF6.0 does not include it."}
+  tmiles_m: {label: Ton-miles, unit: million ton-miles, description: "Tons times miles shipped.", caveat: "NULL where not published: not in the FAF6.0 release."}
+  source_file: {label: Source file, description: "Name of the source CSV inside the downloaded release."}
+
+  # network
+  link_id: {label: Link id, description: "FAF5 model network link identifier; joins the assignment flow tables and the PMTiles `id` property."}
+  length_mi: {label: Length, unit: miles, description: "Computed link length in miles (FAF5 network data dictionary)."}
+  dir: {label: Direction code, description: "Link direction code from the FAF5 network (see the FAF5 Network Data Dictionary)."}
+  road_class: {label: Road class, description: "Two-digit road feature code. 11 Interstate, 12 other controlled access, 14 arterial/major collector, 21/22 ramps, 50 centroid connector, among others.", caveat: "Class 50 (centroid connectors) are model access links, not roads."}
+  road_class_desc: {label: Road class description, description: "Text for road_class."}
+  road_name: {label: Road name, description: "Road name as recorded in the network."}
+  sign_rte: {label: Signed route, description: "Signed route designation."}
+  rte_type: {label: Route type, description: "Route type."}
+  rte_number: {label: Route number, description: "Route number."}
+  country: {label: Country, description: "Country code of the link (USA, CAN)."}
+  state_abbrev: {label: State abbreviation, description: "State or province abbreviation recorded for the link."}
+  state_fips: {label: State FIPS, description: "State FIPS of the link (U.S. links)."}
+  county_fips: {label: County FIPS, description: "5-digit state+county FIPS of the link."}
+  faf_zone: {label: FAF zone, description: "FAF5 zone id the link lies in (3 characters; U.S. links only)."}
+  status: {label: Status, description: "1 open to traffic, 2 proposed or under construction."}
+  f_class: {label: Functional class, description: "FHWA functional class (1 Interstate, 2 other freeways and expressways, 3 other principal arterial, 4 minor arterial, ...)."}
+  facility_type: {label: Facility type, description: "Facility type code from the network."}
+  nhs: {label: NHS designation, description: "National Highway System designation code (1 Interstate, 3 non-Interstate STRAHNET, 4 STRAHNET connector, 7 other NHS, ...)."}
+  strahnet: {label: STRAHNET designation, description: "1 mainline STRAHNET route, 2 STRAHNET connector."}
+  nhfn: {label: NHFN designation, description: "National Highway Freight Network code (1 Primary Highway Freight System, 2 other Interstate, 11 non-inventory direction, 12 ramp or connector)."}
+  truck_access: {label: Truck access, description: "Prohibited, Reserved (truck-only/priority lane) or Restrictions (size/weight/cargo limits); empty when none recorded."}
+  ab_lanes: {label: Lanes AB, description: "Through lanes in the AB direction."}
+  ba_lanes: {label: Lanes BA, description: "Through lanes in the BA direction."}
+  speed_limit: {label: Speed limit, description: "Posted speed limit as recorded in the network (units per the FAF5 network dictionary)."}
+  toll_type: {label: Toll type, description: "Toll type code."}
+  in_state: {label: In state, description: "True when the link's state FIPS equals the configured state (the rest are buffer links)."}
+  truck_type: {label: Truck type, description: "all = all trucks, su = single unit trucks (FHWA classes 5-7), cu = combination unit trucks (classes 8-13)."}
+  market: {label: Market, description: "total, domestic, import or export. total = domestic + import + export.", caveat: "Model assignment, not traffic counts. Includes through traffic that the OD flow tables cannot show."}
+  commodity_group: {label: Commodity group, description: "One of 12 FHWA assignment commodity groups (SCTG membership in the dictionary), or `all`."}
+  ab_tons_k: {label: Tons AB, unit: thousand tons per year, description: "Annual truck tonnage in the AB link direction.", caveat: "Model assignment (FAF5.3-era, 2017 benchmark); not updated for FAF5.7.1 or FAF6; not traffic counts."}
+  ba_tons_k: {label: Tons BA, unit: thousand tons per year, description: "Annual truck tonnage in the BA link direction."}
+  tot_tons_k: {label: Tons both directions, unit: thousand tons per year, description: "Annual truck tonnage, both directions."}
+  ab_trips_day: {label: Trips AB, unit: truck trips per day, description: "Daily truck trips in the AB direction."}
+  ba_trips_day: {label: Trips BA, unit: truck trips per day, description: "Daily truck trips in the BA direction."}
+  tot_trips_day: {label: Trips both directions, unit: truck trips per day, description: "Daily truck trips, both directions."}
+
+  # dimensions
+  mode: {label: Mode code, description: "FAF mode code."}
+  label: {label: Label, description: "Label from the FAF metadata workbook."}
+  region_id: {label: Foreign region id, description: "Foreign region code 801-808."}
+  zone_id: {label: FAF zone id, description: "3-character FAF zone id, version-scoped: the same id can mean a different area in FAF5 and FAF6."}
+  short_name: {label: Zone short name, description: "Short zone description from the metadata workbook."}
+  long_name: {label: Zone long name, description: "Long zone description from the metadata workbook."}
+  type: {label: Zone type, description: "metro, remainder (rest of state) or whole_state; derived from the long description and the number of zones in the state."}
+  is_state_zone: {label: In configured state, description: "Derived at build time: the zone id starts with the configured state FIPS."}
+  anchor_lon: {label: Anchor longitude, unit: degrees, description: "Longitude of the point used to draw flows for this zone."}
+  anchor_lat: {label: Anchor latitude, unit: degrees, description: "Latitude of the point used to draw flows for this zone."}
+  anchor_method: {label: Anchor method, description: "population_weighted_county_centers (Census 2020 county centers of population inside the zone), most_populous_county_center, or point_on_surface.", caveat: "A drawing anchor, not a measured location of freight activity."}
+  anchor_n_counties: {label: Anchor county count, description: "Number of county population centers used for the anchor."}
+
+  # dim_dist_band shares `label`; dim tables reuse sctg2/trade_type/dist_band above.

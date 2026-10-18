@@ -1,0 +1,20 @@
+# UI defaults and schematic geometry that is not tied to any state.
+
+basemap:
+  default_light: positron
+  default_dark: dark
+  styles: [liberty, bright, positron, dark, fiord]
+
+# Foreign regions have no geometry in FAF. These are SCHEMATIC anchor points placed outside the contiguous US
+# (roughly toward each region's direction). They must be flagged `schematic` on the map and in the legend.
+foreign_regions:
+  "801": {lon: -98.0, lat: 54.0}      # Canada
+  "802": {lon: -102.0, lat: 21.0}     # Mexico
+  "803": {lon: -72.0, lat: 12.0}      # Rest of Americas
+  "804": {lon: -30.0, lat: 50.0}      # Europe
+  "805": {lon: -28.0, lat: 18.0}      # Africa
+  "806": {lon: -150.0, lat: 52.0}     # SW & Central Asia (drawn off the Pacific edge; direction only)
+  "807": {lon: -145.0, lat: 40.0}     # Eastern Asia
+  "808": {lon: -140.0, lat: 28.0}     # SE Asia & Oceania
+
+mode_colors: {}   # filled in Phase 2 with a colorblind-safe palette
