@@ -101,7 +101,7 @@ describe('url state', () => {
   it('round-trips a non-default state', () => {
     const s: AppState = {
       ...defaults, version: '6.0', year: 2022, view: 'import', direction: 'inbound', measure: 'value', dollars: 'current',
-      commodities: ['15', '02'], modes: [2, 1], topN: 120, minFlow: 25.5, selected: '491',
+      commodities: ['15', '02'], modes: [2, 1], topN: 120, minFlow: 25.5, selected: '011',
       layers: { flows: true, network: true, zones: false }, net: { year: 2050, truck: 'cu', market: 'import', connectors: true },
       basemap: 'dark', theme: 'dark', cam: [-111.9, 40.7, 7.25],
     };
