@@ -96,6 +96,8 @@
     linkRows = lr.toArray().map((x: any) => ({ link_id: x.link_id, tot_trips: x.tot_trips }));
     say('link flow rows loaded: ' + linkRows.length);
     if (map.getSource('net')) applyLinkFlows();
+    await db.registerFileURL('all.parquet', DATA + 'ut_f5_all.parquet', duckdb.DuckDBDataProtocol.HTTP, false);
+    spike().q = async (sql: string) => (await conn.query(sql)).toArray().map((x: any) => x.toJSON());
     spike().duckdb = true;
   }
 
