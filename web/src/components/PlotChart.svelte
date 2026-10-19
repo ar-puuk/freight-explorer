@@ -3,7 +3,7 @@
   import { readColors } from '../lib/palette';
 
   /** Build the chart element for the current data. Anything reactive read inside `build` re-runs the chart. */
-  let { build, theme, label, height = 260 }: { build: (colors: ChartColors, width: number) => Element; theme: string; label: string; height?: number } = $props();
+  let { build, theme, label, height = 260, onband }: { build: (colors: ChartColors, width: number) => Element; theme: string; label: string; height?: number; onband?: (domainValue: string) => void } = $props();
 
   let host: HTMLDivElement;
   let width = $state(520);
@@ -24,6 +24,19 @@
     for (const n of chart.querySelectorAll('[aria-label]')) n.removeAttribute('aria-label');
     chart.setAttribute('role', 'img');
     chart.setAttribute('aria-label', label);
+    if (onband) {
+      // clicking a band of the x axis (a year) reports its domain value
+      const svg = chart as unknown as SVGSVGElement & { scale: (n: string) => { domain: string[]; range: [number, number] } | undefined };
+      (chart as SVGElement).style.cursor = 'pointer';
+      chart.addEventListener('click', (e) => {
+        const sx = svg.scale('x');
+        if (!sx) return;
+        const r = (chart as SVGElement).getBoundingClientRect();
+        const step = (sx.range[1] - sx.range[0]) / sx.domain.length;
+        const i = Math.floor(((e as MouseEvent).clientX - r.left - sx.range[0]) / step);
+        if (i >= 0 && i < sx.domain.length && sx.domain[i] !== 'gap') onband(sx.domain[i]);
+      });
+    }
     host.replaceChildren(chart);
   });
 </script>

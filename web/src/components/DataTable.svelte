@@ -1,11 +1,12 @@
 <script lang="ts">
-  /** Accessible text alternative for a chart: the plotted numbers as a table. */
+  /** Accessible text alternative for a chart: the plotted numbers as a table. Collapsed by default so charts lead. */
   let { caption, headers, rows }: { caption: string; headers: string[]; rows: (string | number)[][] } = $props();
 </script>
 
 <details class="alt">
-  <summary>Data table: {caption}</summary>
-  <div class="scroll">
+  <summary>Exact values: {caption}</summary>
+  <!-- svelte-ignore a11y_no_noninteractive_tabindex (a scrollable region must be keyboard-reachable) -->
+  <div class="scroll" tabindex="0" role="region" aria-label={caption}>
     <table>
       <caption class="sr-only">{caption}</caption>
       <thead><tr>{#each headers as h, i}<th class:num={i > 0} scope="col">{h}</th>{/each}</tr></thead>
@@ -16,29 +17,3 @@
     </table>
   </div>
 </details>
-
-<style>
-  .alt {
-    margin: 4px 0 14px;
-    padding: 0 8px;
-    font-size: 12.5px;
-  }
-  .scroll {
-    max-height: 220px;
-    overflow: auto;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-  th,
-  td {
-    text-align: left;
-    padding: 2px 8px 2px 0;
-    border-bottom: 1px solid var(--border);
-  }
-  .num {
-    text-align: right;
-    white-space: nowrap;
-  }
-</style>

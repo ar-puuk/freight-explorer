@@ -1,20 +1,29 @@
 <script lang="ts">
   import 'maplibre-gl/dist/maplibre-gl.css';
   import { onMount } from 'svelte';
-  import Controls from './components/Controls.svelte';
-  import Charts from './components/Charts.svelte';
-  import Detail from './components/Detail.svelte';
-  import Kpis from './components/Kpis.svelte';
+  import CommandPalette from './components/CommandPalette.svelte';
+  import Dialogs from './components/Dialogs.svelte';
+  import FilterRail from './components/FilterRail.svelte';
+  import HeadlineBand from './components/HeadlineBand.svelte';
+  import Icon from './components/Icon.svelte';
+  import InsightDrawer from './components/InsightDrawer.svelte';
+  import MapOverlays from './components/MapOverlays.svelte';
+  import QueryBar from './components/QueryBar.svelte';
+  import Sprite from './components/Sprite.svelte';
+  import TimelineDock from './components/TimelineDock.svelte';
+  import TopBar from './components/TopBar.svelte';
   import { Controller } from './lib/controller.svelte';
-  import { BASEMAPS } from './lib/mapview';
 
   const ctrl = new Controller();
   let ready = $state(false);
   let mapEl: HTMLDivElement;
-  let sheetOpen = $state(false);
   let fatal = $state<string | null>(null);
 
   onMount(() => {
+    const mq = matchMedia('(max-width: 1099px)');
+    const sync = () => (ctrl.narrow = mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
     (async () => {
       try {
         await ctrl.init();
@@ -28,6 +37,7 @@
         fatal = e instanceof Error ? e.message : String(e);
       }
     })();
+    return () => mq.removeEventListener('change', sync);
   });
 
   // keep the address bar in sync with the state (replaceState: no history spam)
@@ -37,91 +47,102 @@
     history.replaceState(null, '', `${location.pathname}${q}${location.hash}`);
   });
 
-  const netBadge = $derived(ctrl.s?.layers.network);
+  const typing = (t: EventTarget | null) => t instanceof HTMLElement && (/^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName) || t.isContentEditable);
+
+  function onKey(e: KeyboardEvent) {
+    if (!ready) return;
+    if (e.key === 'Escape') {
+      if (ctrl.modal) ctrl.modal = null;
+      else if (ctrl.narrow && (ctrl.mobL || ctrl.mobR)) ctrl.closeSheets();
+      else if (ctrl.s.selected || ctrl.detail || ctrl.s.partner) {
+        ctrl.s.partner = null;
+        ctrl.closeDetail();
+        if (!ctrl.s.selected) void ctrl.refresh();
+      }
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      ctrl.modal = ctrl.modal === 'palette' ? null : 'palette';
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey || ctrl.modal || typing(e.target)) return;
+    const k = e.key;
+    if (k === '/') {
+      e.preventDefault();
+      ctrl.modal = 'palette';
+    } else if (k === '?') ctrl.modal = 'help';
+    else if (k === '[') ctrl.stepYear(-1);
+    else if (k === ']') ctrl.stepYear(1);
+    else if (k === ' ' && !(e.target instanceof HTMLButtonElement) && !(e.target instanceof HTMLAnchorElement)) {
+      e.preventDefault();
+      ctrl.togglePlay();
+    } else if (k === '1') ctrl.change({ measure: 'tons' });
+    else if (k === '2' && ctrl.available.value) ctrl.change({ measure: 'value' });
+    else if (k === '3' && ctrl.available.tmiles) ctrl.change({ measure: 'tmiles' });
+    else if (k.toLowerCase() === 'f') ctrl.togglePanel('L');
+    else if (k.toLowerCase() === 'i') ctrl.togglePanel('R');
+  }
 </script>
 
-<svelte:window onkeydown={(e) => e.key === 'Escape' && ready && ctrl.closeDetail()} />
+<svelte:window onkeydown={onKey} />
 
+<Sprite />
 <a class="skip" href="#controls">Skip to filters</a>
 <a class="skip" href="#map">Skip to map</a>
 
 <div class="app">
-  <header class="top">
-    <h1>{ready ? ctrl.meta?.state.site_title : 'Freight Explorer'}</h1>
-    {#if ready}
-      {#if fatal}<span class="error" role="alert">{fatal}</span>{/if}
-      <button class="btn sheet-toggle" type="button" aria-expanded={sheetOpen} onclick={() => (sheetOpen = !sheetOpen)}>{sheetOpen ? 'Hide' : 'Show'} filters</button>
-      <span class="spacer"></span>
-      <a class="btn" href={`methodology.html${ctrl.s.theme !== 'system' ? `?theme=${ctrl.s.theme}` : ''}`}>Methodology and data</a>
-      <button class="btn" type="button" aria-expanded={ctrl.s.panel !== 'closed'} onclick={() => ctrl.setPanel(ctrl.s.panel === 'closed' ? 'summary' : 'closed')}>
-        {ctrl.s.panel === 'closed' ? 'Charts and tables' : 'Hide charts'}
-      </button>
-      <label>Basemap
-        <select value={ctrl.s.basemap ?? ''} onchange={(e) => ctrl.setBasemap(e.currentTarget.value || null)} aria-label="Basemap">
-          <option value="">Auto ({ctrl.theme === 'dark' ? 'Dark' : 'Positron'})</option>
-          {#each BASEMAPS as b}<option value={b}>{b[0].toUpperCase() + b.slice(1)}</option>{/each}
-        </select>
-      </label>
-      <label>Theme
-        <select value={ctrl.s.theme} onchange={(e) => ctrl.setTheme(e.currentTarget.value as 'system' | 'light' | 'dark')} aria-label="Theme">
-          <option value="system">System</option>
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
-        </select>
-      </label>
-    {/if}
-  </header>
+  {#if ready}
+    <TopBar {ctrl} />
+  {:else}
+    <header class="top"><h1 class="brand"><span class="t">Freight Explorer</span></h1>{#if fatal}<span class="error" role="alert">{fatal}</span>{/if}</header>
+  {/if}
 
-  <aside class="side" id="controls" class:open={sheetOpen} aria-label="Filters and layers" tabindex="-1">
-    {#if ready}<Controls {ctrl} />{:else if fatal}<p class="error" role="alert">{fatal}</p>{:else}<p class="muted">Loading…</p>{/if}
-  </aside>
+  <div class="workspace">
+    {#if ctrl.narrow && (ctrl.mobL || ctrl.mobR)}<button type="button" class="sheet-scrim" aria-label="Close the panel" onclick={() => ctrl.closeSheets()}></button>{/if}
 
-  <main class="stage" class:drawer-open={ready && ctrl.s.panel !== 'closed'} class:experimental={ready && ctrl.experimental}>
-    <div class="map" id="map" bind:this={mapEl} role="application" aria-label="Freight flow map. The largest flows are listed below the map in text, and any flow table is under Charts and tables." aria-describedby="flow-summary"></div>
-    {#if ready}
-      <ul class="sr-only" id="flow-summary" aria-label="Largest flows on the map">
-        {#each ctrl.flows.slice(0, 10) as f}<li>{ctrl.name(f.origin)} to {ctrl.name(f.dest)}: {ctrl.fmtMeasure(f.count)}</li>{/each}
-      </ul>
-    {/if}
-    {#if ready}
-      {#if ctrl.experimental}
-        <div class="card exp-banner" role="note">
-          <strong>EXPERIMENTAL.</strong> County-level estimates for 2022 (BTS), tons only, built from FAF5.6.1 and allocated to counties with public indicator data.
-          Not FAF6, not directly comparable with the FAF numbers in the other versions, and not measured county flows.
-        </div>
-      {/if}
-      <Kpis {ctrl} />
-      <Detail {ctrl} />
-      <Charts {ctrl} />
+    <aside class="panel left" class:open={ctrl.narrow && ctrl.mobL} class:collapsed={!ctrl.narrow && !ctrl.panelL} id="controls" aria-label="Filters and layers" tabindex="-1">
+      <div class="panel-head"><h2>Filters</h2><span class="spacer"></span><button class="btn icon ghost" type="button" aria-label="Close filters" onclick={() => (ctrl.mobL = false)}><Icon name="x" /></button></div>
+      {#if ready}<FilterRail {ctrl} />
+      {:else if fatal}<div class="panel-body"><p class="error" role="alert">{fatal}</p></div>
+      {:else}<div class="panel-body"><p class="muted">Loading…</p></div>{/if}
+    </aside>
 
-      {#if ctrl.hover}
-        <div class="card tooltip" style={`left:${ctrl.hover.x + 14}px;top:${ctrl.hover.y + 14}px`}>
-          {#each ctrl.hover.lines as l, i}<div style={i === 0 ? 'font-weight:650' : ''}>{l}</div>{/each}
-        </div>
-      {/if}
-
-      <div class="card legend" aria-label="Legend">
-        {#if ctrl.s.layers.flows}<div>Arc width: {ctrl.s.measure === 'tons' ? 'tons' : ctrl.s.measure === 'value' ? 'value' : 'ton-miles'}. Circles: zone totals. Foreign regions are schematic positions.</div>{/if}
-        {#if netBadge}<div style="margin-top: 4px"><span class="ramp" aria-hidden="true"></span> modeled truck trips per day. Grey: no modeled truck flow.</div>{/if}
+    <main class="stage" class:experimental={ready && ctrl.experimental}>
+      {#if ready}<QueryBar {ctrl} /><HeadlineBand {ctrl} />{/if}
+      <div class="mapwrap">
+        <div class="map" id="map" bind:this={mapEl} role="application" aria-label="Freight flow map. The largest flows are listed in text in the Insights panel, and every number is in the Data tab." aria-describedby="flow-summary"></div>
+        {#if ready}
+          <ul class="sr-only" id="flow-summary" aria-label="Largest flows on the map">
+            {#each ctrl.flows.slice(0, 10) as f}<li>{ctrl.name(f.origin)} to {ctrl.name(f.dest)}: {ctrl.fmtMeasure(f.count)}</li>{/each}
+          </ul>
+          <MapOverlays {ctrl} />
+        {/if}
       </div>
+      {#if ready}<TimelineDock {ctrl} />{/if}
+    </main>
 
-      {#if netBadge}
-        <div class="card badge" role="note">
-          <strong>FAF5 model assignment ({ctrl.s.net.year === 2017 ? '2017 benchmark' : `${ctrl.s.net.year} baseline projection`}).</strong> Not traffic counts; not updated to FAF6.
-          {#if ctrl.s.version !== ctrl.defaults.version}The network is a FAF5 product even while {ctrl.versionLabel} flows are shown.{/if}
-        </div>
-      {/if}
-
-      <div class="footer">
-        <span>
-          {#if ctrl.experimental}
-            {ctrl.versionLabel}: 2022, tons only (thousand tons). Experimental modeled estimates, not counts. Not comparable with the FAF releases.
-          {:else}
-            {ctrl.versionLabel}, {ctrl.benchmarkYear} benchmark; values in {ctrl.benchmarkYear} dollars unless "current" is chosen. Modeled estimates, not counts. Not comparable with the other FAF version.
-          {/if}
-          Sources: BTS, FHWA, ORNL, U.S. Census Bureau. Basemap: OpenFreeMap, OpenStreetMap.
-        </span>
-      </div>
-    {/if}
-  </main>
+    {#if ready}<InsightDrawer {ctrl} />{/if}
+  </div>
 </div>
+
+{#if ready}
+  <CommandPalette {ctrl} />
+  <Dialogs {ctrl} />
+  <div class="toast" class:on={!!ctrl.toastMsg} role="status" aria-live="polite">{ctrl.toastMsg ?? ''}</div>
+{/if}
+
+<style>
+  .sheet-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    border: 0;
+    background: rgba(8, 12, 18, 0.4);
+  }
+  @media (min-width: 1100px) {
+    .sheet-scrim {
+      display: none;
+    }
+  }
+</style>

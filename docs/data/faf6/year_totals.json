@@ -1,0 +1,19 @@
+{
+ "columns": [
+  "tons_kt",
+  "value_const_musd",
+  "value_current_musd",
+  "tmiles_m"
+ ],
+ "faf_version": "6.0",
+ "totals": {
+  "mid": {
+   "2022": [
+    336735.168,
+    445931.153,
+    null,
+    null
+   ]
+  }
+ }
+}

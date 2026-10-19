@@ -1,6 +1,9 @@
 import * as Plot from '@observablehq/plot';
-import type { CompareSeries, OtherSeries, TrendPoint } from './controller.svelte';
-import { modeColor, OKABE_ITO, type ChartColors } from './palette';
+import type { CompareSeries, OtherSeries, Trends, TrendPoint, YearsCompare } from './controller.svelte';
+import { formatShort } from './format';
+import { groupColor, modeColor, OKABE_ITO, type ChartColors } from './palette';
+import type { Measure } from './types';
+import { trunc } from './ui';
 
 type Row = { label: string; v: number };
 
@@ -15,7 +18,11 @@ export function spacedTicks(years: number[], width: number, minPx = 46): number[
   return out;
 }
 
-const base = (c: ChartColors, width: number) => ({ width, style: { background: 'transparent', color: c.text, fontSize: '12px' } });
+const FONT = '"Instrument Sans", system-ui, sans-serif';
+
+/** Y axis in the raw unit. With a measure the ticks are short (200M, $1.2B) and the unit is the chart's subtitle; without one they are full numbers. */
+const yAxis = (unit: string, measure?: Measure) => (measure ? { label: null, grid: true, tickFormat: (d: number) => formatShort(measure, d), zero: true } : { label: unit, grid: true, tickFormat: comma, zero: true });
+const base = (c: ChartColors, width: number) => ({ width, style: { background: 'transparent', color: c.text, fontSize: '12px', fontFamily: FONT, overflow: 'visible' } });
 
 export function barChart(rows: Row[], c: ChartColors, width: number, unit: string, fill?: (r: Row) => string): Element {
   const h = Math.max(80, rows.length * 26 + 46);
@@ -43,8 +50,8 @@ export function heatmapChart(cells: { commodity: string; mode: string; v: number
     marginBottom: 54,
     x: { label: null, domain: modes, tickRotate: -30 },
     y: { label: null, domain: top },
-    color: { type: 'sqrt', scheme: 'viridis', legend: true, label: unit },
-    marks: [Plot.cell(data, { x: 'mode', y: 'commodity', fill: 'v', inset: 0.5, tip: true })],
+    color: { type: 'sqrt', range: [c.panel3, c.accent], legend: true, label: unit },
+    marks: [Plot.cell(data, { x: 'mode', y: 'commodity', fill: 'v', inset: 0.5, rx: 3, tip: true })],
   });
 }
 
@@ -74,7 +81,7 @@ function statusDots(data: TrendPoint[], c: ChartColors, stroke: string): Plot.Ma
 }
 
 export function trendChart(
-  points: TrendPoint[], other: OtherSeries | null, c: ChartColors, width: number, unit: string, thisLabel: string,
+  points: TrendPoint[], other: OtherSeries | null, c: ChartColors, width: number, unit: string, thisLabel: string, measure?: Measure,
 ): Element {
   const mid = points.filter((p) => p.scenario === 'mid').sort((a, b) => a.year - b.year);
   const low = points.filter((p) => p.scenario === 'low').sort((a, b) => a.year - b.year);
@@ -116,14 +123,14 @@ export function trendChart(
   return Plot.plot({
     ...base(c, width),
     height: 320,
-    marginLeft: 56,
+    marginLeft: measure ? 48 : 56,
     x: { label: null, tickFormat: 'd', ticks: spacedTicks(years, width), domain: years.length > 1 ? [years[0] - 1, years[years.length - 1] + 1] : [years[0] - 2, years[0] + 2] },
-    y: { label: unit, grid: true, tickFormat: comma, zero: true },
+    y: yAxis(unit, measure),
     marks,
   });
 }
 
-export function compareChart(series: CompareSeries[], c: ChartColors, width: number, unit: string): Element {
+export function compareChart(series: CompareSeries[], c: ChartColors, width: number, unit: string, measure?: Measure): Element {
   const rows = series.flatMap((s) => s.points.map((p) => ({ ...p, label: s.label })));
   const labels = series.map((s) => s.label);
   const range = labels.map((_, i) => OKABE_ITO[i % OKABE_ITO.length]);
@@ -133,9 +140,9 @@ export function compareChart(series: CompareSeries[], c: ChartColors, width: num
   return Plot.plot({
     ...base(c, width),
     height: 320,
-    marginLeft: 56,
+    marginLeft: measure ? 48 : 56,
     x: { label: null, tickFormat: 'd', ticks: spacedTicks(years, width), domain: years.length > 1 ? [years[0] - 1, years[years.length - 1] + 1] : undefined },
-    y: { label: unit, grid: true, tickFormat: comma, zero: true },
+    y: yAxis(unit, measure),
     color: { domain: labels, range, legend: true },
     symbol: { domain: STATUS_ORDER, range: ['diamond', 'circle', 'circle', 'triangle'] },
     marks: [
@@ -147,7 +154,7 @@ export function compareChart(series: CompareSeries[], c: ChartColors, width: num
   });
 }
 
-export function modeStackChart(rows: { year: number; code: string; label: string; v: number }[], c: ChartColors, width: number, unit: string, share: boolean): Element {
+export function modeStackChart(rows: { year: number; code: string; label: string; v: number }[], c: ChartColors, width: number, unit: string, share: boolean, measure?: Measure): Element {
   const labels = [...new Map(rows.map((r) => [Number(r.code), r.label])).entries()].sort((a, b) => a[0] - b[0]);
   const years = [...new Set(rows.map((r) => r.year))].sort((a, b) => a - b);
   return Plot.plot({
@@ -155,7 +162,7 @@ export function modeStackChart(rows: { year: number; code: string; label: string
     height: 300,
     marginLeft: 56,
     x: { label: null, type: 'band', domain: years, tickFormat: 'd', ticks: spacedTicks(years, width, 40) },
-    y: { label: share ? 'share of total' : unit, grid: true, tickFormat: share ? '%' : comma },
+    y: share ? { label: measure ? null : 'share of total', grid: true, tickFormat: '%' } : yAxis(unit, measure),
     color: { domain: labels.map((l) => l[1]), range: labels.map((l) => modeColor(l[0])), legend: true },
     marks: [Plot.barY(rows, { x: 'year', y: 'v', fill: 'label', ...(share ? { offset: 'normalize' as const } : {}), tip: true }), Plot.ruleY([0])],
   });
@@ -168,7 +175,7 @@ import type { HistorySeries } from './controller.svelte';
 
 /** Totals at the four snapshot years, optionally beside the FAF5 annual estimates (a separate, differently marked series). */
 export function historyTotalsChart(
-  totals: { year: number; v: number }[], faf5: TrendPoint[] | null, faf5Label: string, c: ChartColors, width: number, unit: string,
+  totals: { year: number; v: number }[], faf5: TrendPoint[] | null, faf5Label: string, c: ChartColors, width: number, unit: string, measure?: Measure,
 ): Element {
   const years = [...new Set([...totals.map((t) => t.year), ...(faf5?.map((p) => p.year) ?? [])])].sort((a, b) => a - b);
   const marks: Plot.Markish[] = [];
@@ -186,15 +193,15 @@ export function historyTotalsChart(
   return Plot.plot({
     ...base(c, width),
     height: 300,
-    marginLeft: 56,
+    marginLeft: measure ? 48 : 56,
     x: { label: null, tickFormat: 'd', ticks: spacedTicks(years, width), domain: [years[0] - 1, years[years.length - 1] + 1] },
-    y: { label: unit, grid: true, tickFormat: comma, zero: true },
+    y: yAxis(unit, measure),
     marks,
   });
 }
 
 /** One line per series across the snapshot years (partners or commodities), colorblind-safe colors plus direct labels at the line ends. */
-export function snapshotLinesChart(series: HistorySeries[], c: ChartColors, width: number, unit: string): Element {
+export function snapshotLinesChart(series: HistorySeries[], c: ChartColors, width: number, unit: string, measure?: Measure): Element {
   const rows = series.flatMap((s) => s.points.map((p) => ({ ...p, label: s.label })));
   const labels = series.map((s) => s.label);
   const years = [...new Set(rows.map((r) => r.year))].sort((a, b) => a - b);
@@ -202,10 +209,10 @@ export function snapshotLinesChart(series: HistorySeries[], c: ChartColors, widt
   return Plot.plot({
     ...base(c, width),
     height: 300,
-    marginLeft: 56,
+    marginLeft: measure ? 48 : 56,
     marginRight: Math.min(190, Math.floor(width * 0.3)),
     x: { label: null, tickFormat: 'd', ticks: years, domain: [years[0] - 1, years[years.length - 1] + 1] },
-    y: { label: unit, grid: true, tickFormat: comma, zero: true },
+    y: yAxis(unit, measure),
     color: { domain: labels, range: labels.map((_, i) => OKABE_ITO[i % OKABE_ITO.length]) },
     marks: [
       Plot.lineY(rows, { x: 'year', y: 'v', stroke: 'label', strokeWidth: 2 }),
@@ -215,3 +222,133 @@ export function snapshotLinesChart(series: HistorySeries[], c: ChartColors, widt
     ],
   });
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Redesign charts. A "gap" band marks years the release does not publish: hatched, never interpolated.
+
+const HATCH = '#fe00fe'; // placeholder fill, swapped for the hatch pattern after the chart is built
+
+/** Replace the placeholder fill with a diagonal hatch (missing data), keeping the chart's own colors theme-aware. */
+export function hatchify(svg: SVGSVGElement | Element, c: ChartColors): void {
+  const id = `hatch${Math.random().toString(36).slice(2, 7)}`;
+  svg.insertAdjacentHTML('afterbegin', `<defs><pattern id="${id}" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="6" stroke="${c.grid}" stroke-width="1.4"/></pattern></defs>`);
+  for (const e of svg.querySelectorAll(`[fill="${HATCH}"]`)) e.setAttribute('fill', `url(#${id})`);
+}
+
+const yearTick = (d: string) => (d === 'gap' ? '' : `\u2019${d.slice(2)}`);
+
+/** Year domain with one 'gap' slot where the release jumps from annual years to sparse forecasts. */
+function yearDomain(years: number[]): string[] {
+  const out: string[] = [];
+  let prevStep = 0;
+  years.forEach((y, i) => {
+    const step = i > 0 ? y - years[i - 1] : 0;
+    if (step > 1 && prevStep === 1) out.push('gap');
+    out.push(String(y));
+    if (i > 0) prevStep = step;
+  });
+  return out;
+}
+
+/** Inbound, outbound and within as stacked bars by year, with the published High and Low scenarios as whiskers on forecast years. */
+export function directionChart(
+  rows: Trends['directions'], scenario: string, selectedYear: number, c: ChartColors, width: number, measure: Measure, label: (dir: string) => string,
+): Element {
+  const years = [...new Set(rows.map((r) => r.year))].sort((a, b) => a - b);
+  const sc = (year: number) => (rows.some((r) => r.year === year && r.scenario === scenario) ? scenario : 'mid');
+  const bars = rows.filter((r) => r.scenario === sc(r.year)).map((r) => ({ x: String(r.year), year: r.year, dir: r.dir, v: r.v }));
+  const total = (year: number, s: string) => rows.filter((r) => r.year === year && r.scenario === s).reduce((a, r) => a + r.v, 0);
+  const whisk = years.flatMap((y) => {
+    const hi = rows.some((r) => r.year === y && r.scenario === 'high') ? total(y, 'high') : null;
+    const lo = rows.some((r) => r.year === y && r.scenario === 'low') ? total(y, 'low') : null;
+    return hi != null && lo != null ? [{ x: String(y), hi, lo }] : [];
+  });
+  const sums = new Map<number, number>();
+  for (const b of bars) sums.set(b.year, (sums.get(b.year) ?? 0) + b.v);
+  const ymax = Math.max(1, ...sums.values(), ...whisk.map((w) => w.hi)) * 1.1;
+  const domain = yearDomain(years);
+  const marks: Plot.Markish[] = [];
+  if (domain.includes('gap')) {
+    marks.push(Plot.barY([{ x: 'gap', v: ymax }], { x: 'x', y: 'v', fill: HATCH }));
+    marks.push(Plot.text([{ x: 'gap', y: ymax / 2 }], { x: 'x', y: 'y', text: ['not published'], rotate: -90, fill: c.muted, fontSize: 10.5 }));
+  }
+  marks.push(
+    Plot.barY(bars, { x: 'x', y: 'v', fill: 'dir', fillOpacity: (d: { year: number }) => (d.year === selectedYear ? 1 : 0.62), title: (d: { year: number; dir: string; v: number }) => `${d.year} \u00b7 ${label(d.dir)}\n${formatShort(measure, d.v)}`, tip: true }),
+    Plot.ruleY([0], { stroke: c.grid }),
+    Plot.ruleX(whisk, { x: 'x', y1: 'lo', y2: 'hi', stroke: c.text, strokeWidth: 1.4 }),
+    Plot.dot(whisk, { x: 'x', y: 'hi', r: 2.2, fill: c.text }),
+    Plot.dot(whisk, { x: 'x', y: 'lo', r: 2.2, fill: c.text }),
+  );
+  const chart = Plot.plot({
+    ...base(c, width), height: 240, marginLeft: 46, marginRight: 4, marginBottom: 24, marginTop: 8,
+    x: { domain, label: null, tickSize: 0, padding: 0.2, tickFormat: yearTick },
+    y: { domain: [0, ymax], grid: true, label: null, tickFormat: (d: number) => formatShort(measure, d) },
+    color: { domain: ['inbound', 'outbound', 'within'], range: [c.inbound, c.outbound, c.within] },
+    marks,
+  });
+  hatchify(chart, c);
+  return chart;
+}
+
+/** Commodity by year as a heatmap (square-root color scale so small groups stay visible); the selected year is outlined. */
+export function commodityHeatChart(
+  rows: { year: number; code: string; label: string; v: number }[], selectedYear: number, c: ChartColors, width: number, measure: Measure, maxRows = 14,
+): Element {
+  const totals = new Map<string, { label: string; v: number }>();
+  for (const r of rows) totals.set(r.code, { label: r.label, v: (totals.get(r.code)?.v ?? 0) + r.v });
+  const top = [...totals.entries()].sort((a, b) => b[1].v - a[1].v).slice(0, maxRows);
+  const names = top.map(([, t]) => t.label);
+  const codeName = new Map(top.map(([k, t]) => [k, t.label]));
+  const data = rows.filter((r) => codeName.has(r.code)).map((r) => ({ x: String(r.year), year: r.year, y: codeName.get(r.code)!, v: r.v }));
+  const years = [...new Set(rows.map((r) => r.year))].sort((a, b) => a - b);
+  const mx = Math.max(1, ...data.map((d) => d.v));
+  const chart = Plot.plot({
+    ...base(c, width), height: top.length * 22 + 36, marginLeft: 128, marginRight: 2, marginBottom: 24, marginTop: 4,
+    x: { domain: yearDomain(years), label: null, tickSize: 0, padding: 0.08, tickFormat: yearTick },
+    y: { domain: names, label: null, tickSize: 0, padding: 0.08, tickFormat: (d: string) => trunc(d, 22) },
+    color: { type: 'sqrt', domain: [0, mx], range: [c.panel3, c.accent] },
+    marks: [Plot.cell(data, { x: 'x', y: 'y', fill: 'v', rx: 3, inset: 0.5, stroke: (d: { year: number }) => (d.year === selectedYear ? c.text : 'none'), strokeWidth: 1.6, title: (d: { y: string; year: number; v: number }) => `${d.y}\n${d.year}: ${formatShort(measure, d.v)}`, tip: true })],
+  });
+  return chart;
+}
+
+/** Start and end for each item on one row: a dumbbell, ordered by size, with the percent change as a label. */
+export function dumbbellChart(
+  rows: { label: string; a: number; b: number }[], a: number, b: number, c: ChartColors, width: number, measure: Measure,
+): Element {
+  const data = rows.filter((r) => r.a || r.b).sort((x, y) => Math.max(y.a, y.b) - Math.max(x.a, x.b)).slice(0, 14);
+  const pct = (d: { a: number; b: number }) => (d.a ? `${((d.b - d.a) / d.a) * 100 >= 0 ? '+' : ''}${(((d.b - d.a) / d.a) * 100).toFixed(0)}%` : 'new');
+  return Plot.plot({
+    ...base(c, width), height: data.length * 27 + 34, marginLeft: 140, marginRight: 60, marginTop: 6, marginBottom: 24,
+    x: { grid: true, label: null, tickFormat: (d: number) => formatShort(measure, d), ticks: 4 },
+    y: { domain: data.map((d) => d.label), label: null, tickSize: 0, tickFormat: (d: string) => trunc(d, 21) },
+    marks: [
+      Plot.ruleY(data, { y: 'label', x1: 'a', x2: 'b', stroke: c.grid, strokeWidth: 3, strokeLinecap: 'round' }),
+      Plot.dot(data, { y: 'label', x: 'a', r: 5, fill: c.surface, stroke: c.muted, strokeWidth: 2, title: (d: { label: string; a: number }) => `${d.label}\n${a}: ${formatShort(measure, d.a)}` }),
+      Plot.dot(data, { y: 'label', x: 'b', r: 5, fill: c.accent, title: (d: { label: string; b: number }) => `${d.label}\n${b}: ${formatShort(measure, d.b)}` }),
+      Plot.text(data, { y: 'label', x: (d: { a: number; b: number }) => Math.max(d.a, d.b), dx: 10, textAnchor: 'start', fill: c.muted, fontSize: 10.5, text: pct }),
+    ],
+  });
+}
+
+/** Percent change by item around a zero line. Items missing in one of the two years are left out (a change from nothing is not a percentage). */
+export function deltaBarsChart(rows: { label: string; code: string; a: number; b: number }[], c: ChartColors, width: number, color: (code: string) => string): Element {
+  const data = rows.filter((r) => r.a > 0 && r.b >= 0).map((r) => ({ label: r.label, code: r.code, d: ((r.b - r.a) / r.a) * 100 })).sort((x, y) => y.d - x.d);
+  const ext = Math.max(5, ...data.map((d) => Math.abs(d.d)));
+  const sign = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(0)}%`;
+  const label = (anchor: 'start' | 'end', dd: typeof data) =>
+    Plot.text(dd, { y: 'label', x: 'd', text: (d: { d: number }) => sign(d.d), dx: anchor === 'start' ? 6 : -6, textAnchor: anchor, fill: c.muted, fontSize: 10.5 });
+  return Plot.plot({
+    ...base(c, width), height: data.length * 30 + 34, marginLeft: 118, marginRight: 46, marginTop: 4, marginBottom: 24,
+    x: { grid: true, label: null, domain: [-ext * 1.15, ext * 1.15], tickFormat: (d: number) => `${d > 0 ? '+' : ''}${d}%`, ticks: 5 },
+    y: { domain: data.map((d) => d.label), label: null, tickSize: 0, tickFormat: (d: string) => trunc(d, 22) },
+    marks: [
+      Plot.barX(data, { y: 'label', x: 'd', fill: (d: { code: string }) => color(d.code), rx: 3, title: (d: { label: string; d: number }) => `${d.label}: ${sign(d.d)}` }),
+      Plot.ruleX([0], { stroke: c.muted }),
+      label('start', data.filter((d) => d.d >= 0)),
+      label('end', data.filter((d) => d.d < 0)),
+    ],
+  });
+}
+
+export { groupColor, yearDomain };
