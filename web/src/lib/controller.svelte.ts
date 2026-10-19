@@ -17,6 +17,11 @@ export interface Kpis {
   tmiles_m: number | null;
   rows: number;
 }
+export interface HoverChart {
+  title: string;
+  rows: { label: string; v: number; text: string }[];
+}
+
 export interface Breakdown {
   code: string;
   label: string;
@@ -121,7 +126,7 @@ export class Controller {
   available = $state({ tmiles: true, current: true, value: true });
   notice = $state<string | null>(null);
   detail = $state<Detail | null>(null);
-  hover = $state<{ x: number; y: number; lines: string[]; zone?: boolean } | null>(null);
+  hover = $state<{ x: number; y: number; lines: string[]; zone?: boolean; key?: string; charts?: HoverChart[] } | null>(null);
   linkCount = $state<number | null>(null);
   headlineShown = $state(false);
 
@@ -368,6 +373,7 @@ export class Controller {
   // ---- queries
   async refresh(): Promise<void> {
     const id = ++this.reqId;
+    this.hoverCache.clear();
     const s = this.s;
     this.busy = true;
     try {
@@ -624,15 +630,57 @@ export class Controller {
 
   private onFlowHover(p: FlowmapPick | null): void {
     if (!p) {
-      this.hover = null;
+      if (!this.hover?.zone) this.hover = null; // a miss on the flow layers must not wipe a zone tooltip
       return;
     }
     if (p.kind === 'location' && p.id) {
       const loc = this.locations.get(p.id);
-      this.hover = { x: p.x, y: p.y, lines: [loc?.name ?? p.id, loc?.schematic ? 'Foreign region (schematic position)' : ''].filter(Boolean) };
+      const id = p.id;
+      this.showHover(p.x, p.y, [loc?.name ?? id, loc?.schematic ? 'Foreign region (schematic position)' : '', 'Click to open the zone'].filter(Boolean), `loc:${id}`, () => this.zoneCharts(id));
     } else if (p.kind === 'flow') {
-      this.hover = { x: p.x, y: p.y, lines: [`${this.name(p.originId!)} to ${this.name(p.destId!)}`, `${this.fmtMeasure(p.count ?? 0)}`] };
+      const [o, d] = [p.originId!, p.destId!];
+      this.showHover(p.x, p.y, [`${this.name(o)} to ${this.name(d)}`, `${this.fmtMeasure(p.count ?? 0)}`, 'Click to open the flow'], `flow:${o}>${d}`, () => this.pairCharts(o, d));
     }
+  }
+
+  private hoverCache = new Map<string, HoverChart[]>();
+  private hoverTimer: ReturnType<typeof setTimeout> | undefined;
+
+  /** Show the tooltip now; the mini charts follow once the pointer has rested for a moment (a query per pixel moved would flood the engine). */
+  private showHover(x: number, y: number, lines: string[], key: string, charts: () => Promise<HoverChart[]>, zone = false): void {
+    const same = this.hover?.key === key;
+    this.hover = { x, y, lines, zone, key, charts: same ? this.hover?.charts : undefined };
+    if (same) return;
+    clearTimeout(this.hoverTimer);
+    const ck = `${this.product}|${this.s.year}|${this.s.scenario}|${this.s.measure}|${this.reqId}|${key}`;
+    const cached = this.hoverCache.get(ck);
+    if (cached) {
+      this.hover.charts = cached;
+      return;
+    }
+    this.hoverTimer = setTimeout(async () => {
+      try {
+        const c = await charts();
+        this.hoverCache.set(ck, c);
+        if (this.hover?.key === key) this.hover = { ...this.hover, charts: c };
+      } catch {
+        /* the plain tooltip stays */
+      }
+    }, 140);
+  }
+
+  private toChart(title: string, rows: Breakdown[], n = 4): HoverChart {
+    return { title, rows: rows.slice(0, n).map((r) => ({ label: r.label, v: r.magnitude, text: this.fmtMeasure(r.magnitude) })) };
+  }
+
+  private async zoneCharts(id: string): Promise<HoverChart[]> {
+    const [com, mode] = await Promise.all([this.breakdown('sctg2', id, undefined, 4), this.breakdown('dms_mode', id, undefined, 3)]);
+    return [this.toChart('Top commodities', com), this.toChart('By mode', mode, 3)];
+  }
+
+  private async pairCharts(o: string, d: string): Promise<HoverChart[]> {
+    const [com, mode] = await Promise.all([this.breakdown('sctg2', null, [o, d], 4), this.breakdown('dms_mode', null, [o, d], 3)]);
+    return [this.toChart('Top commodities', com), this.toChart('By mode', mode, 3)];
   }
 
   private zoneTotals = new Map<string, number>();
@@ -644,7 +692,9 @@ export class Controller {
     }
     if (this.hover && !this.hover.zone) return; // a flow, node or link tooltip is showing
     const v = this.zoneTotals.get(id);
-    this.hover = { x, y, zone: true, lines: [this.name(id), v != null ? `${this.fmtMeasure(v)} touching the state` : 'No flow with the state in this view', 'Click to select'] };
+    const inState = this.stateZones.includes(id);
+    const line = inState ? 'Inside the state' : v != null ? `${this.fmtMeasure(v)} touching the state` : 'No flow with the state in this view';
+    this.showHover(x, y, [this.name(id), line, 'Click to open the zone'], `zone:${id}`, () => this.zoneCharts(id), true);
   }
 
   private onLinkHover(props: Record<string, unknown> | null, x: number, y: number): void {

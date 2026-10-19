@@ -66,6 +66,7 @@ export class MapView {
   private shade = new Map<string, number>();
   private shadeIds = new Set<string>();
   private locations: ZoneInfo[] = [];
+  private locById = new Map<string, ZoneInfo>();
   private flows: FlowRow[] = [];
   private flowsVisible = true;
   private readonly cb: MapCallbacks;
@@ -85,7 +86,7 @@ export class MapView {
     this.styleName = opts.style;
     this.home = { center: opts.center, zoom: opts.zoom };
     this.map = new maplibregl.Map({ container: el, style: STYLE_URL(opts.style), center: opts.center, zoom: opts.zoom, attributionControl: { compact: true } });
-    this.overlay = new MapboxOverlay({ interleaved: false, layers: [] });
+    this.overlay = new MapboxOverlay({ interleaved: false, layers: [], pickingRadius: 6 });
     this.map.addControl(this.overlay as unknown as maplibregl.IControl);
 
     // Everything MapLibre owns (sources and layers) disappears on setStyle, so it is re-added here. The deck.gl overlay
@@ -119,10 +120,46 @@ export class MapView {
     this.map.on('mousemove', (e) => {
       const f = this.netVisible && this.hasLayer('net-lines') ? this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0] : undefined;
       this.cb.onLinkHover(f ? (f.properties ?? {}) : null, e.point.x, e.point.y);
+      // Nodes are picked by deck.gl (its own onHover). The flow lines are not reliably pickable through the flowmap layer, so they are
+      // hit-tested here, in screen space, against the straight line between the two zone centres.
+      const node = this.overlay.pickObject({ x: e.point.x, y: e.point.y, radius: 6 });
+      const flow = !node && !f ? this.flowAt(e.point.x, e.point.y) : null;
+      if (!node && !f) this.cb.onFlowHover(flow);
+      this.map.getCanvas().style.cursor = node || f || flow ? 'pointer' : '';
       // zones: only when no flow, node or link is under the pointer (those have their own tooltips)
-      const z = !f && this.hasLayer('zones-fill') && !this.overlay.pickObject({ x: e.point.x, y: e.point.y, radius: 6 }) ? this.map.queryRenderedFeatures(e.point, { layers: ['zones-fill'] })[0] : undefined;
+      const z = !f && !node && !flow && this.hasLayer('zones-fill') ? this.map.queryRenderedFeatures(e.point, { layers: ['zones-fill'] })[0] : undefined;
       this.cb.onZoneHover(z ? String(z.properties?.zone_id) : null, e.point.x, e.point.y);
     });
+  }
+
+  /** Nearest drawn flow within a few pixels of the pointer (the larger flow wins a tie). */
+  private flowAt(px: number, py: number): FlowmapPick | null {
+    if (!this.flowsVisible || !this.flows.length) return null;
+    const pos = new Map<string, { x: number; y: number }>();
+    const at = (id: string) => {
+      let p = pos.get(id);
+      if (!p) {
+        const l = this.locById.get(id);
+        if (!l) return null;
+        p = this.project(l.lon, l.lat);
+        pos.set(id, p);
+      }
+      return p;
+    };
+    let best: { f: FlowRow; d: number } | null = null;
+    for (const f of this.flows) {
+      if (f.origin === f.dest) continue;
+      const a = at(f.origin);
+      const b = at(f.dest);
+      if (!a || !b) continue;
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const len2 = dx * dx + dy * dy || 1;
+      const t = Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / len2));
+      const d = Math.hypot(px - (a.x + t * dx), py - (a.y + t * dy));
+      if (d <= 7 && (!best || d < best.d - 1.5 || (Math.abs(d - best.d) <= 1.5 && f.count > best.f.count))) best = { f, d };
+    }
+    return best ? { kind: 'flow', originId: best.f.origin, destId: best.f.dest, count: best.f.count, x: px, y: py } : null;
   }
 
   /**
@@ -265,6 +302,7 @@ export class MapView {
   // ---- flows (deck.gl + flowmap.gl)
   setFlows(locations: ZoneInfo[], flows: FlowRow[]): void {
     this.locations = locations;
+    this.locById = new Map(locations.map((l) => [l.id, l]));
     this.flows = flows;
     this.pushOverlay();
   }

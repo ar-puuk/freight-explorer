@@ -98,8 +98,21 @@
 <div class={`float floatnote ${noteHtml.cls}`} role="note"><Icon name={noteHtml.icon} size={16} /><span><b style="color:var(--ink)">{noteHtml.strong}</b> {noteHtml.text}</span></div>
 
 {#if ctrl.hover}
-  <div class="tip" style={`left:${Math.min(ctrl.hover.x + 14, Math.max(0, ctrl.mapSize.w - 290))}px;top:${Math.min(ctrl.hover.y + 14, Math.max(0, ctrl.mapSize.h - 120))}px`} role="status">
-    {#each ctrl.hover.lines as l, i}<div class={i === 0 ? 't' : 'r'}>{l}</div>{/each}
+  <div class="tip" style={`left:${Math.min(ctrl.hover.x + 14, Math.max(0, ctrl.mapSize.w - 290))}px;top:${Math.min(ctrl.hover.y + 14, Math.max(0, ctrl.mapSize.h - (ctrl.hover.charts ? 270 : 120)))}px`} role="status">
+    {#each ctrl.hover.lines as l, i}<div class={i === 0 ? 't' : i === ctrl.hover.lines.length - 1 && ctrl.hover.key ? 'hint' : 'r'}>{l}</div>{/each}
+    {#if ctrl.hover.charts}
+      {#each ctrl.hover.charts as ch}
+        {#if ch.rows.length}
+          {@const mx = Math.max(...ch.rows.map((r) => r.v), 1)}
+          <div class="mini" aria-hidden="true">
+            <div class="mh">{ch.title}</div>
+            {#each ch.rows as r}
+              <div class="mr"><span class="ml">{r.label}</span><span class="mv">{r.text}</span><i style={`width:${Math.max(2, (r.v / mx) * 100).toFixed(1)}%`}></i></div>
+            {/each}
+          </div>
+        {/if}
+      {/each}
+    {/if}
   </div>
 {/if}
 
