@@ -355,6 +355,23 @@ details.alt .num { text-align: right; white-space: nowrap; }
 .maplibregl-ctrl button:focus-visible, .maplibregl-ctrl-attrib-button:focus-visible, .maplibregl-canvas:focus-visible, #deckgl-overlay:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .maplibregl-ctrl-bottom-left, .maplibregl-ctrl-bottom-right { z-index: 1; }
 
+/* ---- MapLibre attribution follows the app theme (its stylesheet is light-only) */
+.maplibregl-ctrl-attrib, .maplibregl-ctrl-attrib.maplibregl-compact { background: var(--glass); color: var(--ink-2); border: 1px solid var(--line); border-radius: var(--r-s); }
+.maplibregl-ctrl-attrib a, .maplibregl-ctrl-attrib a:visited { color: var(--ink); }
+.maplibregl-ctrl-attrib-button { background-color: transparent; }
+:root[data-theme='dark'] .maplibregl-ctrl-attrib-button { filter: invert(1) hue-rotate(180deg); }
+.maplibregl-ctrl-attrib.maplibregl-compact-show { background: var(--panel); }
+
+/* ---- Observable Plot tooltips draw on --plot-background (white by default) with currentColor text, unreadable in dark mode */
+.chartbox svg, svg[class^='plot'], figure svg { --plot-background: var(--panel); }
+
+/* ---- scrollbars follow the theme */
+* { scrollbar-color: var(--line-2) transparent; }
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--line-2); border-radius: 8px; border: 2px solid transparent; background-clip: content-box; }
+*::-webkit-scrollbar-thumb:hover { background: var(--ink-3); background-clip: content-box; }
+*::-webkit-scrollbar-track, *::-webkit-scrollbar-corner { background: transparent; }
+
 /* ---- skeleton while the query engine warms up */
 .shimmer { background: linear-gradient(90deg, var(--panel-3), var(--panel-2), var(--panel-3)); background-size: 200% 100%; animation: shimmer 1.4s infinite; border-radius: 4px; color: transparent !important; }
 @keyframes shimmer { to { background-position: -200% 0; } }

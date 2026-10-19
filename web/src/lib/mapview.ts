@@ -42,6 +42,7 @@ export interface MapCallbacks {
   onFlowClick: (pick: FlowmapPick) => void;
   onZoneClick: (zoneId: string | null) => void;
   onLinkHover: (props: Record<string, unknown> | null, x: number, y: number) => void;
+  onZoneHover: (zoneId: string | null, x: number, y: number) => void;
   onLinkClick: (props: Record<string, unknown>) => void;
   onMoveEnd: (cam: [number, number, number]) => void;
   onMove?: () => void;
@@ -116,10 +117,11 @@ export class MapView {
       this.cb.onZoneClick(z ? String(z.properties?.zone_id) : null);
     });
     this.map.on('mousemove', (e) => {
-      if (!this.netVisible || !this.hasLayer('net-lines')) return this.cb.onLinkHover(null, 0, 0);
-      const f = this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0];
-      this.map.getCanvas().style.cursor = f ? 'pointer' : '';
+      const f = this.netVisible && this.hasLayer('net-lines') ? this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0] : undefined;
       this.cb.onLinkHover(f ? (f.properties ?? {}) : null, e.point.x, e.point.y);
+      // zones: only when no flow, node or link is under the pointer (those have their own tooltips)
+      const z = !f && this.hasLayer('zones-fill') && !this.overlay.pickObject({ x: e.point.x, y: e.point.y, radius: 6 }) ? this.map.queryRenderedFeatures(e.point, { layers: ['zones-fill'] })[0] : undefined;
+      this.cb.onZoneHover(z ? String(z.properties?.zone_id) : null, e.point.x, e.point.y);
     });
   }
 

@@ -121,7 +121,7 @@ export class Controller {
   available = $state({ tmiles: true, current: true, value: true });
   notice = $state<string | null>(null);
   detail = $state<Detail | null>(null);
-  hover = $state<{ x: number; y: number; lines: string[] } | null>(null);
+  hover = $state<{ x: number; y: number; lines: string[]; zone?: boolean } | null>(null);
   linkCount = $state<number | null>(null);
   headlineShown = $state(false);
 
@@ -303,6 +303,7 @@ export class Controller {
         onFlowClick: (p) => this.onFlowClick(p),
         onZoneClick: (id) => this.select(id),
         onLinkHover: (props, x, y) => this.onLinkHover(props, x, y),
+        onZoneHover: (id, x, y) => this.onZoneHover(id, x, y),
         onLinkClick: (props) => void this.showLink(Number(props.id)),
         onScale: (samples) => (this.scaleSamples = samples),
         onMove: () => {
@@ -399,6 +400,7 @@ export class Controller {
       if (id !== this.reqId) return;
       const flows: FlowRow[] = rows.map((r) => ({ origin: String(r.origin), dest: String(r.dest), count: r.magnitude, dir: this.flowDir(String(r.origin), String(r.dest)) }));
       const zmax = Math.max(1, ...zt.map((z) => z.v));
+      this.zoneTotals = new Map(zt.map((z) => [String(z.id), z.v]));
       this.view?.setZoneShading(new Map(zt.map((z) => [String(z.id), Math.sqrt(z.v / zmax)])));
       this.flows = flows;
       this.flowTotals = { n: tot[0].n, total: tot[0].total, shownSum: flows.reduce((a, r) => a + r.count, 0) };
@@ -631,6 +633,18 @@ export class Controller {
     } else if (p.kind === 'flow') {
       this.hover = { x: p.x, y: p.y, lines: [`${this.name(p.originId!)} to ${this.name(p.destId!)}`, `${this.fmtMeasure(p.count ?? 0)}`] };
     }
+  }
+
+  private zoneTotals = new Map<string, number>();
+
+  private onZoneHover(id: string | null, x: number, y: number): void {
+    if (!id) {
+      if (this.hover?.zone) this.hover = null;
+      return;
+    }
+    if (this.hover && !this.hover.zone) return; // a flow, node or link tooltip is showing
+    const v = this.zoneTotals.get(id);
+    this.hover = { x, y, zone: true, lines: [this.name(id), v != null ? `${this.fmtMeasure(v)} touching the state` : 'No flow with the state in this view', 'Click to select'] };
   }
 
   private onLinkHover(props: Record<string, unknown> | null, x: number, y: number): void {
