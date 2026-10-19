@@ -4,7 +4,7 @@ import { Db, loadHeadline, loadLocations, loadMeta, loadYearTotals, loadZones, p
 import { MapView, type FlowmapPick } from './mapview';
 import {
   balanceSql, breakdownSql, commodityTrendSql, compareSql, compareYearsSql, directionTrendSql, flowsSql, flowTotalsSql, heatmapSql, kpiSql, measureColumn, modeSharesSql, modeTrendSql,
-  historyCommoditiesSql, historyModeSql, historyPartnersSql, historyTrendSql, pairBreakdownSql, partnerBreakdownSql, TABLE_DIM_SQL, tableSql, trendSql, zoneTotalsSql, type FlowFilter,
+  historyCommoditiesSql, historyModeSql, historyPartnersSql, historyTrendSql, pairBreakdownSql, partnerBreakdownSql, TABLE_DIM_SQL, tableSql, trendSql, zoneTotalsSql, zoneTrendSql, type FlowFilter,
 } from './sql';
 import { applyTheme, defaultBasemap, onSystemThemeChange, resolveTheme, type ResolvedTheme } from './theme';
 import type { AppState, Dir, FlowRow, ZoneInfo } from './types';
@@ -19,6 +19,8 @@ export interface Kpis {
 }
 export interface HoverChart {
   title: string;
+  series?: { year: number; v: number }[];
+  year?: number;
   rows: { label: string; v: number; text: string }[];
 }
 
@@ -674,8 +676,21 @@ export class Controller {
   }
 
   private async zoneCharts(id: string): Promise<HoverChart[]> {
-    const [com, mode] = await Promise.all([this.breakdown('sctg2', id, undefined, 4), this.breakdown('dms_mode', id, undefined, 3)]);
-    return [this.toChart('Top commodities', com), this.toChart('By mode', mode, 3)];
+    const [com, mode, series] = await Promise.all([
+      this.breakdown('sctg2', id, undefined, 4),
+      this.breakdown('dms_mode', id, undefined, 3),
+      this.zoneSeries(id),
+    ]);
+    return [...(series.length > 1 ? [{ title: 'By year', series, year: this.s.year, rows: [] }] : []), this.toChart('Top commodities', com), this.toChart('By mode', mode, 3)];
+  }
+
+  private async zoneSeries(id: string): Promise<{ year: number; v: number }[]> {
+    try {
+      const tbl = await this.allYears(this.s.version);
+      return await this.db.query<{ year: number; v: number }>(zoneTrendSql(tbl, this.filter, this.stateZones, id));
+    } catch {
+      return []; // products without an all-years table (county estimates) simply get no sparkline
+    }
   }
 
   private async pairCharts(o: string, d: string): Promise<HoverChart[]> {

@@ -169,6 +169,15 @@ export function trendSql(tbl: string, f: FlowFilter, stateZones: string[], opts:
   );
 }
 
+/** One location's total by year (mid-range scenario) for the current filters, for the map tooltip sparkline. */
+export function zoneTrendSql(tbl: string, f: FlowFilter, stateZones: string[], id: string): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT year::INTEGER AS year, sum(${m}) AS v FROM ${tbl} WHERE scenario = 'mid' AND ${whereClause(f, stateZones)}${involving(f, id)} ` +
+    `GROUP BY 1 HAVING sum(${m}) IS NOT NULL ORDER BY 1`
+  );
+}
+
 /** Mode share over years (the mode filter is ignored so the stack shows every mode). */
 export function modeTrendSql(tbl: string, f: FlowFilter, stateZones: string[]): string {
   const m = measureColumn(f.measure, f.dollars);

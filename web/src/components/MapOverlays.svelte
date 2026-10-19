@@ -98,11 +98,28 @@
 <div class={`float floatnote ${noteHtml.cls}`} role="note"><Icon name={noteHtml.icon} size={16} /><span><b style="color:var(--ink)">{noteHtml.strong}</b> {noteHtml.text}</span></div>
 
 {#if ctrl.hover}
-  <div class="tip" style={`left:${Math.min(ctrl.hover.x + 14, Math.max(0, ctrl.mapSize.w - 290))}px;top:${Math.min(ctrl.hover.y + 14, Math.max(0, ctrl.mapSize.h - (ctrl.hover.charts ? 270 : 120)))}px`} role="status">
+  <div class="tip" style={`left:${Math.min(ctrl.hover.x + 14, Math.max(0, ctrl.mapSize.w - 290))}px;top:${Math.min(ctrl.hover.y + 14, Math.max(0, ctrl.mapSize.h - (ctrl.hover.charts ? 380 : 120)))}px`} role="status">
     {#each ctrl.hover.lines as l, i}<div class={i === 0 ? 't' : i === ctrl.hover.lines.length - 1 && ctrl.hover.key ? 'hint' : 'r'}>{l}</div>{/each}
     {#if ctrl.hover.charts}
       {#each ctrl.hover.charts as ch}
-        {#if ch.rows.length}
+        {#if ch.series}
+          {@const ys = ch.series.map((d) => d.year)}
+          {@const lo = Math.min(...ys)}
+          {@const hi = Math.max(...ys)}
+          {@const vm = Math.max(...ch.series.map((d) => d.v), 1)}
+          {@const vn = Math.min(...ch.series.map((d) => d.v))}
+          {@const px = (y: number) => 4 + ((y - lo) / Math.max(1, hi - lo)) * 192}
+          {@const py = (v: number) => 30 - ((v - vn) / Math.max(vm - vn, vm * 0.02, 1e-9)) * 26}
+          {@const cur = ch.series.find((d) => d.year === ch.year)}
+          <div class="mini" aria-hidden="true">
+            <div class="mh">{ch.title}</div>
+            <svg class="spark" viewBox="0 0 200 36" width="100%" height="36" preserveAspectRatio="none">
+              <polyline points={ch.series.map((d) => `${px(d.year).toFixed(1)},${py(d.v).toFixed(1)}`).join(' ')} fill="none" stroke="var(--accent)" stroke-width="1.6" vector-effect="non-scaling-stroke" />
+              {#if cur}<circle cx={px(cur.year)} cy={py(cur.v)} r="3" fill="var(--accent)" stroke="var(--panel)" stroke-width="1.5" />{/if}
+            </svg>
+            <div class="mr sp"><span class="ml">{lo}</span>{#if cur}<span class="mv">{ch.year}: {formatShort(s.measure, cur.v * 1)}</span>{/if}<span class="ml">{hi}</span></div>
+          </div>
+        {:else if ch.rows.length}
           {@const mx = Math.max(...ch.rows.map((r) => r.v), 1)}
           <div class="mini" aria-hidden="true">
             <div class="mh">{ch.title}</div>
