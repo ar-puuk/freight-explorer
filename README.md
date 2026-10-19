@@ -4,13 +4,15 @@ A map-first, static, zero-cost explorer for the public **Freight Analysis Framew
 
 **Live site:** https://ar-puuk.github.io/freight-explorer/ · **Methodology and data:** [methodology page](https://ar-puuk.github.io/freight-explorer/methodology.html)
 
-![The map: origin-destination flow arcs, zone outlines, the FAF5 truck network and the headline numbers](docs/img/screenshot.jpg)
+![The workspace: a filter rail, the flow map with the headline numbers above it, a timeline under it and an insight drawer beside it](docs/img/screenshot.jpg)
 
 ## What it shows
 
 - **Origin-destination flows** (tons, value, ton-miles) for every record that touches the state, by commodity, mode and year, as a flow map: FAF5.7.1 (2017 to 2050) and FAF6.0 (2022), kept apart.
 - **Forecast scenarios:** the mid-range forecast and FAF5's published High and Low scenarios, with forecast and preliminary years marked and the missing 2025 to 2029 shown as a gap.
-- **Charts, a comparison mode, a table and CSV export** (every CSV row carries version, scenario, year, data status and dollar basis).
+- **A timeline** that shows which years exist (benchmark, final, preliminary, forecast) and hatches the unpublished 2025 to 2029, with Play, scrubbing and the High and Low scenarios beside the forecast years.
+- **Linked charts instead of tables:** direction, mode and commodity (treemap) for the current selection, the largest partner states split by commodity, trends with the scenario band, mode share and commodity-by-year heat map, a two-year comparison, a two-model comparison (FAF5 and FAF6 side by side, never one axis), and a table with CSV export (every CSV row carries version, scenario, year, data status and dollar basis). Clicking a mode, commodity, partner, flow, year or zone filters everything else.
+- **Search and jump** (Ctrl K) to any year, zone, commodity, mode or action, keyboard shortcuts (press `?`), and light, dark and color-blind-safe palettes.
 - **The FAF5 truck network** with modeled link volumes by year, truck type and market.
 - **FAF5-reprocessed state history** (1997, 2002, 2007, 2012) and **experimental county-level estimates** (2022), each in its own clearly labeled place.
 
@@ -29,10 +31,10 @@ config/sources.yml         source URLs, releases, which years are final/prelimin
 config/app.yml             UI defaults and the schematic foreign-region positions
 pipeline/faf_pipeline/     fetch, schema guard, flows, zones, network, county, dictionary, validate
 pipeline/tests/            pytest on tiny fixture files (a fictional state)
-web/src/                   the app (lib/ has the URL state, SQL builders, map and controller)
+web/src/                   the app (lib/ has the URL state, SQL builders, map and controller; components/ has the workspace)
 docs/                      GitHub Pages root: built app, methodology page, docs/data/
 data-raw/manifest.json     what was downloaded, from where, with hashes (the files themselves are not committed)
-HANDOFF.md                 the original plan; docs/SPIKES.md and docs/DECISIONS.md record what was found and decided
+HANDOFF.md                 the original plan; docs/SPIKES.md and docs/DECISIONS.md record what was found and decided; docs/DESIGN.md is the design system
 ```
 
 ## Quickstart
@@ -85,9 +87,9 @@ GitHub Pages from the `main` branch, `/docs` folder. There are no GitHub Actions
 
 ## Performance and accessibility
 
-- First paint needs about 1.1 MB of gzipped JavaScript, the zone shapes and a 60-flow headline file. On the live site (measured with headless Chromium) the first arcs appear in well under a second and the full query engine is ready in about two seconds. The 36 MB DuckDB-WASM binary (about 8 MB gzipped) starts loading after first paint. The chart code loads the first time the Charts panel opens, and the all-years data (about 11 MB for FAF5.7.1 including High/Low) loads once when you open Trends or Compare.
+- First paint needs about 1.1 MB of gzipped JavaScript, the bundled fonts (seven woff2 files, about 120 KB), the zone shapes and a 60-flow headline file. Measured locally with headless Chromium on software rendering, the first arcs appear in about half a second and the full query engine is ready in one to two seconds. The 36 MB DuckDB-WASM binary (about 8 MB gzipped) starts loading after first paint. The chart code loads the first time the insight drawer opens, and the all-years data (about 11 MB for FAF5.7.1 including High/Low) loads once when you open Trends, or Compare in its year and model modes. The sparkline under the timeline reads a small precomputed file (`year_totals.json`) instead.
 - GitHub Pages does not serve Parquet by byte range to DuckDB-WASM, so each file is fetched whole; the data is therefore partitioned into small per-year files.
-- Tested with axe-core (WCAG 2.0, 2.1 and 2.2 level A and AA, including target size) on every view in light and dark themes, on desktop and a 390 px phone layout, plus keyboard operation (skip links, a visible focus ring on every control, a zone picker as a keyboard alternative to clicking the map, Escape closes details), 320 px reflow and reduced motion. The map itself is a canvas: its largest flows are also listed as text, and every chart has a data table. This is not a substitute for testing with assistive technology.
+- Tested with axe-core (WCAG 2.0, 2.1 and 2.2 level A and AA, including target size) on every insight tab and dataset in light and dark themes at 1440 px and on the map, filter sheet and insight sheet at 390 px, plus keyboard operation (skip links, a visible focus ring on every control, roving focus in the timeline and tabs, a zone picker as a keyboard alternative to clicking the map, Escape clears a focus or closes a panel) and reduced motion. The map itself is a canvas: its largest flows are also listed as text, and every chart has an exact-values table. This is not a substitute for testing with assistive technology. The design rules are in [docs/DESIGN.md](docs/DESIGN.md).
 - If the basemap service is unreachable, flows, zones and the network still work on a plain background. A content-security policy restricts the page to its own files and OpenFreeMap.
 
 ## Known limitations
@@ -98,6 +100,7 @@ GitHub Pages from the `main` branch, `/docs` folder. There are no GitHub Actions
 - The county-level product is experimental and its import and export totals differ slightly from FAF5.7.1 for reasons not established here.
 - The FAF6 constant-dollar year (2022) is taken from the release notes and was not independently verified. Zone anchors are drawing aids, and the eight foreign regions have schematic positions.
 - Tested in Chromium (headless, software rendering). Firefox, Safari, a real GPU and real phones have not been tested.
+- The map draws the largest zone pairs (50 by default, up to 500); the headline numbers always include every flow. Partner bars cover the 14 largest partners.
 
 ## Contributing
 

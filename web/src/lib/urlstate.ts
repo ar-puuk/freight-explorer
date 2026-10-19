@@ -8,7 +8,8 @@ const TRUCKS: TruckType[] = ['all', 'su', 'cu'];
 const MARKETS: Market[] = ['total', 'domestic', 'import', 'export'];
 const THEMES: ThemePref[] = ['system', 'light', 'dark'];
 const BASEMAPS = ['liberty', 'bright', 'positron', 'dark', 'fiord'];
-const PANELS: Panel[] = ['closed', 'summary', 'trends', 'compare', 'history', 'table'];
+const PANELS: Panel[] = ['closed', 'summary', 'trends', 'partners', 'compare', 'history', 'table'];
+const COMPARE_MODES = ['series', 'years', 'models'] as const;
 const COMPARE_KINDS: CompareKind[] = ['zone', 'commodity'];
 export const TABLE_DIMS = ['orig', 'dest', 'sctg2', 'dms_mode', 'trade_type'];
 
@@ -63,6 +64,7 @@ export function decode(search: string, defaults: AppState, allowed: Allowed): Ap
     topN: Math.round(num(q.get('top'), defaults.topN, 5, 500)),
     minFlow: num(q.get('min'), defaults.minFlow, 0, 1e9),
     selected: /^\d{3}$/.test(q.get('sel') ?? '') ? q.get('sel') : null,
+    partner: /^(\d{2}|\d{3})$/.test(q.get('pt') ?? '') ? q.get('pt') : null,
     layers: layers == null ? defaults.layers : { flows: layers.includes('f'), network: layers.includes('n'), zones: layers.includes('z') },
     net: {
       year: allowed.netYears.includes(Number(q.get('ny'))) ? Number(q.get('ny')) : defaults.net.year,
@@ -81,6 +83,9 @@ export function decode(search: string, defaults: AppState, allowed: Allowed): Ap
     overlayOther: q.get('ov') === '1',
     historyOverlay: q.get('ho') === '1',
     tableDims: pickDims(q.get('td'), defaults.tableDims),
+    compareMode: pick(q.get('cm'), COMPARE_MODES, defaults.compareMode),
+    cmpA: Math.round(num(q.get('ca'), defaults.cmpA, 1990, 2100)),
+    cmpB: Math.round(num(q.get('cb'), defaults.cmpB, 1990, 2100)),
   };
 }
 
@@ -102,6 +107,7 @@ export function encode(s: AppState, d: AppState, defaultYear: (version: string) 
   set('top', s.topN, d.topN);
   set('min', s.minFlow, d.minFlow);
   set('sel', s.selected);
+  set('pt', s.partner);
   const lay = `${s.layers.flows ? 'f' : ''}${s.layers.network ? 'n' : ''}${s.layers.zones ? 'z' : ''}`;
   const dlay = `${d.layers.flows ? 'f' : ''}${d.layers.network ? 'n' : ''}${d.layers.zones ? 'z' : ''}`;
   if (lay !== dlay) q.set('l', lay);
@@ -120,6 +126,9 @@ export function encode(s: AppState, d: AppState, defaultYear: (version: string) 
   if (s.overlayOther) q.set('ov', '1');
   if (s.historyOverlay) q.set('ho', '1');
   if (s.tableDims.join() !== d.tableDims.join()) q.set('td', s.tableDims.join(','));
+  set('cm', s.compareMode, d.compareMode);
+  set('ca', s.cmpA, d.cmpA);
+  set('cb', s.cmpB, d.cmpB);
   const out = q.toString();
   return out ? `?${out}` : '';
 }

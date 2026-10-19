@@ -5,7 +5,7 @@ export type Dollars = 'const' | 'current';
 export type TruckType = 'all' | 'su' | 'cu';
 export type Market = 'total' | 'domestic' | 'import' | 'export';
 export type ThemePref = 'system' | 'light' | 'dark';
-export type Panel = 'closed' | 'summary' | 'trends' | 'compare' | 'history' | 'table';
+export type Panel = 'closed' | 'summary' | 'trends' | 'partners' | 'compare' | 'history' | 'table';
 export type CompareKind = 'zone' | 'commodity';
 
 export interface AppState {
@@ -21,6 +21,7 @@ export interface AppState {
   topN: number;
   minFlow: number; // in the raw unit of the measure
   selected: string | null; // zone id or foreign region id
+  partner: string | null; // state FIPS (domestic views) or foreign region id: keep only flows with this partner
   layers: { flows: boolean; network: boolean; zones: boolean };
   net: { year: number; truck: TruckType; market: Market; connectors: boolean };
   basemap: string | null; // null = follow theme default
@@ -31,6 +32,9 @@ export interface AppState {
   overlayOther: boolean; // trend chart: also draw the other FAF version (separate series, never connected)
   historyOverlay: boolean; // history tab: also draw the FAF5 annual estimates (a separate, labeled series)
   tableDims: string[]; // table view group-by columns
+  compareMode: 'series' | 'years' | 'models'; // compare tab: trends of chosen items, two years, or two models
+  cmpA: number; // compare tab (two years): first year
+  cmpB: number; // compare tab (two years): second year
 }
 
 export interface StateMeta {
@@ -91,8 +95,11 @@ export interface ZoneInfo {
   schematic?: boolean;
 }
 
+export type Dir = 'inbound' | 'outbound' | 'within';
+
 export interface FlowRow {
   origin: string;
   dest: string;
   count: number;
+  dir?: Dir; // direction relative to the state, for the arc color
 }

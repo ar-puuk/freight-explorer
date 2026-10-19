@@ -78,6 +78,14 @@ export interface Headline {
 
 export const loadHeadline = (product: string) => loadJson<Headline>(`${product}/headline_flows.json`);
 
+/** State totals by scenario and year (unfiltered), in the order tons_kt, value_const_musd, value_current_musd, tmiles_m. null = not published. */
+export interface YearTotals {
+  faf_version: string;
+  columns: string[];
+  totals: Record<string, Record<string, (number | null)[]>>;
+}
+export const loadYearTotals = (product: string) => loadJson<YearTotals>(`${product}/year_totals.json`);
+
 /** Zone anchors (domestic zones for one version) plus the schematic foreign-region anchors, keyed by id. */
 export async function loadLocations(meta: Meta, version: string, zones: ZoneGeoJSON): Promise<Map<string, ZoneInfo>> {
   if (meta.versions.products[productKey(meta, version)].kind === 'county') return loadCountyLocations();

@@ -23,6 +23,19 @@ def default_year(data_version: dict[str, Any], years: list[int]) -> int:
     return min(years)
 
 
+def year_totals(con, flows_dir, faf_version: str) -> dict[str, Any]:
+    """State totals of every published year and scenario, unfiltered: the sparkline under the timeline. NULL = not published (never 0)."""
+    totals: dict[str, dict[str, list[float | None]]] = {}
+    for sc_dir in sorted(p for p in flows_dir.iterdir() if p.is_dir()):
+        per_year: dict[str, list[float | None]] = {}
+        for f in sorted(sc_dir.glob("*.parquet")):
+            row = con.execute(
+                f"SELECT sum(tons_kt), sum(value_const_musd), sum(value_current_musd), sum(tmiles_m) FROM read_parquet({sql_literal(f.as_posix())})").fetchone()
+            per_year[f.stem] = [None if v is None else round(v, 3) for v in row]
+        totals[sc_dir.name] = per_year
+    return {"faf_version": faf_version, "columns": ["tons_kt", "value_const_musd", "value_current_musd", "tmiles_m"], "totals": totals}
+
+
 def build(ctx: Context, log=print) -> None:
     out = ctx.paths.out
     con = connect()
@@ -72,3 +85,5 @@ def build(ctx: Context, log=print) -> None:
             "flows": [[o, d, round(t, 3)] for o, d, t in rows],
         }, out / p / "headline_flows.json")
         log(f"  {p}: headline flows for {y} ({len(rows)} of {total_n})")
+        write_json(year_totals(con, out / p / "flows", spec["faf_version"]), out / p / "year_totals.json")
+        log(f"  {p}: year totals")

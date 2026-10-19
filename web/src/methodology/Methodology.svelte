@@ -48,7 +48,10 @@
 
 <a class="skip" href="#content">Skip to the text</a>
 <header class="top">
-  <h1>Methodology and data</h1>
+  <h1 class="brand">
+    <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect width="26" height="26" rx="7" fill="var(--ink)" /><path d="M5 19c4 0 7-4 8-10M21 19c-4 0-7-4-8-10M13 21V9" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round" /><circle cx="13" cy="8" r="2.4" fill="var(--bg)" /></svg>
+    <span>Methodology and data</span>
+  </h1>
   <span class="spacer"></span>
   <a class="btn" href="./">Back to the map</a>
 </header>
@@ -299,9 +302,11 @@
     outline: none;
   }
   h2 {
-    font-size: 18px;
-    margin: 28px 0 8px;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    margin: 32px 0 8px;
     padding-top: 4px;
+    scroll-margin-top: 16px;
   }
   section:first-child h2 {
     margin-top: 0;

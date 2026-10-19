@@ -8,6 +8,8 @@ export interface FlowFilter {
   modes: number[];
   measure: Measure;
   dollars: Dollars;
+  /** Keep only flows whose non-state end is this partner: a 2-digit state FIPS (domestic views) or a foreign region id (import and export). */
+  partner?: string | null;
 }
 
 export function measureColumn(measure: Measure, dollars: Dollars): string {
@@ -43,8 +45,9 @@ export function directionClause(direction: Direction, stateZones: string[]): str
   return `(dms_orig IN (${s}) AND dms_dest IN (${s}))`;
 }
 
-export function whereClause(f: FlowFilter, stateZones: string[], opts: { ignoreDirection?: boolean; ignoreModes?: boolean; ignoreCommodities?: boolean } = {}): string {
+export function whereClause(f: FlowFilter, stateZones: string[], opts: { ignoreDirection?: boolean; ignoreModes?: boolean; ignoreCommodities?: boolean; ignorePartner?: boolean } = {}): string {
   const parts: string[] = [];
+  if (f.partner && !opts.ignorePartner) parts.push(partnerClause(f.view, stateZones, f.partner));
   if (f.view === 'domestic') parts.push('trade_type = 1');
   if (f.view === 'import') parts.push('trade_type = 2');
   if (f.view === 'export') parts.push('trade_type = 3');
@@ -58,6 +61,26 @@ export function whereClause(f: FlowFilter, stateZones: string[], opts: { ignoreD
     parts.push(`dms_mode IN (${f.modes.join(', ')})`);
   }
   return parts.length ? parts.join(' AND ') : 'TRUE';
+}
+
+/** The non-state end of each flow, as one expression: a zone id, or a foreign region id in the import and export views. */
+function partnerEnd(view: View, stateZones: string[]): string {
+  const s = inList(stateZones, ZONE_RX);
+  if (view === 'import') return `CASE WHEN dms_dest IN (${s}) THEN fr_orig WHEN dms_orig IN (${s}) THEN dms_dest END`;
+  if (view === 'export') return `CASE WHEN dms_orig IN (${s}) THEN fr_dest WHEN dms_dest IN (${s}) THEN dms_orig END`;
+  return `CASE WHEN dms_dest IN (${s}) AND dms_orig NOT IN (${s}) THEN dms_orig WHEN dms_orig IN (${s}) AND dms_dest NOT IN (${s}) THEN dms_dest END`;
+}
+
+/** Partner as the charts group it: a state (first two digits of the zone id) in the domestic views, the region itself in import and export. */
+export function partnerKey(view: View, stateZones: string[]): string {
+  const e = partnerEnd(view, stateZones);
+  return view === 'import' || view === 'export' ? e : `substr(${e}, 1, 2)`;
+}
+
+/** Keep flows whose partner is `code` (a 2-digit state FIPS in the domestic views, a 3-digit foreign region id otherwise). */
+export function partnerClause(view: View, stateZones: string[], code: string): string {
+  if (!/^(\d{2}|\d{3})$/.test(code)) throw new Error('invalid partner code');
+  return `${partnerKey(view, stateZones)} = '${code}'`;
 }
 
 function involving(f: FlowFilter, id: string | null): string {
@@ -157,10 +180,7 @@ export function modeTrendSql(tbl: string, f: FlowFilter, stateZones: string[]): 
 
 /** The non-state end of each flow, by view. Within-state flows have no partner (NULL) and are excluded by the caller. */
 export function partnerExpr(view: View, stateZones: string[]): string {
-  const s = inList(stateZones, ZONE_RX);
-  if (view === 'import') return `CASE WHEN dms_dest IN (${s}) THEN fr_orig WHEN dms_orig IN (${s}) THEN dms_dest END`;
-  if (view === 'export') return `CASE WHEN dms_orig IN (${s}) THEN fr_dest WHEN dms_dest IN (${s}) THEN dms_orig END`;
-  return `CASE WHEN dms_dest IN (${s}) AND dms_orig NOT IN (${s}) THEN dms_orig WHEN dms_orig IN (${s}) AND dms_dest NOT IN (${s}) THEN dms_dest END`;
+  return partnerEnd(view, stateZones);
 }
 
 export function partnersSql(src: string, f: FlowFilter, stateZones: string[], limit = 10): string {
@@ -230,6 +250,10 @@ export function historyWhere(f: FlowFilter, fips: string): string {
     if (f.modes.some((m) => !Number.isInteger(m))) throw new Error('invalid mode code');
     parts.push(`dms_mode IN (${f.modes.join(', ')})`);
   }
+  if (f.partner) {
+    if (!/^(\d{2}|\d{3})$/.test(f.partner)) throw new Error('invalid partner code');
+    parts.push(`${historyPartnerExpr(f.view, fips)} = '${f.partner}'`);
+  }
   return parts.length ? parts.join(' AND ') : 'TRUE';
 }
 
@@ -270,5 +294,66 @@ export function historyCommoditiesSql(tbl: string, f: FlowFilter, fips: string, 
     `WITH p AS (SELECT year::INTEGER AS year, sctg2 AS code, ${m} AS v FROM ${tbl} WHERE ${where}), ` +
     `top AS (SELECT code FROM p GROUP BY 1 HAVING sum(v) > 0 ORDER BY sum(v) DESC, code LIMIT ${Math.floor(limit)}) ` +
     `SELECT year, code, sum(v) AS v FROM p WHERE code IN (SELECT code FROM top) GROUP BY 1, 2 ORDER BY 2, 1`
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Redesign: partner butterfly, direction and commodity over time, two-year comparison.
+
+/** The `limit` largest partners (a state, or a foreign region in import and export) split by direction and commodity. The partner filter itself is ignored so the chart can show the alternatives. */
+export function partnerBreakdownSql(src: string, f: FlowFilter, stateZones: string[], limit = 14): string {
+  const s = inList(stateZones, ZONE_RX);
+  const m = measureColumn(f.measure, f.dollars);
+  const where = whereClause(f, stateZones, { ignorePartner: true });
+  return (
+    `WITH p AS (SELECT ${partnerKey(f.view, stateZones)} AS k, CASE WHEN dms_dest IN (${s}) THEN 'inbound' ELSE 'outbound' END AS dir, sctg2 AS c, ${m} AS v ` +
+    `FROM ${src} WHERE ${where}), ` +
+    `t AS (SELECT k FROM p WHERE k IS NOT NULL GROUP BY 1 HAVING sum(v) > 0 ORDER BY sum(v) DESC, k LIMIT ${Math.floor(limit)}) ` +
+    `SELECT k AS partner, dir, c AS code, sum(v) AS v FROM p WHERE k IN (SELECT k FROM t) AND v IS NOT NULL GROUP BY 1, 2, 3 ORDER BY 1, 2, 3`
+  );
+}
+
+/** Inbound, outbound and within by year and scenario (the direction filter is ignored so the bars stack all three). */
+export function directionTrendSql(tbl: string, f: FlowFilter, stateZones: string[]): string {
+  const s = inList(stateZones, ZONE_RX);
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT scenario, year::INTEGER AS year, any_value(data_version) AS data_version, ` +
+    `CASE WHEN dms_orig IN (${s}) AND dms_dest IN (${s}) THEN 'within' WHEN dms_dest IN (${s}) THEN 'inbound' ELSE 'outbound' END AS dir, sum(${m}) AS v ` +
+    `FROM ${tbl} WHERE ${whereClause(f, stateZones, { ignoreDirection: true })} GROUP BY 1, 2, 4 HAVING sum(${m}) IS NOT NULL ORDER BY 1, 2, 4`
+  );
+}
+
+/** The strength of each zone's link with the state: the measure summed by the non-state end of each flow (for the map shading). */
+export function zoneTotalsSql(src: string, f: FlowFilter, stateZones: string[]): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT partner AS id, sum(magnitude) AS v FROM (SELECT ${partnerEnd(f.view, stateZones)} AS partner, ${m} AS magnitude FROM ${src} ` +
+    `WHERE ${whereClause(f, stateZones)}) WHERE partner IS NOT NULL GROUP BY 1 HAVING sum(magnitude) > 0`
+  );
+}
+
+/** Commodity by year (mid-range), ignoring the commodity filter. */
+export function commodityTrendSql(tbl: string, f: FlowFilter, stateZones: string[]): string {
+  const m = measureColumn(f.measure, f.dollars);
+  return (
+    `SELECT year::INTEGER AS year, sctg2 AS code, sum(${m}) AS v FROM ${tbl} WHERE scenario = 'mid' AND ${whereClause(f, stateZones, { ignoreCommodities: true })} ` +
+    `GROUP BY 1, 2 HAVING sum(${m}) > 0 ORDER BY 1, 2`
+  );
+}
+
+const SCENARIO_RX = /^[a-z]+$/;
+
+/** One dimension (commodity or mode) for two (year, scenario) pairs side by side, tagged 'a' and 'b'. Filters on the other dimensions apply. */
+export function compareYearsSql(
+  tbl: string, f: FlowFilter, stateZones: string[], column: 'sctg2' | 'dms_mode', a: { year: number; scenario: string }, b: { year: number; scenario: string },
+): string {
+  for (const x of [a, b]) if (!Number.isInteger(x.year) || !SCENARIO_RX.test(x.scenario)) throw new Error('invalid year or scenario');
+  const m = measureColumn(f.measure, f.dollars);
+  const opts = column === 'sctg2' ? { ignoreCommodities: true } : { ignoreModes: true };
+  return (
+    `SELECT CASE WHEN year = ${a.year} AND scenario = '${a.scenario}' THEN 'a' ELSE 'b' END AS side, ${column} AS code, sum(${m}) AS v FROM ${tbl} ` +
+    `WHERE ((year = ${a.year} AND scenario = '${a.scenario}') OR (year = ${b.year} AND scenario = '${b.scenario}')) AND ${whereClause(f, stateZones, opts)} ` +
+    `GROUP BY 1, 2 HAVING sum(${m}) IS NOT NULL ORDER BY 1, 2`
   );
 }

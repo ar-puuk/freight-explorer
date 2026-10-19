@@ -1,10 +1,12 @@
+import { ScatterplotLayer, TextLayer } from '@deck.gl/layers';
 import { MapboxOverlay } from '@deck.gl/mapbox';
 import { FlowmapLayer } from '@flowmap.gl/layers';
 import * as maplibregl from 'maplibre-gl';
 import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { Protocol } from 'pmtiles';
 import type { ZoneGeoJSON } from './data';
-import type { FlowRow, ZoneInfo } from './types';
+import { mix } from './palette';
+import type { Dir, FlowRow, ZoneInfo } from './types';
 
 export const BASEMAPS = ['positron', 'dark', 'liberty', 'bright', 'fiord'] as const;
 const STYLE_URL = (name: string) => `https://tiles.openfreemap.org/styles/${name}`;
@@ -12,10 +14,17 @@ const NET_SOURCE_LAYER = 'faf5_links';
 
 type Theme = 'light' | 'dark';
 
-const PALETTE = {
-  light: { stateFill: '#1b6a8a', otherFill: '#6b7280', stateLine: '#14536d', otherLine: '#8a8f98', noFlow: '#a3a8b0', ramp: ['#f6a35c', '#c2410c'] },
-  dark: { stateFill: '#4fb3d9', otherFill: '#9aa3af', stateLine: '#7cc7e6', otherLine: '#6b7280', noFlow: '#6b7280', ramp: ['#fdba74', '#ea580c'] },
-} as const;
+/** Colors come from the CSS design tokens, so the map follows the theme and the color-blind palette. Read after the theme is applied. */
+function tokens() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (n: string) => cs.getPropertyValue(n).trim();
+  return {
+    accent: v('--accent'), ink: v('--ink'), ink3: v('--ink-3'), line2: v('--line-2'), panel: v('--panel'), mapBg: v('--map-bg'), net: v('--net'),
+    dir: { inbound: v('--in'), outbound: v('--out'), within: v('--within') } as Record<Dir, string>,
+  };
+}
+
+
 
 export interface FlowmapPick {
   kind: 'location' | 'flow';
@@ -35,6 +44,8 @@ export interface MapCallbacks {
   onLinkHover: (props: Record<string, unknown> | null, x: number, y: number) => void;
   onLinkClick: (props: Record<string, unknown>) => void;
   onMoveEnd: (cam: [number, number, number]) => void;
+  onMove?: () => void;
+  onScale?: (samples: { magnitude: number; thickness: number }[]) => void;
 }
 
 let protocolAdded = false;
@@ -50,6 +61,9 @@ export class MapView {
   private netVmax = 1;
   private connectors = false;
   private theme: Theme = 'light';
+  private home: { center: [number, number]; zoom: number };
+  private shade = new Map<string, number>();
+  private shadeIds = new Set<string>();
   private locations: ZoneInfo[] = [];
   private flows: FlowRow[] = [];
   private flowsVisible = true;
@@ -68,8 +82,8 @@ export class MapView {
     this.cb = opts.callbacks;
     this.theme = opts.theme;
     this.styleName = opts.style;
+    this.home = { center: opts.center, zoom: opts.zoom };
     this.map = new maplibregl.Map({ container: el, style: STYLE_URL(opts.style), center: opts.center, zoom: opts.zoom, attributionControl: { compact: true } });
-    this.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
     this.overlay = new MapboxOverlay({ interleaved: false, layers: [] });
     this.map.addControl(this.overlay as unknown as maplibregl.IControl);
 
@@ -92,6 +106,8 @@ export class MapView {
       const c = this.map.getCenter();
       this.cb.onMoveEnd([c.lng, c.lat, this.map.getZoom()]);
     });
+    this.map.on('move', () => this.cb.onMove?.());
+    this.map.on('resize', () => this.cb.onMove?.());
     this.map.on('click', (e) => {
       if (this.overlay.pickObject({ x: e.point.x, y: e.point.y, radius: 6 })) return; // a flow or location was hit; its own handler runs
       const link = this.hasLayer('net-lines') && this.map.queryRenderedFeatures(e.point, { layers: ['net-lines'] })[0];
@@ -134,7 +150,7 @@ export class MapView {
   private useFallbackStyle(): void {
     this.fallbackActive = true;
     this.styleReady = false;
-    const bg = this.theme === 'dark' ? '#1b2027' : '#eceff1';
+    const bg = tokens().mapBg;
     this.map.setStyle({ version: 8, sources: {}, layers: [{ id: 'plain-background', type: 'background', paint: { 'background-color': bg } }] });
     this.cb.onBasemapFailed();
   }
@@ -147,25 +163,18 @@ export class MapView {
   private installLayers(): void {
     if (!this.map.getStyle()) return; // no style yet (or it failed): nothing to attach to; retried on the next style.load
     const before = this.beforeLabels();
-    const p = PALETTE[this.theme];
     if (this.zones && !this.map.getSource('zones')) {
-      this.map.addSource('zones', { type: 'geojson', data: this.zones as unknown as GeoJSON.FeatureCollection });
+      this.map.addSource('zones', { type: 'geojson', data: this.zones as unknown as GeoJSON.FeatureCollection, promoteId: 'zone_id' });
       this.map.addLayer(
-        {
-          id: 'zones-fill', type: 'fill', source: 'zones',
-          layout: { visibility: this.zonesVisible ? 'visible' : 'none' },
-          paint: { 'fill-color': ['case', ['get', 'is_state_zone'], p.stateFill, p.otherFill], 'fill-opacity': ['case', ['get', 'is_state_zone'], 0.16, 0.05] },
-        },
+        { id: 'zones-fill', type: 'fill', source: 'zones', layout: { visibility: this.zonesVisible ? 'visible' : 'none' }, paint: {} },
         before,
       );
       this.map.addLayer(
-        {
-          id: 'zones-line', type: 'line', source: 'zones',
-          layout: { visibility: this.zonesVisible ? 'visible' : 'none' },
-          paint: { 'line-color': ['case', ['get', 'is_state_zone'], p.stateLine, p.otherLine], 'line-width': ['case', ['get', 'is_state_zone'], 1.6, 0.6], 'line-opacity': 0.8 },
-        },
+        { id: 'zones-line', type: 'line', source: 'zones', layout: { visibility: this.zonesVisible ? 'visible' : 'none' }, paint: {} },
         before,
       );
+      this.styleZones();
+      this.applyShade();
     }
     if (this.netUrl && !this.map.getSource('net')) {
       this.map.addSource('net', { type: 'vector', url: `pmtiles://${this.netUrl}`, promoteId: 'id' });
@@ -176,15 +185,56 @@ export class MapView {
     this.pushOverlay();
   }
 
+  /** State zones in the accent; the zones that trade with the state are tinted by the strength of the link (feature-state `s`, 0 to 1). */
+  private styleZones(): void {
+    if (!this.hasLayer('zones-fill')) return;
+    const t = tokens();
+    const s: unknown[] = ['coalesce', ['feature-state', 's'], 0];
+    this.map.setPaintProperty('zones-fill', 'fill-color', ['case', ['get', 'is_state_zone'], t.accent, t.accent] as never);
+    this.map.setPaintProperty('zones-fill', 'fill-opacity', ['case', ['get', 'is_state_zone'], 0.1, ['+', 0.015, ['*', 0.2, s]]] as never);
+    this.map.setPaintProperty('zones-line', 'line-color', ['case', ['get', 'is_state_zone'], t.accent, t.ink3] as never);
+    this.map.setPaintProperty('zones-line', 'line-width', ['case', ['get', 'is_state_zone'], 1.5, 0.5] as never);
+    this.map.setPaintProperty('zones-line', 'line-opacity', ['case', ['get', 'is_state_zone'], 0.9, 0.45] as never);
+  }
+
+  /** Strength of each zone's link with the state, as shares of the largest (0 to 1). Cleared and re-applied on every query. */
+  setZoneShading(values: Map<string, number>): void {
+    this.shade = values;
+    this.applyShade();
+  }
+
+  private applyShade(): void {
+    if (!this.styleReady || !this.map.getSource('zones')) return;
+    for (const id of this.shadeIds) this.map.removeFeatureState({ source: 'zones', id });
+    this.shadeIds = new Set(this.shade.keys());
+    for (const [id, s] of this.shade) this.map.setFeatureState({ source: 'zones', id }, { s });
+  }
+
   setTheme(theme: Theme): void {
     this.theme = theme;
-    const p = PALETTE[theme];
-    if (this.hasLayer('zones-fill')) {
-      this.map.setPaintProperty('zones-fill', 'fill-color', ['case', ['get', 'is_state_zone'], p.stateFill, p.otherFill]);
-      this.map.setPaintProperty('zones-line', 'line-color', ['case', ['get', 'is_state_zone'], p.stateLine, p.otherLine]);
-    }
+    this.styleZones();
     this.stylNet();
     this.pushOverlay();
+  }
+
+  // ---- camera helpers for the custom map controls
+  zoomBy(d: number): void {
+    this.map.easeTo({ zoom: this.map.getZoom() + d, duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250 });
+  }
+
+  goHome(): void {
+    this.map.flyTo({ center: this.home.center, zoom: this.home.zoom, duration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600 });
+  }
+
+  /** Screen position of a lon/lat inside the map element, and the element size (for edge labels). */
+  project(lon: number, lat: number): { x: number; y: number } {
+    const p = this.map.project([lon, lat]);
+    return { x: p.x, y: p.y };
+  }
+
+  get size(): { w: number; h: number } {
+    const c = this.map.getContainer();
+    return { w: c.clientWidth, h: c.clientHeight };
   }
 
   setBasemap(name: string): void {
@@ -224,6 +274,8 @@ export class MapView {
 
   private flowLayers() {
     if (!this.flowsVisible || !this.flows.length) return [];
+    const t = tokens();
+    const dark = this.theme === 'dark';
     const pick = (info: unknown): FlowmapPick | null => {
       const i = info as { object?: Record<string, any>; x: number; y: number } | undefined;
       const o = i?.object;
@@ -232,31 +284,84 @@ export class MapView {
       if (o.type === 'flow') return { kind: 'flow', originId: String(o.origin.id ?? o.origin.zone_id), destId: String(o.dest.id ?? o.dest.zone_id), count: o.count, x: i!.x, y: i!.y };
       return null;
     };
+    // One layer per direction so inbound, outbound and within carry their own hue. A shared scale lock keeps arc widths comparable
+    // across the three layers, and a fourth layer draws the zone circles (location totals) from every flow without drawing arcs.
+    // zone-to-itself flows are drawn as the zone circle, not as an arc, so they must not set the arc width scale
+    const max = Math.max(1, ...this.flows.filter((f) => f.origin !== f.dest).map((f) => f.count));
+    const base = {
+      pickable: true,
+      opacity: 0.95,
+      darkMode: dark,
+      clusteringEnabled: false,
+      fadeAmount: 12,
+      adaptiveScalesEnabled: false,
+      scaleLock: { enabled: true, domains: { flowMagnitude: [0, max] as [number, number], locationTotals: [0, max * 1.6] as [number, number] } },
+      maxTopFlowsDisplayNum: 500,
+      getLocationId: (l: ZoneInfo) => l.id,
+      getLocationName: (l: ZoneInfo) => l.name,
+      getLocationLat: (l: ZoneInfo) => l.lat,
+      getLocationLon: (l: ZoneInfo) => l.lon,
+      getFlowOriginId: (f: FlowRow) => f.origin,
+      getFlowDestId: (f: FlowRow) => f.dest,
+      getFlowMagnitude: (f: FlowRow) => f.count,
+      onHover: (info: unknown) => this.cb.onFlowHover(pick(info)),
+      onClick: (info: unknown) => {
+        const p = pick(info);
+        if (p) this.cb.onFlowClick(p);
+      },
+    };
+    const ramp = (c: string): string[] => [mix(c, dark ? '#10161d' : '#ffffff', dark ? 0.55 : 0.6), c];
+    let reported = false;
+    const layers = (['within', 'outbound', 'inbound'] as Dir[]).flatMap((d) => {
+      const flows = this.flows.filter((f) => (f.dir ?? 'inbound') === d);
+      if (!flows.length) return [];
+      // the three layers share one locked scale, so one of them reports the width legend
+      const report = reported
+        ? undefined
+        : (st: { flowThickness?: { samples: { magnitude: number; thickness: number }[] } } | undefined) => this.cb.onScale?.((st?.flowThickness?.samples ?? []).map((x) => ({ magnitude: x.magnitude, thickness: x.thickness })));
+      reported = true;
+      return [new FlowmapLayer({ ...base, id: `flowmap-${d}`, data: { locations: this.locations, flows }, colorScheme: ramp(t.dir[d]), locationsEnabled: false, locationTotalsEnabled: false, onScaleChange: report } as never)];
+    });
+    return [...layers, ...this.nodeLayers(t, pick)];
+  }
+
+  /** Zone circles sized by the flow that touches them (state zones in the accent), with names for the largest and the state's own zones. */
+  private nodeLayers(t: ReturnType<typeof tokens>, pick: (info: unknown) => FlowmapPick | null) {
+    const total = new Map<string, number>();
+    for (const f of this.flows) {
+      total.set(f.origin, (total.get(f.origin) ?? 0) + f.count);
+      if (f.dest !== f.origin) total.set(f.dest, (total.get(f.dest) ?? 0) + f.count);
+    }
+    const byId = new Map(this.locations.map((l) => [l.id, l]));
+    const max = Math.max(1, ...total.values());
+    const nodes = [...total.entries()].flatMap(([id, v]) => {
+      const l = byId.get(id);
+      return l ? [{ id, name: l.name, lon: l.lon, lat: l.lat, v, r: 5 + 13 * Math.sqrt(v / max), state: l.is_state_zone }] : [];
+    });
+    const rgba = (hex: string, a: number): [number, number, number, number] => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16), Math.round(a * 255)];
+    const labeled = nodes.filter((n) => n.state).concat([...nodes].filter((n) => !n.state).sort((a, b) => b.v - a.v).slice(0, 7));
     return [
-      new FlowmapLayer({
-        id: 'flowmap',
-        data: { locations: this.locations, flows: this.flows },
-        pickable: true,
-        opacity: 0.95,
-        darkMode: this.theme === 'dark',
-        colorScheme: 'Teal',
-        clusteringEnabled: false,
-        fadeAmount: 12,
-        adaptiveScalesEnabled: true,
-        locationTotalsEnabled: true,
-        maxTopFlowsDisplayNum: 500,
-        getLocationId: (l: ZoneInfo) => l.id,
-        getLocationName: (l: ZoneInfo) => l.name,
-        getLocationLat: (l: ZoneInfo) => l.lat,
-        getLocationLon: (l: ZoneInfo) => l.lon,
-        getFlowOriginId: (f: FlowRow) => f.origin,
-        getFlowDestId: (f: FlowRow) => f.dest,
-        getFlowMagnitude: (f: FlowRow) => f.count,
-        onHover: (info: unknown) => this.cb.onFlowHover(pick(info)),
-        onClick: (info: unknown) => {
-          const p = pick(info);
-          if (p) this.cb.onFlowClick(p);
+      new ScatterplotLayer({
+        id: 'nodes', data: nodes, pickable: true, radiusUnits: 'pixels', lineWidthUnits: 'pixels', stroked: true, filled: true,
+        getPosition: (n: { lon: number; lat: number }) => [n.lon, n.lat],
+        getRadius: (n: { r: number }) => n.r,
+        getFillColor: (n: { state: boolean }) => (n.state ? rgba(t.accent, 0.2) : rgba(t.panel, 0.92)),
+        getLineColor: (n: { state: boolean }) => rgba(n.state ? t.accent : t.ink3, 1),
+        getLineWidth: 1.8,
+        onHover: (info: unknown) => {
+          const o = (info as { object?: { id: string }; x: number; y: number }).object;
+          this.cb.onFlowHover(o ? { kind: 'location', id: o.id, x: (info as { x: number }).x, y: (info as { y: number }).y } : null);
         },
+        onClick: (info: unknown) => {
+          const o = (info as { object?: { id: string } }).object;
+          if (o) this.cb.onFlowClick({ kind: 'location', id: o.id, x: 0, y: 0 });
+        },
+      } as never),
+      new TextLayer({
+        id: 'node-labels', data: labeled, pickable: false, getPosition: (n: { lon: number; lat: number }) => [n.lon, n.lat], getText: (n: { name: string }) => n.name,
+        getSize: 12, getColor: rgba(t.ink, 1), getTextAnchor: 'start', getAlignmentBaseline: 'center',
+        getPixelOffset: (n: { r: number }) => [n.r + 6, 0], fontFamily: '"Instrument Sans", system-ui, sans-serif', fontWeight: 600,
+        outlineWidth: 3, outlineColor: rgba(t.mapBg, 0.95), fontSettings: { sdf: true },
       } as never),
     ];
   }
@@ -290,12 +395,13 @@ export class MapView {
 
   private stylNet(): void {
     if (!this.hasLayer('net-lines')) return;
-    const p = PALETTE[this.theme];
+    const t = tokens();
+    const ramp = [mix(t.net, t.mapBg, 0.7), t.net];
     const v: unknown[] = ['coalesce', ['feature-state', 'v'], 0];
     const root = ['sqrt', v];
     const w = (scale: number) => ['interpolate', ['linear'], root, 0, 0.5 * scale, Math.sqrt(this.netVmax), 5 * scale];
     this.map.setPaintProperty('net-lines', 'line-width', ['interpolate', ['exponential', 1.6], ['zoom'], 4, w(0.45), 12, w(2.4)] as never);
-    this.map.setPaintProperty('net-lines', 'line-color', ['case', ['>', v, 0], ['interpolate', ['linear'], root, 0, p.ramp[0], Math.sqrt(this.netVmax), p.ramp[1]], p.noFlow] as never);
+    this.map.setPaintProperty('net-lines', 'line-color', ['case', ['>', v, 0], ['interpolate', ['linear'], root, 0, ramp[0], Math.sqrt(this.netVmax), ramp[1]], t.line2] as never);
     this.map.setPaintProperty('net-lines', 'line-opacity', ['case', ['>', v, 0], 0.9, 0.55] as never);
     // centroid connectors (road class 50) are model access links, not roads; hidden unless asked for
     this.map.setFilter('net-lines', this.connectors ? null : ['!=', ['get', 'cls'], 50]);

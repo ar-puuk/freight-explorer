@@ -81,7 +81,7 @@ describe('scenario url state', () => {
   const defaults: AppState = {
     version: '5.7.1', scenario: 'mid', year: 2023, view: 'total', direction: 'both', measure: 'tons', dollars: 'const', commodities: [], modes: [],
     topN: 50, minFlow: 0, selected: null, layers: { flows: true, network: false, zones: true }, net: { year: 2017, truck: 'all', market: 'total', connectors: false },
-    basemap: null, theme: 'system', cam: null, panel: 'closed', compare: { kind: 'zone', ids: [] }, overlayOther: false, historyOverlay: false, tableDims: ['orig', 'dest', 'sctg2'],
+    basemap: null, theme: 'system', cam: null, panel: 'closed', compare: { kind: 'zone', ids: [] }, overlayOther: false, historyOverlay: false, tableDims: ['orig', 'dest', 'sctg2'], partner: null, compareMode: 'series', cmpA: 2017, cmpB: 2023,
   };
   const allowed: Allowed = {
     versions: ['5.7.1', '6.0'],
